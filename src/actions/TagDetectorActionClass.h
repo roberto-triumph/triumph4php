@@ -38,55 +38,55 @@ namespace t4p {
  * OutputDbFileName.
  */
 class TagDetectorParamsClass {
-	public:
-	/**
-	 * location to the php executable (php.exe / php)
-	 * this is usually retrieved from t4p::EnvironmentClass
-	 */
-	wxString PhpExecutablePath;
+ public:
+    /**
+     * location to the php executable (php.exe / php)
+     * this is usually retrieved from t4p::EnvironmentClass
+     */
+    wxString PhpExecutablePath;
 
-	/**
-	 * the base location of the php detector scripts. this is used as the
-	 * include path so that both local detectors and global detectors
-	 * can access the php detector sources (since local detectors and global
-	 * detectors are located in separate directories, we need to use
-	 * include_path)
-	 */
-	wxFileName PhpIncludePath;
+    /**
+     * the base location of the php detector scripts. this is used as the
+     * include path so that both local detectors and global detectors
+     * can access the php detector sources (since local detectors and global
+     * detectors are located in separate directories, we need to use
+     * include_path)
+     */
+    wxFileName PhpIncludePath;
 
-	/**
-	 * The actual PHP script to run.
-	 */
-	wxFileName ScriptName;
+    /**
+     * The actual PHP script to run.
+     */
+    wxFileName ScriptName;
 
-	/**
-	 * Argument to the tag detector script; the base directory of the project to scan
-	 */
-	wxFileName SourceDir;
+    /**
+     * Argument to the tag detector script; the base directory of the project to scan
+     */
+    wxFileName SourceDir;
 
-	/**
-	 * Argument to the tag detector script; the location of the resource cache SQLite db.
-	 * this db is created when the project is indexed and can be accessed via the
-	 * GlobalsClass::Projects list
-	 */
-	wxFileName ResourceDbFileName;
+    /**
+     * Argument to the tag detector script; the location of the resource cache SQLite db.
+     * this db is created when the project is indexed and can be accessed via the
+     * GlobalsClass::Projects list
+     */
+    wxFileName ResourceDbFileName;
 
-	/**
-	 * Argument to the tag detector script; the location of th detectors cache SQLite db.
-	 * this db is created when the project is indexed and can be accessed via the
-	 * GlobalsClass::Projects list. This argument is optional; it can be empty in which
-	 * case the script outputs to STDOUT; leaving this argument empty is useful
-	 * for testing url detectors; so that the results are visible in the console wthout
-	 * needing to query the SQLite db.
-	 */
-	wxString OutputDbFileName;
+    /**
+     * Argument to the tag detector script; the location of th detectors cache SQLite db.
+     * this db is created when the project is indexed and can be accessed via the
+     * GlobalsClass::Projects list. This argument is optional; it can be empty in which
+     * case the script outputs to STDOUT; leaving this argument empty is useful
+     * for testing url detectors; so that the results are visible in the console wthout
+     * needing to query the SQLite db.
+     */
+    wxString OutputDbFileName;
 
-	TagDetectorParamsClass();
+    TagDetectorParamsClass();
 
-	/**
-	 * build the command line to be executed for each url detector
-	 */
-	wxString BuildCmdLine() const;
+    /**
+     * build the command line to be executed for each url detector
+     */
+    wxString BuildCmdLine() const;
 };
 
 /**
@@ -94,50 +94,50 @@ class TagDetectorParamsClass {
  * one external process execution for each project source directory / tag detector combination
  */
 class TagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
-	public:
-	TagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    TagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * @return bool false if php is not installed in the system
-	 */
-	bool Init(t4p::GlobalsClass& globals);
+    /**
+     * @return bool false if php is not installed in the system
+     */
+    bool Init(t4p::GlobalsClass& globals);
 
-	bool DoAsync();
+    bool DoAsync();
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	void BackgroundWork();
+    void BackgroundWork();
 
-	private:
-	/**
-	 * used to run the external tag detector PHP script
-	 */
-	t4p::ProcessWithHeartbeatClass Process;
+ private:
+    /**
+     * used to run the external tag detector PHP script
+     */
+    t4p::ProcessWithHeartbeatClass Process;
 
-	/**
-	 * we will perform one external call for each item in this
-	 * queue
-	 */
-	std::queue<t4p::TagDetectorParamsClass> ParamsQueue;
+    /**
+     * we will perform one external call for each item in this
+     * queue
+     */
+    std::queue<t4p::TagDetectorParamsClass> ParamsQueue;
 
-	/**
-	 * pop the next set of params from the queue and call the php tag
-	 * detector.
-	 * @return bool TRUE if the detection was started succesfully
-	 */
-	bool NextDetection();
+    /**
+     * pop the next set of params from the queue and call the php tag
+     * detector.
+     * @return bool TRUE if the detection was started succesfully
+     */
+    bool NextDetection();
 
-	/**
-	 * @return all of the PHP tag detector scripts. These can be either ones
-	 * provided by default or ones created by the user.
-	 */
-	std::vector<wxString> DetectorScripts();
+    /**
+     * @return all of the PHP tag detector scripts. These can be either ones
+     * provided by default or ones created by the user.
+     */
+    std::vector<wxString> DetectorScripts();
 
-	void OnProcessComplete(wxCommandEvent& event);
+    void OnProcessComplete(wxCommandEvent& event);
 
-	void OnProcessFailed(wxCommandEvent& event);
+    void OnProcessFailed(wxCommandEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

@@ -28,13 +28,13 @@
 #include <wx/bmpbuttn.h>
 
 namespace t4p {
-	/**
-	 * function to fix inconsistencies with the help among the
-	 * various operating systems
-	 *
-	 * @param button button to put the help icon on
-	 */
-	void HelpButtonIcon(wxBitmapButton* button);
+/**
+ * function to fix inconsistencies with the help among the
+ * various operating systems
+ *
+ * @param button button to put the help icon on
+ */
+void HelpButtonIcon(wxBitmapButton* button);
 }  // namespace t4p
 
 #endif  // SRC_WIDGETS_BUTTONS_H_

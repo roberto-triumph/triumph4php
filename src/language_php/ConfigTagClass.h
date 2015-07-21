@@ -40,31 +40,31 @@ namespace t4p {
  * files.
  */
 class ConfigTagClass {
-	public:
-	/**
-	 * The label that will be showns as the menu item.
-	 * Note that this should not be used to populate the label as
-	 * it may contain ampersands. Use the MenuLabel method instead
-	 */
-	wxString Label;
+ public:
+    /**
+     * The label that will be showns as the menu item.
+     * Note that this should not be used to populate the label as
+     * it may contain ampersands. Use the MenuLabel method instead
+     */
+    wxString Label;
 
-	/**
-	 * The file that will be opened when the menu item is activated
-	 */
-	wxFileName ConfigFileName;
+    /**
+     * The file that will be opened when the menu item is activated
+     */
+    wxFileName ConfigFileName;
 
-	ConfigTagClass();
+    ConfigTagClass();
 
-	ConfigTagClass(const t4p::ConfigTagClass& src);
+    ConfigTagClass(const t4p::ConfigTagClass& src);
 
-	void Copy(const t4p::ConfigTagClass& src);
+    void Copy(const t4p::ConfigTagClass& src);
 
-	t4p::ConfigTagClass& operator=(const t4p::ConfigTagClass& src);
+    t4p::ConfigTagClass& operator=(const t4p::ConfigTagClass& src);
 
-	/**
-	 * @return wxString menu item label with any ampersands already escaped.
-	 */
-	wxString MenuLabel() const;
+    /**
+     * @return wxString menu item label with any ampersands already escaped.
+     */
+    wxString MenuLabel() const;
 };
 
 /**
@@ -73,13 +73,13 @@ class ConfigTagClass {
  * into the db and this class will SELECT from the db.
  */
 class ConfigTagFinderClass : public t4p::SqliteFinderClass {
-	public:
-	ConfigTagFinderClass(soci::session& session);
+ public:
+    ConfigTagFinderClass(soci::session& session);
 
-	/**
-	 * @return all of the configs tags in all attached sqlite dbs
-	 */
-	std::vector<t4p::ConfigTagClass> All(const std::vector<wxFileName>& sourceDirectories);
+    /**
+     * @return all of the configs tags in all attached sqlite dbs
+     */
+    std::vector<t4p::ConfigTagClass> All(const std::vector<wxFileName>& sourceDirectories);
 };
 }  // namespace t4p
 

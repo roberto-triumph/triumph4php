@@ -91,7 +91,7 @@ extern const wxString KEYWORDS_JAVASCRIPT;
  * @return bool TRUE if at least 1 keyword matched
  */
 bool KeywordsTokenizeMatch(const wxString& keywords, const wxString& prefixMatch,
-	std::vector<wxString>& results);
+                           std::vector<wxString>& results);
 
 /**
  * @return string list of keywords, including 5.4 keywords but only

@@ -29,44 +29,42 @@
 #include "Triumph.h"
 
 t4p::TotalSearchFeatureClass::TotalSearchFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app) {
+    : FeatureClass(app) {
 }
 
 
 void t4p::TotalSearchFeatureClass::OpenFileTag(const t4p::FileTagClass& fileTag, int lineNumber) {
-	t4p::OpenFileCommandEventClass cmd(fileTag.FullPath, -1, -1, lineNumber);
-	App.EventSink.Post(cmd);
+    t4p::OpenFileCommandEventClass cmd(fileTag.FullPath, -1, -1, lineNumber);
+    App.EventSink.Post(cmd);
 }
 
 void t4p::TotalSearchFeatureClass::OpenPhpTag(const t4p::PhpTagClass& tag) {
-	UnicodeString content;
-	bool hasSignature = false;
-	wxString charset;
-	t4p::FindInFilesClass::FileContents(tag.FullPath, content, charset, hasSignature);
-	int32_t position,
-			length;
-	bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, content, position, length);
+    UnicodeString content;
+    bool hasSignature = false;
+    wxString charset;
+    t4p::FindInFilesClass::FileContents(tag.FullPath, content, charset, hasSignature);
+    int32_t position,
+            length;
+    bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, content, position, length);
 
-	if (found) {
-		t4p::OpenFileCommandEventClass cmd(tag.FullPath, position, length);
-		App.EventSink.Publish(cmd);
-	} else {
-		t4p::OpenFileCommandEventClass cmd(tag.FullPath);
-		App.EventSink.Publish(cmd);
-	}
+    if (found) {
+        t4p::OpenFileCommandEventClass cmd(tag.FullPath, position, length);
+        App.EventSink.Publish(cmd);
+    } else {
+        t4p::OpenFileCommandEventClass cmd(tag.FullPath);
+        App.EventSink.Publish(cmd);
+    }
 }
 
 void t4p::TotalSearchFeatureClass::OpenDbTable(const t4p::DatabaseTableTagClass& tableTag) {
-	t4p::OpenDbTableCommandEventClass cmd(
-		t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, tableTag.TableName, tableTag.ConnectionHash
-	);
-	App.EventSink.Publish(cmd);
+    t4p::OpenDbTableCommandEventClass cmd(
+        t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, tableTag.TableName, tableTag.ConnectionHash);
+    App.EventSink.Publish(cmd);
 }
 
 void t4p::TotalSearchFeatureClass::OpenDbData(const t4p::DatabaseTableTagClass& tableTag) {
-	t4p::OpenDbTableCommandEventClass cmd(
-		t4p::EVENT_CMD_DB_TABLE_DATA_OPEN, tableTag.TableName, tableTag.ConnectionHash
-	);
-	App.EventSink.Publish(cmd);
+    t4p::OpenDbTableCommandEventClass cmd(
+        t4p::EVENT_CMD_DB_TABLE_DATA_OPEN, tableTag.TableName, tableTag.ConnectionHash);
+    App.EventSink.Publish(cmd);
 }
 

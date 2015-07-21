@@ -25,43 +25,43 @@
 #include "widgets/SearchControlValidatorClass.h"
 
 SearchControlValidatorClass::SearchControlValidatorClass(wxString* data)
-	: wxValidator()
-	, Data(data) {
+    : wxValidator()
+    , Data(data) {
 }
 
 SearchControlValidatorClass::SearchControlValidatorClass()
-	: wxValidator()
-	, Data(NULL) {
+    : wxValidator()
+    , Data(NULL) {
 }
 
 wxObject* SearchControlValidatorClass::Clone() const {
-	SearchControlValidatorClass* other = new SearchControlValidatorClass();
-	other->Data = Data;
-	return other;
+    SearchControlValidatorClass* other = new SearchControlValidatorClass();
+    other->Data = Data;
+    return other;
 }
 
 bool SearchControlValidatorClass::TransferFromWindow() {
-	bool ret = false;
-	wxSearchCtrl* window = wxDynamicCast(GetWindow(), wxSearchCtrl);
-	if (window) {
-		wxString val = window->GetValue();
-		*Data = val;
-		ret = true;
-	}
-	return ret;
+    bool ret = false;
+    wxSearchCtrl* window = wxDynamicCast(GetWindow(), wxSearchCtrl);
+    if (window) {
+        wxString val = window->GetValue();
+        *Data = val;
+        ret = true;
+    }
+    return ret;
 }
 
 bool SearchControlValidatorClass::TransferToWindow() {
-	bool ret = false;
-	wxSearchCtrl* window = wxDynamicCast(GetWindow(), wxSearchCtrl);
-	if (window) {
-		wxString val = *Data;
-		window->SetValue(val);
-		ret = true;
-	}
-	return ret;
+    bool ret = false;
+    wxSearchCtrl* window = wxDynamicCast(GetWindow(), wxSearchCtrl);
+    if (window) {
+        wxString val = *Data;
+        window->SetValue(val);
+        ret = true;
+    }
+    return ret;
 }
 
 bool SearchControlValidatorClass::Validate(wxWindow* parent) {
-	return true;
+    return true;
 }

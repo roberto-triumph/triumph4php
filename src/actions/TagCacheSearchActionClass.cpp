@@ -30,74 +30,74 @@
 #include "language_php/TagFinderList.h"
 
 t4p::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,
-																	const UnicodeString& searchString,
-																	const std::vector<t4p::PhpTagClass>& tags)
-	: wxEvent(eventId, t4p::EVENT_TAG_CACHE_SEARCH_COMPLETE)
-	, SearchString(searchString)
-	, Tags(tags) {
+        const UnicodeString& searchString,
+        const std::vector<t4p::PhpTagClass>& tags)
+    : wxEvent(eventId, t4p::EVENT_TAG_CACHE_SEARCH_COMPLETE)
+    , SearchString(searchString)
+    , Tags(tags) {
 }
 
 wxEvent* t4p::TagCacheSearchCompleteEventClass::Clone() const {
-	return new t4p::TagCacheSearchCompleteEventClass(GetId(), SearchString, Tags);
+    return new t4p::TagCacheSearchCompleteEventClass(GetId(), SearchString, Tags);
 }
 
 t4p::TagCacheSearchActionClass::TagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads,
-																int eventId)
-	: ActionClass(runningThreads, eventId)
-	, TagCache()
-	, SearchString()
-	, SearchDirs() {
+        int eventId)
+    : ActionClass(runningThreads, eventId)
+    , TagCache()
+    , SearchString()
+    , SearchDirs() {
 }
 
 void t4p::TagCacheSearchActionClass::SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs) {
-	// deep copy the string, wxString not thread safe
-	SearchString = t4p::WxToIcu(search);
-	SearchDirs = t4p::DeepCopyFileNames(dirs);
+    // deep copy the string, wxString not thread safe
+    SearchString = t4p::WxToIcu(search);
+    SearchDirs = t4p::DeepCopyFileNames(dirs);
 
-	t4p::TagFinderListClass* cache = new t4p::TagFinderListClass;
+    t4p::TagFinderListClass* cache = new t4p::TagFinderListClass;
 
-	// only need to initialize the global tag cache, will not show native tags
-	// because there is no file that needs to be opened
-	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(),
-		globals.FileTypes.GetMiscFileExtensions(),
-		globals.Environment.Php.Version);
-	TagCache.RegisterGlobal(cache);
+    // only need to initialize the global tag cache, will not show native tags
+    // because there is no file that needs to be opened
+    cache->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(),
+                         globals.FileTypes.GetMiscFileExtensions(),
+                         globals.Environment.Php.Version);
+    TagCache.RegisterGlobal(cache);
 }
 
 void t4p::TagCacheSearchActionClass::BackgroundWork() {
-	bool exactOnly = SearchString.length() <= 2;
-	if (IsCancelled()) {
-		return;
-	}
-	std::vector<t4p::PhpTagClass> matches;
+    bool exactOnly = SearchString.length() <= 2;
+    if (IsCancelled()) {
+        return;
+    }
+    std::vector<t4p::PhpTagClass> matches;
 
-	// do exact match first, if that succeeds then don't bother doing near matches
-	t4p::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
-	matches = results->Matches();
-	if (matches.empty() && !exactOnly) {
-		delete results;
-		results = TagCache.NearMatchTags(SearchString, SearchDirs);
-		matches = results->Matches();
-		if (matches.empty()) {
-			t4p::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
-			matches = fileTagResults->MatchesAsTags();
-			if (matches.empty()) {
-				delete fileTagResults;
-				fileTagResults = TagCache.NearMatchFileTags(SearchString, SearchDirs);
-				matches = fileTagResults->MatchesAsTags();
-			}
-			delete fileTagResults;
-		}
-	}
-	delete results;
-	if (!IsCancelled()) {
-		// PostEvent will set the correct event ID
-		t4p::TagCacheSearchCompleteEventClass evt(wxID_ANY, SearchString, matches);
-		PostEvent(evt);
-	}
+    // do exact match first, if that succeeds then don't bother doing near matches
+    t4p::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
+    matches = results->Matches();
+    if (matches.empty() && !exactOnly) {
+        delete results;
+        results = TagCache.NearMatchTags(SearchString, SearchDirs);
+        matches = results->Matches();
+        if (matches.empty()) {
+            t4p::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
+            matches = fileTagResults->MatchesAsTags();
+            if (matches.empty()) {
+                delete fileTagResults;
+                fileTagResults = TagCache.NearMatchFileTags(SearchString, SearchDirs);
+                matches = fileTagResults->MatchesAsTags();
+            }
+            delete fileTagResults;
+        }
+    }
+    delete results;
+    if (!IsCancelled()) {
+        // PostEvent will set the correct event ID
+        t4p::TagCacheSearchCompleteEventClass evt(wxID_ANY, SearchString, matches);
+        PostEvent(evt);
+    }
 }
 wxString t4p::TagCacheSearchActionClass::GetLabel() const {
-	return wxT("Tag Cache Search");
+    return wxT("Tag Cache Search");
 }
 
 const wxEventType t4p::EVENT_TAG_CACHE_SEARCH_COMPLETE = wxNewEventType();

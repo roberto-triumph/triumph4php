@@ -36,24 +36,24 @@ namespace t4p {
  * code completes HTML keywords
  */
 class HtmlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
-	public:
-	HtmlCodeCompletionProviderClass();
+ public:
+    HtmlCodeCompletionProviderClass();
 
-	bool DoesSupport(t4p::FileType type);
+    bool DoesSupport(t4p::FileType type);
 
-	void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
+    void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
 };
 
 /**
  * this class highlights matching braces {}, [], and ()
  */
 class CssBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
-	public:
-	CssBraceMatchStylerClass();
+ public:
+    CssBraceMatchStylerClass();
 
-	bool DoesSupport(t4p::FileType type);
+    bool DoesSupport(t4p::FileType type);
 
-	void Style(t4p::CodeControlClass* ctrl, int postToCheck);
+    void Style(t4p::CodeControlClass* ctrl, int postToCheck);
 };
 
 /**
@@ -61,23 +61,23 @@ class CssBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
  * coding HTML, code completion, keyword highlighting
  */
 class HtmlViewClass : public t4p::FeatureViewClass {
-	public:
-	HtmlViewClass();
+ public:
+    HtmlViewClass();
 
-	private:
-	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+ private:
+    void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
-	/**
-	 * to implement code completion of html tags and attributes
-	 */
-	t4p::HtmlCodeCompletionProviderClass HtmlCompletionProvider;
+    /**
+     * to implement code completion of html tags and attributes
+     */
+    t4p::HtmlCodeCompletionProviderClass HtmlCompletionProvider;
 
-	/**
-	 * to implement brace matching
-	 */
-	t4p::CssBraceMatchStylerClass CssBraceStyler;
+    /**
+     * to implement brace matching
+     */
+    t4p::CssBraceMatchStylerClass CssBraceStyler;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

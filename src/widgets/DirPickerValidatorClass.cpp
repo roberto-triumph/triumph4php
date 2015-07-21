@@ -27,43 +27,43 @@
 #include <wx/msgdlg.h>
 
 t4p::DirPickerValidatorClass::DirPickerValidatorClass(wxFileName* data)
-: wxValidator()
-, Data(data) {
+    : wxValidator()
+    , Data(data) {
 }
 
 bool t4p::DirPickerValidatorClass::TransferToWindow() {
-	bool ret = false;
-	wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
-	if (ctrl) {
-		ctrl->SetPath(Data->GetPath());
-		ret = true;
-	}
-	return ret;
+    bool ret = false;
+    wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
+    if (ctrl) {
+        ctrl->SetPath(Data->GetPath());
+        ret = true;
+    }
+    return ret;
 }
 
 bool t4p::DirPickerValidatorClass::TransferFromWindow() {
-	bool ret = false;
-	wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
-	if (ctrl) {
-		Data->AssignDir(ctrl->GetPath());
-		ret = true;
-	}
-	return ret;
+    bool ret = false;
+    wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
+    if (ctrl) {
+        Data->AssignDir(ctrl->GetPath());
+        ret = true;
+    }
+    return ret;
 }
 
 bool t4p::DirPickerValidatorClass::Validate(wxWindow* parent) {
-	bool ret = false;
-	wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
-	if (ctrl) {
-		ret = !ctrl->GetPath().IsEmpty();
-		if (!ret) {
-			wxMessageBox(ctrl->GetName() + _(" must have a value"), _("Error"));
-		}
-	}
-	return ret;
+    bool ret = false;
+    wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
+    if (ctrl) {
+        ret = !ctrl->GetPath().IsEmpty();
+        if (!ret) {
+            wxMessageBox(ctrl->GetName() + _(" must have a value"), _("Error"));
+        }
+    }
+    return ret;
 }
 
 wxObject* t4p::DirPickerValidatorClass::Clone() const {
-	t4p::DirPickerValidatorClass* other = new t4p::DirPickerValidatorClass(Data);
-	return other;
+    t4p::DirPickerValidatorClass* other = new t4p::DirPickerValidatorClass(Data);
+    return other;
 }

@@ -26,43 +26,43 @@
 #include "Triumph.h"
 
 t4p::EditorMessagesFeatureClass::EditorMessagesFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app) {
+    : FeatureClass(app) {
 }
 
 void t4p::EditorMessagesFeatureClass::OnAppReady(wxCommandEvent& event) {
-	// this line is needed so that we get all the wxLogXXX messages
-	// pointer will be managed by wxWidgets
-	// need to put this here because the logger needs an initialized window state
-	wxLog::SetActiveTarget(new t4p::EditorMessagesLoggerClass(*this));
+    // this line is needed so that we get all the wxLogXXX messages
+    // pointer will be managed by wxWidgets
+    // need to put this here because the logger needs an initialized window state
+    wxLog::SetActiveTarget(new t4p::EditorMessagesLoggerClass(*this));
 }
 
 t4p::EditorMessagesLoggerClass::EditorMessagesLoggerClass(t4p::EditorMessagesFeatureClass& feature)
-	: wxLog()
-	, Feature(feature) {
-	SetLogLevel(wxLOG_Message);
+    : wxLog()
+    , Feature(feature) {
+    SetLogLevel(wxLOG_Message);
 }
 
 void t4p::EditorMessagesLoggerClass::DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info) {
-	t4p::EditorLogEventClass evt(msg, level, info.timestamp);
-	Feature.App.EventSink.Post(evt);
+    t4p::EditorLogEventClass evt(msg, level, info.timestamp);
+    Feature.App.EventSink.Post(evt);
 }
 
 t4p::EditorLogEventClass::EditorLogEventClass(const wxString& msg, wxLogLevel level, time_t timestamp)
-: wxEvent(wxID_ANY, t4p::EVENT_APP_LOG)
+    : wxEvent(wxID_ANY, t4p::EVENT_APP_LOG)
 
 // make thread safe
-, Message(msg.c_str())
-, Level(level)
-, Timestamp(timestamp) {
+    , Message(msg.c_str())
+    , Level(level)
+    , Timestamp(timestamp) {
 }
 
 wxEvent* t4p::EditorLogEventClass::Clone() const {
-	t4p::EditorLogEventClass* evt = new t4p::EditorLogEventClass(Message, Level, Timestamp);
-	return evt;
+    t4p::EditorLogEventClass* evt = new t4p::EditorLogEventClass(Message, Level, Timestamp);
+    return evt;
 }
 
 const wxEventType t4p::EVENT_APP_LOG = wxNewEventType();
 
 BEGIN_EVENT_TABLE(t4p::EditorMessagesFeatureClass, t4p::FeatureClass)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::EditorMessagesFeatureClass::OnAppReady)
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::EditorMessagesFeatureClass::OnAppReady)
 END_EVENT_TABLE()

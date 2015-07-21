@@ -40,53 +40,53 @@ namespace t4p {
  * under "Key bindings"
  */
 class EditorKeyboardCommandClass {
-	public:
-	/**
-	 * human-friendly name of the command
-	 */
-	wxString Name;
+ public:
+    /**
+     * human-friendly name of the command
+     */
+    wxString Name;
 
-	/**
-	 * the scintilla command number. one of wxSTC_CMD_*
-	 */
-	int CmdId;
+    /**
+     * the scintilla command number. one of wxSTC_CMD_*
+     */
+    int CmdId;
 
-	/**
-	 * bitwise mask of ALT, CTRL, SHIFT that will trigger
-	 * this command.
-	 * these are scintilla modifiers, not WX modifiers. ie.
-	 * wxSTC_SCMOD_SHIFT, wxSTC_SCMOD_CTRL, wxSTC_SCMOD_ALT
-	 * This can be zero; if zero it means that we don't have
-	 * a shortcut for this command.
-	 */
-	int Modifiers;
+    /**
+     * bitwise mask of ALT, CTRL, SHIFT that will trigger
+     * this command.
+     * these are scintilla modifiers, not WX modifiers. ie.
+     * wxSTC_SCMOD_SHIFT, wxSTC_SCMOD_CTRL, wxSTC_SCMOD_ALT
+     * This can be zero; if zero it means that we don't have
+     * a shortcut for this command.
+     */
+    int Modifiers;
 
-	/**
-	 * key code that will trigger this command.
-	 * this is a scintilla key code, not a WX key code
-	 * key codes > 300 have different values in wxWidgets and
-	 * scintilla. must map them correctly.
-	 * ie. wxSTC_KEY_*
-	 * This can be zero; if zero it means that we don't have
-	 * a shortcut for this command.
-	 */
-	int KeyCode;
+    /**
+     * key code that will trigger this command.
+     * this is a scintilla key code, not a WX key code
+     * key codes > 300 have different values in wxWidgets and
+     * scintilla. must map them correctly.
+     * ie. wxSTC_KEY_*
+     * This can be zero; if zero it means that we don't have
+     * a shortcut for this command.
+     */
+    int KeyCode;
 
-	EditorKeyboardCommandClass();
+    EditorKeyboardCommandClass();
 
-	EditorKeyboardCommandClass(const wxString& name, int cmdId, int modifiers, int keyCode);
+    EditorKeyboardCommandClass(const wxString& name, int cmdId, int modifiers, int keyCode);
 
-	EditorKeyboardCommandClass(const t4p::EditorKeyboardCommandClass& src);
+    EditorKeyboardCommandClass(const t4p::EditorKeyboardCommandClass& src);
 
-	t4p::EditorKeyboardCommandClass& operator=(const t4p::EditorKeyboardCommandClass& src);
+    t4p::EditorKeyboardCommandClass& operator=(const t4p::EditorKeyboardCommandClass& src);
 
-	void Copy(const t4p::EditorKeyboardCommandClass& src);
+    void Copy(const t4p::EditorKeyboardCommandClass& src);
 
-	bool IsOk() const;
+    bool IsOk() const;
 
-	void InitFromString(const wxString& str);
+    void InitFromString(const wxString& str);
 
-	wxString ToString() const;
+    wxString ToString() const;
 };
 
 /**
@@ -94,37 +94,37 @@ class EditorKeyboardCommandClass {
  * virtual space, multiple selection, and zoom
  */
 class EditorBehaviorFeatureClass : public t4p::FeatureClass {
-	public:
-	/**
-	 * The keyboard commands (shortcuts) assigned to the Scintilla
-	 * control.
-	 */
-	std::vector<t4p::EditorKeyboardCommandClass> KeyboardCommands;
+ public:
+    /**
+     * The keyboard commands (shortcuts) assigned to the Scintilla
+     * control.
+     */
+    std::vector<t4p::EditorKeyboardCommandClass> KeyboardCommands;
 
-	EditorBehaviorFeatureClass(t4p::AppClass& app);
+    EditorBehaviorFeatureClass(t4p::AppClass& app);
 
-	void LoadPreferences(wxConfigBase* config);
+    void LoadPreferences(wxConfigBase* config);
 
-	void ToggleWordWrap();
-	void ToggleIndentationGuides();
-	void ToggleWhitespace();
-	void ZoomIn();
-	void ZoomOut();
-	void ZoomReset();
-	void EditConvertEols();
+    void ToggleWordWrap();
+    void ToggleIndentationGuides();
+    void ToggleWhitespace();
+    void ZoomIn();
+    void ZoomOut();
+    void ZoomReset();
+    void EditConvertEols();
 
-	// translations of scintilla commands to menu IDs
-	// and vice versa
-	int SciCommandToMenuId(int cmdId);
-	int MenuIdToSciCommand(int menuId);
+    // translations of scintilla commands to menu IDs
+    // and vice versa
+    int SciCommandToMenuId(int cmdId);
+    int MenuIdToSciCommand(int menuId);
 
-	private:
-	/**
-	 * Handler to save the editor feature preferences.
-	 */
-	void OnPreferencesSaved(wxCommandEvent& event);
+ private:
+    /**
+     * Handler to save the editor feature preferences.
+     */
+    void OnPreferencesSaved(wxCommandEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

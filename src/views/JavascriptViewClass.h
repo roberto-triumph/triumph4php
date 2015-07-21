@@ -41,52 +41,52 @@ class AppClass;
  * code completes javascript function names
  */
 class JavascriptCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
-	public:
-	/**
-	 * @param finder connection to SQLite file that contains the parsed
-	 *        javascript function names
-	 */
-	JavascriptCodeCompletionProviderClass(t4p::GlobalsClass& globals);
+ public:
+    /**
+     * @param finder connection to SQLite file that contains the parsed
+     *        javascript function names
+     */
+    JavascriptCodeCompletionProviderClass(t4p::GlobalsClass& globals);
 
-	/**
-	 * initializes the connection to the sqlite file, and prepares the
-	 * sql statement.
-	 */
-	void Init();
+    /**
+     * initializes the connection to the sqlite file, and prepares the
+     * sql statement.
+     */
+    void Init();
 
-	bool DoesSupport(t4p::FileType type);
+    bool DoesSupport(t4p::FileType type);
 
-	void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
+    void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
 
-	private:
-	/**
-	 * The globals; used to get connection handle
-	 * to the js sqlite file and the current project
-	 * sources
-	 */
-	t4p::GlobalsClass& Globals;
+ private:
+    /**
+     * The globals; used to get connection handle
+     * to the js sqlite file and the current project
+     * sources
+     */
+    t4p::GlobalsClass& Globals;
 
-	/**
-	 * This builds the query to get the function names
-	 */
-	t4p::NearMatchJsTagResultClass Results;
+    /**
+     * This builds the query to get the function names
+     */
+    t4p::NearMatchJsTagResultClass Results;
 
-	/**
-	 * To make sure we initialize only once per app
-	 */
-	bool HasInit;
+    /**
+     * To make sure we initialize only once per app
+     */
+    bool HasInit;
 };
 
 /**
  * this class highlights matching braces {}, [], and ()
  */
 class JavascriptBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
-	public:
-	JavascriptBraceMatchStylerClass();
+ public:
+    JavascriptBraceMatchStylerClass();
 
-	bool DoesSupport(t4p::FileType type);
+    bool DoesSupport(t4p::FileType type);
 
-	void Style(t4p::CodeControlClass* ctrl, int postToCheck);
+    void Style(t4p::CodeControlClass* ctrl, int postToCheck);
 };
 
 
@@ -95,23 +95,23 @@ class JavascriptBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
  * coding Javascript, code completion, keyword highlighting
  */
 class JavascriptViewClass : public t4p::FeatureViewClass {
-	public:
-	JavascriptViewClass(t4p::AppClass& app);
+ public:
+    JavascriptViewClass(t4p::AppClass& app);
 
-	private:
-	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+ private:
+    void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
-	/**
-	 * to implement code completion of html tags and attributes
-	 */
-	t4p::JavascriptCodeCompletionProviderClass JavascriptCompletionProvider;
+    /**
+     * to implement code completion of html tags and attributes
+     */
+    t4p::JavascriptCodeCompletionProviderClass JavascriptCompletionProvider;
 
-	/**
-	 * to implement brace matching
-	 */
-	t4p::JavascriptBraceMatchStylerClass BraceStyler;
+    /**
+     * to implement brace matching
+     */
+    t4p::JavascriptBraceMatchStylerClass BraceStyler;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

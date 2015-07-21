@@ -38,43 +38,43 @@ namespace t4p {
  * can be changed via the SetDocumentMode() method.
  */
 enum FileType {
-	/**
-	 * No code completion, ever. No syntax highlight, ever.  This is the default mode
-	 * for anything that's not one of the types below.
-	 */
-	FILE_TYPE_TEXT,
+    /**
+     * No code completion, ever. No syntax highlight, ever.  This is the default mode
+     * for anything that's not one of the types below.
+     */
+    FILE_TYPE_TEXT,
 
-	/**
-	 * The full functionality code completion, call tips, syntax highlighting, the works
-	 */
-	FILE_TYPE_PHP,
+    /**
+     * The full functionality code completion, call tips, syntax highlighting, the works
+     */
+    FILE_TYPE_PHP,
 
-	/**
-	 * Code completion and SQL syntax highlighting
-	 */
-	FILE_TYPE_SQL,
+    /**
+     * Code completion and SQL syntax highlighting
+     */
+    FILE_TYPE_SQL,
 
-	/**
-	 * CSS style sheets (pure CSS files only)
-	 */
-	FILE_TYPE_CSS,
+    /**
+     * CSS style sheets (pure CSS files only)
+     */
+    FILE_TYPE_CSS,
 
-	/**
-	 * Javascript (pure JS files only)
-	 */
-	FILE_TYPE_JS,
+    /**
+     * Javascript (pure JS files only)
+     */
+    FILE_TYPE_JS,
 
-	// the rest of the document types are only slightly supported
-	// syntax highlighting works but not much else
-	FILE_TYPE_CONFIG,
-	FILE_TYPE_CRONTAB,
-	FILE_TYPE_YAML,
-	FILE_TYPE_XML,
-	FILE_TYPE_RUBY,
-	FILE_TYPE_LUA,
-	FILE_TYPE_MARKDOWN,
-	FILE_TYPE_BASH,
-	FILE_TYPE_DIFF
+    // the rest of the document types are only slightly supported
+    // syntax highlighting works but not much else
+    FILE_TYPE_CONFIG,
+    FILE_TYPE_CRONTAB,
+    FILE_TYPE_YAML,
+    FILE_TYPE_XML,
+    FILE_TYPE_RUBY,
+    FILE_TYPE_LUA,
+    FILE_TYPE_MARKDOWN,
+    FILE_TYPE_BASH,
+    FILE_TYPE_DIFF
 };
 
 /**
@@ -84,109 +84,109 @@ enum FileType {
  * file type.
  */
 class FileTypeClass {
-	public:
-	/**
-	 * Serialized file filters strings from the config
-	 * these strings contain multitple wildcards, use
-	 * the corresponding GetXXXFileExtensions()
-	 * to get the wildcards in a list
-	 */
-	wxString PhpFileExtensionsString;
-	wxString CssFileExtensionsString;
-	wxString SqlFileExtensionsString;
-	wxString JsFileExtensionsString;
-	wxString ConfigFileExtensionsString;
-	wxString CrontabFileExtensionsString;
-	wxString YamlFileExtensionsString;
-	wxString XmlFileExtensionsString;
-	wxString RubyFileExtensionsString;
-	wxString LuaFileExtensionsString;
-	wxString MarkdownFileExtensionsString;
-	wxString BashFileExtensionsString;
-	wxString DiffFileExtensionsString;
+ public:
+    /**
+     * Serialized file filters strings from the config
+     * these strings contain multitple wildcards, use
+     * the corresponding GetXXXFileExtensions()
+     * to get the wildcards in a list
+     */
+    wxString PhpFileExtensionsString;
+    wxString CssFileExtensionsString;
+    wxString SqlFileExtensionsString;
+    wxString JsFileExtensionsString;
+    wxString ConfigFileExtensionsString;
+    wxString CrontabFileExtensionsString;
+    wxString YamlFileExtensionsString;
+    wxString XmlFileExtensionsString;
+    wxString RubyFileExtensionsString;
+    wxString LuaFileExtensionsString;
+    wxString MarkdownFileExtensionsString;
+    wxString BashFileExtensionsString;
+    wxString DiffFileExtensionsString;
 
-	/**
-	 * Serialized miscalleneous file filters string from the config
-	 * basically any files that we want to open in the editor, like
-	 * text files, twig files, json files, etc...
-	 */
-	wxString MiscFileExtensionsString;
+    /**
+     * Serialized miscalleneous file filters string from the config
+     * basically any files that we want to open in the editor, like
+     * text files, twig files, json files, etc...
+     */
+    wxString MiscFileExtensionsString;
 
-	FileTypeClass();
+    FileTypeClass();
 
-	FileTypeClass(const t4p::FileTypeClass& src);
+    FileTypeClass(const t4p::FileTypeClass& src);
 
-	t4p::FileTypeClass& operator=(const t4p::FileTypeClass& src);
+    t4p::FileTypeClass& operator=(const t4p::FileTypeClass& src);
 
-	void Copy(const t4p::FileTypeClass& src);
+    void Copy(const t4p::FileTypeClass& src);
 
-	/**
-	 * The methods below returns the list of wildcard file extensions for
-	 * the specified file type, each wildcard on its own string
-	 */
+    /**
+     * The methods below returns the list of wildcard file extensions for
+     * the specified file type, each wildcard on its own string
+     */
 
-	std::vector<wxString> GetPhpFileExtensions() const;
-	std::vector<wxString> GetCssFileExtensions() const;
-	std::vector<wxString> GetSqlFileExtensions() const;
-	std::vector<wxString> GetJsFileExtensions() const;
-	std::vector<wxString> GetConfigFileExtensions() const;
-	std::vector<wxString> GetCrontabFileExtensions() const;
-	std::vector<wxString> GetYamlFileExtensions() const;
-	std::vector<wxString> GetRubyFileExtensions() const;
-	std::vector<wxString> GetLuaFileExtensions() const;
-	std::vector<wxString> GetMarkdownFileExtensions() const;
-	std::vector<wxString> GetBashFileExtensions() const;
-	std::vector<wxString> GetDiffFileExtensions() const;
-	std::vector<wxString> GetMiscFileExtensions() const;
+    std::vector<wxString> GetPhpFileExtensions() const;
+    std::vector<wxString> GetCssFileExtensions() const;
+    std::vector<wxString> GetSqlFileExtensions() const;
+    std::vector<wxString> GetJsFileExtensions() const;
+    std::vector<wxString> GetConfigFileExtensions() const;
+    std::vector<wxString> GetCrontabFileExtensions() const;
+    std::vector<wxString> GetYamlFileExtensions() const;
+    std::vector<wxString> GetRubyFileExtensions() const;
+    std::vector<wxString> GetLuaFileExtensions() const;
+    std::vector<wxString> GetMarkdownFileExtensions() const;
+    std::vector<wxString> GetBashFileExtensions() const;
+    std::vector<wxString> GetDiffFileExtensions() const;
+    std::vector<wxString> GetMiscFileExtensions() const;
 
-	/**
-	 * Returns the all file extensions exception PHP file extensions
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetNonPhpFileExtensions() const;
+    /**
+     * Returns the all file extensions exception PHP file extensions
+     * @return std::vector<wxString> a copy of the file extensions
+     */
+    std::vector<wxString> GetNonPhpFileExtensions() const;
 
-	/**
-	 * Returns the all file extensions that we want the editor to open
-	 *   php, css, sql, etc...
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetAllSourceFileExtensions() const;
+    /**
+     * Returns the all file extensions that we want the editor to open
+     *   php, css, sql, etc...
+     * @return std::vector<wxString> a copy of the file extensions
+     */
+    std::vector<wxString> GetAllSourceFileExtensions() const;
 
-	/**
-	 * @return all of the file extensions, concatenated with semicolon
-	 */
-	wxString GetAllSourceFileExtensionsString() const;
+    /**
+     * @return all of the file extensions, concatenated with semicolon
+     */
+    wxString GetAllSourceFileExtensionsString() const;
 
-	/**
-	 * The methods below return TRUE
-	 * @return TRUE if given full path is a file of the specified
-	 * type, as determined only by the appropriate file extensions
-	 * wilcard. For example, HasAPhpExtension returns TRUE if
-	 * fullPath has one of the extensions configure in PhpExtensionsString
-	 */
+    /**
+     * The methods below return TRUE
+     * @return TRUE if given full path is a file of the specified
+     * type, as determined only by the appropriate file extensions
+     * wilcard. For example, HasAPhpExtension returns TRUE if
+     * fullPath has one of the extensions configure in PhpExtensionsString
+     */
 
-	bool HasAPhpExtension(const wxString& fullPath) const;
-	bool HasASqlExtension(const wxString& fullPath) const;
-	bool HasAJsExtension(const wxString& fullPath) const;
-	bool HasACssExtension(const wxString& fullPath) const;
-	bool HasAConfigExtension(const wxString& fullPath) const;
-	bool HasACrontabExtension(const wxString& fullPath) const;
-	bool HasAYamlExtension(const wxString& fullPath) const;
-	bool HasAXmlExtension(const wxString& fullPath) const;
-	bool HasARubyExtension(const wxString& fullPath) const;
-	bool HasALuaExtension(const wxString& fullPath) const;
-	bool HasAMarkdownExtension(const wxString& fullPath) const;
-	bool HasABashExtension(const wxString& fullPath) const;
-	bool HasADiffExtension(const wxString& fullPath) const;
-	bool HasAMiscExtension(const wxString& fullPath) const;
+    bool HasAPhpExtension(const wxString& fullPath) const;
+    bool HasASqlExtension(const wxString& fullPath) const;
+    bool HasAJsExtension(const wxString& fullPath) const;
+    bool HasACssExtension(const wxString& fullPath) const;
+    bool HasAConfigExtension(const wxString& fullPath) const;
+    bool HasACrontabExtension(const wxString& fullPath) const;
+    bool HasAYamlExtension(const wxString& fullPath) const;
+    bool HasAXmlExtension(const wxString& fullPath) const;
+    bool HasARubyExtension(const wxString& fullPath) const;
+    bool HasALuaExtension(const wxString& fullPath) const;
+    bool HasAMarkdownExtension(const wxString& fullPath) const;
+    bool HasABashExtension(const wxString& fullPath) const;
+    bool HasADiffExtension(const wxString& fullPath) const;
+    bool HasAMiscExtension(const wxString& fullPath) const;
 
-	/**
-	 * @params fullPath the look at
-	 * @return boolean TRUE if the given file is any
-	 *         of the configured file types; ie. if the file
-	 *         is a php OR sql OR js OR css OR .... file
-	 */
-	bool HasAnyExtension(const wxString& fullPath) const;
+    /**
+     * @params fullPath the look at
+     * @return boolean TRUE if the given file is any
+     *         of the configured file types; ie. if the file
+     *         is a php OR sql OR js OR css OR .... file
+     */
+    bool HasAnyExtension(const wxString& fullPath) const;
 };
 }  // namespace t4p
 

@@ -37,141 +37,141 @@ namespace t4p {
  * for "macro" file operations: load, save, revert.
  */
 class FileOperationsViewClass : public t4p::FeatureViewClass {
-	public:
+ public:
     FileOperationsViewClass(t4p::FileOperationsFeatureClass& feature);
 
-	void AddFileMenuItems(wxMenu* fileMenu);
+    void AddFileMenuItems(wxMenu* fileMenu);
 
-	void AddToolBarItems(wxAuiToolBar* toolBar);
+    void AddToolBarItems(wxAuiToolBar* toolBar);
 
-	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& cmds);
+    void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& cmds);
 
-	private:
-	/**
-	 * Loads the given files into the application, one page for each file.
-	 * File names must be fully qualified.
-	 */
-	void FileOpen(const std::vector<wxString>& filenames);
+ private:
+    /**
+     * Loads the given files into the application, one page for each file.
+     * File names must be fully qualified.
+     */
+    void FileOpen(const std::vector<wxString>& filenames);
 
-	/**
-	 * Loads the given file into the application, and goes to the
-	 * position. highlights to the given length
-	 */
-	void FileOpenPosition(const wxString& fullPath, int startingPos, int length);
+    /**
+     * Loads the given file into the application, and goes to the
+     * position. highlights to the given length
+     */
+    void FileOpenPosition(const wxString& fullPath, int startingPos, int length);
 
-	/**
-	 * Loads the given file into the application, and goes to the
-	 * given line. line number is 1 based.
-	 */
-	void FileOpenLine(const wxString& fullPath, int lineNumber);
+    /**
+     * Loads the given file into the application, and goes to the
+     * given line. line number is 1 based.
+     */
+    void FileOpenLine(const wxString& fullPath, int lineNumber);
 
-	// menu event handlers
-	void OnFileSave(wxCommandEvent& event);
-	void OnFilePhpNew(wxCommandEvent& event);
-	void OnFileSqlNew(wxCommandEvent& event);
-	void OnFileCssNew(wxCommandEvent& event);
-	void OnFileTextNew(wxCommandEvent& event);
-	void OnFileRun(wxCommandEvent& event);
-	void OnFileOpen(wxCommandEvent& event);
-	void OnFileSaveAs(wxCommandEvent& event);
-	void OnFileSaveAll(wxCommandEvent& event);
-	void OnFileRevert(wxCommandEvent& event);
-	void OnFileClose(wxCommandEvent& event);
+    // menu event handlers
+    void OnFileSave(wxCommandEvent& event);
+    void OnFilePhpNew(wxCommandEvent& event);
+    void OnFileSqlNew(wxCommandEvent& event);
+    void OnFileCssNew(wxCommandEvent& event);
+    void OnFileTextNew(wxCommandEvent& event);
+    void OnFileRun(wxCommandEvent& event);
+    void OnFileOpen(wxCommandEvent& event);
+    void OnFileSaveAs(wxCommandEvent& event);
+    void OnFileSaveAll(wxCommandEvent& event);
+    void OnFileRevert(wxCommandEvent& event);
+    void OnFileClose(wxCommandEvent& event);
 
-	/**
-	 * When a page is modified, enable the save button
-	 */
-	void EnableSave(wxStyledTextEvent& event);
+    /**
+     * When a page is modified, enable the save button
+     */
+    void EnableSave(wxStyledTextEvent& event);
 
-	/**
-	 * When a page is saved, disable the save button
-	 */
-	void DisableSave(wxStyledTextEvent& event);
+    /**
+     * When a page is saved, disable the save button
+     */
+    void DisableSave(wxStyledTextEvent& event);
 
-	/**
-	 * Save the currently active tab.
-	 */
-	void SaveCurrentFile(wxCommandEvent& event);
+    /**
+     * Save the currently active tab.
+     */
+    void SaveCurrentFile(wxCommandEvent& event);
 
-	/**
-	 * repaint the status bar; cursor line position
-	 */
-	void UpdateStatusBar();
+    /**
+     * repaint the status bar; cursor line position
+     */
+    void UpdateStatusBar();
 
-	/**
-	 * Creates the toolbar buttons
-	 */
-	void CreateToolBarButtons();
+    /**
+     * Creates the toolbar buttons
+     */
+    void CreateToolBarButtons();
 
-	/**
-	 * after the application starts, start the status bar timer.
-	 * The status bar timer will update the status bar info (line, column)
-	 * at specific intervals instead of in a EVT_STC_UPDATEUI event.
-	 * Updating the status bar text triggers a refresh of the whole
-	 * status bar (and it seems that the entire app is refreshed too)
-	 * and it makes the app feel sluggish.
-	 */
-	void StartStatusBarTimer();
+    /**
+     * after the application starts, start the status bar timer.
+     * The status bar timer will update the status bar info (line, column)
+     * at specific intervals instead of in a EVT_STC_UPDATEUI event.
+     * Updating the status bar text triggers a refresh of the whole
+     * status bar (and it seems that the entire app is refreshed too)
+     * and it makes the app feel sluggish.
+     */
+    void StartStatusBarTimer();
 
-	/**
-	 * at regular intervals, update the status bar text
-	 */
-	void OnStatusBarTimer(wxTimerEvent& event);
+    /**
+     * at regular intervals, update the status bar text
+     */
+    void OnStatusBarTimer(wxTimerEvent& event);
 
-	/**
-	 * Handler for the FILE_OPEN app command
-	 * In this handler, a notebook tab is added
-	 */
-	void OnCmdFileOpen(t4p::OpenFileCommandEventClass& event);
+    /**
+     * Handler for the FILE_OPEN app command
+     * In this handler, a notebook tab is added
+     */
+    void OnCmdFileOpen(t4p::OpenFileCommandEventClass& event);
 
-	/**
-	 * Toggle various widgets on or off based on the application state.
-	 */
-	void MenuUpdate(bool isClosingPage);
+    /**
+     * Toggle various widgets on or off based on the application state.
+     */
+    void MenuUpdate(bool isClosingPage);
 
-	/**
-	 * Start the timer that will notify us when to update the status bar
-	 */
-	void OnAppReady(wxCommandEvent& event);
+    /**
+     * Start the timer that will notify us when to update the status bar
+     */
+    void OnAppReady(wxCommandEvent& event);
 
-	/**
-	 * When a code notebook page changes, it means that a new source
-	 * code that is active.  In this event, we need to upate the
-	 * various metrics (cursor position, dirty state)
-	 */
-	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
+    /**
+     * When a code notebook page changes, it means that a new source
+     * code that is active.  In this event, we need to upate the
+     * various metrics (cursor position, dirty state)
+     */
+    void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
 
-	/**
-	 * When a code notebook page closes, it means that a new source
-	 * code that is active.  In this event, we need to upate the
-	 * various metrics (cursor position, dirty state)
-	 */
-	void OnAppFileClosed(t4p::CodeControlEventClass& event);
+    /**
+     * When a code notebook page closes, it means that a new source
+     * code that is active.  In this event, we need to upate the
+     * various metrics (cursor position, dirty state)
+     */
+    void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
-	// update the menu bars on these events
-	void OnAppFileOpened(t4p::CodeControlEventClass& event);
-	void OnAppFileNew(t4p::CodeControlEventClass& event);
+    // update the menu bars on these events
+    void OnAppFileOpened(t4p::CodeControlEventClass& event);
+    void OnAppFileNew(t4p::CodeControlEventClass& event);
 
-	/**
-	 * When the app frame is closed, check to see if there are "dirty"
-	 * files that need to be saved.
-	 */
-	void OnAppFrameClose(wxNotifyEvent& event);
+    /**
+     * When the app frame is closed, check to see if there are "dirty"
+     * files that need to be saved.
+     */
+    void OnAppFrameClose(wxNotifyEvent& event);
 
-	/**
-	 * @return bool TRUE if there is at least one opened file that needs
-	 *         to be saved using an elevated (privilege / root) access.
-	 */
-	bool NeedsElevatedSave();
+    /**
+     * @return bool TRUE if there is at least one opened file that needs
+     *         to be saved using an elevated (privilege / root) access.
+     */
+    bool NeedsElevatedSave();
 
-	t4p::FileOperationsFeatureClass& Feature;
+    t4p::FileOperationsFeatureClass& Feature;
 
-	/**
-	 * timer to update the status bar at a regular intervals
-	 */
-	wxTimer StatusBarTimer;
+    /**
+     * timer to update the status bar at a regular intervals
+     */
+    wxTimer StatusBarTimer;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

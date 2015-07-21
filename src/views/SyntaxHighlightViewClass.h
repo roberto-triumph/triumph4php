@@ -42,40 +42,40 @@ class SyntaxHighlightFeatureClass;
 
 /** Implementing EditColorsPanelGeneratedClass */
 class EditColorsPanelClass : public SyntaxHighlightPanelGeneratedClass {
-	protected:
-	// Handlers for EditColorsPanelGeneratedClass events.
-	void OnListBox(wxCommandEvent& event);
-	void OnCheck(wxCommandEvent& event);
-	void OnColorChanged(wxColourPickerEvent& event);
-	void OnFontChanged(wxFontPickerEvent& event);
-	void OnThemeChoice(wxCommandEvent& event);
+ protected:
+    // Handlers for EditColorsPanelGeneratedClass events.
+    void OnListBox(wxCommandEvent& event);
+    void OnCheck(wxCommandEvent& event);
+    void OnColorChanged(wxColourPickerEvent& event);
+    void OnFontChanged(wxFontPickerEvent& event);
+    void OnThemeChoice(wxCommandEvent& event);
 
-	public:
-	/** Constructor */
-	EditColorsPanelClass(wxWindow* parent,
-	                     t4p::SyntaxHighlightFeatureClass& feature,
-	                     t4p::SyntaxHighlightViewClass& view);
+ public:
+    /** Constructor */
+    EditColorsPanelClass(wxWindow* parent,
+                         t4p::SyntaxHighlightFeatureClass& feature,
+                         t4p::SyntaxHighlightViewClass& view);
 
-	bool TransferDataFromWindow();
+    bool TransferDataFromWindow();
 
-	private:
-	t4p::CodeControlOptionsClass& CodeControlOptions;
+ private:
+    t4p::CodeControlOptionsClass& CodeControlOptions;
 
-	t4p::CodeControlOptionsClass EditedCodeControlOptions;
+    t4p::CodeControlOptionsClass EditedCodeControlOptions;
 
-	// the different code previews
-	t4p::CodeControlClass* PhpCodeCtrl;
-	t4p::CodeControlClass* SqlCodeCtrl;
-	t4p::CodeControlClass* CssCodeCtrl;
-	t4p::CodeControlClass* JsCodeCtrl;
+    // the different code previews
+    t4p::CodeControlClass* PhpCodeCtrl;
+    t4p::CodeControlClass* SqlCodeCtrl;
+    t4p::CodeControlClass* CssCodeCtrl;
+    t4p::CodeControlClass* JsCodeCtrl;
 
-	t4p::GlobalsClass Globals;
+    t4p::GlobalsClass Globals;
 
-	t4p::EventSinkClass EventSink;
+    t4p::EventSinkClass EventSink;
 
-	t4p::SyntaxHighlightViewClass& View;
+    t4p::SyntaxHighlightViewClass& View;
 
-	void AddPreviews();
+    void AddPreviews();
 };
 
 
@@ -87,55 +87,55 @@ class EditColorsPanelClass : public SyntaxHighlightPanelGeneratedClass {
  * also set colors for the code control margins
  */
 class SyntaxHighlightViewClass : public t4p::FeatureViewClass {
-	public:
-	SyntaxHighlightViewClass(t4p::SyntaxHighlightFeatureClass& feature);
+ public:
+    SyntaxHighlightViewClass(t4p::SyntaxHighlightFeatureClass& feature);
 
-	/**
-	 * Change the styles to use based on the
-	 * code control's document mode and the given options
-	 */
-	void ApplyPreferences(t4p::CodeControlClass* ctrl, t4p::CodeControlOptionsClass& options);
+    /**
+     * Change the styles to use based on the
+     * code control's document mode and the given options
+     */
+    void ApplyPreferences(t4p::CodeControlClass* ctrl, t4p::CodeControlOptionsClass& options);
 
-	void AddPreferenceWindow(wxBookCtrlBase* parent);
+    void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-	private:
-	/*
-	 * when a file is opened or created, we will
-	 * set the colors on the Scintilla code control
-	 */
-	void OnFileNew(t4p::CodeControlEventClass& event);
-	void OnFileOpen(t4p::CodeControlEventClass& event);
+ private:
+    /*
+     * when a file is opened or created, we will
+     * set the colors on the Scintilla code control
+     */
+    void OnFileNew(t4p::CodeControlEventClass& event);
+    void OnFileOpen(t4p::CodeControlEventClass& event);
 
-	/**
-	 * after the user saves the preferences redraw the code
-	 * control because the styles might have changed.
-	 */
-	void OnPreferencesSaved(wxCommandEvent& event);
+    /**
+     * after the user saves the preferences redraw the code
+     * control because the styles might have changed.
+     */
+    void OnPreferencesSaved(wxCommandEvent& event);
 
-	/**
-	 * on app start we load the bitmaps we use
-	 * on the margin markers
-	 */
-	void OnAppReady(wxCommandEvent& event);
+    /**
+     * on app start we load the bitmaps we use
+     * on the margin markers
+     */
+    void OnAppReady(wxCommandEvent& event);
 
-	/**
-	 * loads the bitmaps that are used as STC markers
-	 * from disk.
-	 */
-	void LoadMarkerBitmaps();
+    /**
+     * loads the bitmaps that are used as STC markers
+     * from disk.
+     */
+    void LoadMarkerBitmaps();
 
-	t4p::SyntaxHighlightFeatureClass& Feature;
+    t4p::SyntaxHighlightFeatureClass& Feature;
 
-	// bitmaps to show in the margin for search hits
-	// and bookmarks
-	// we load from disk once per feature
-	wxBitmap SearchHitGoodBitmap;
-	wxBitmap SearchHitBadBitmap;
-	wxBitmap BookmarkBitmap;
-	wxBitmap BreakpointBitmap;
-	wxBitmap ExecutionLineBitmap;
+    // bitmaps to show in the margin for search hits
+    // and bookmarks
+    // we load from disk once per feature
+    wxBitmap SearchHitGoodBitmap;
+    wxBitmap SearchHitBadBitmap;
+    wxBitmap BookmarkBitmap;
+    wxBitmap BreakpointBitmap;
+    wxBitmap ExecutionLineBitmap;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

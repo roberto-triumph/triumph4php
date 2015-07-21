@@ -35,35 +35,35 @@ namespace t4p {
  * will keep track of bookmarks at the user's request.
  */
 class BookmarkClass {
-	public:
-	/**
-	 * the file being bookmarked
-	 */
-	wxFileName FileName;
+ public:
+    /**
+     * the file being bookmarked
+     */
+    wxFileName FileName;
 
-	/**
-	 * the line number bookmarked. the number is 1-based
-	 */
-	int LineNumber;
+    /**
+     * the line number bookmarked. the number is 1-based
+     */
+    int LineNumber;
 
-	/**
-	 * an opaque identifier that scintilla assigns bookmarks, we use
-	 * this handle to get the updated line number when the source code
-	 * contents change.
-	 */
-	int Handle;
+    /**
+     * an opaque identifier that scintilla assigns bookmarks, we use
+     * this handle to get the updated line number when the source code
+     * contents change.
+     */
+    int Handle;
 
-	BookmarkClass();
+    BookmarkClass();
 
-	BookmarkClass(const t4p::BookmarkClass& src);
+    BookmarkClass(const t4p::BookmarkClass& src);
 
-	BookmarkClass(const wxFileName& fileName, int lineNumber, int handle);
+    BookmarkClass(const wxFileName& fileName, int lineNumber, int handle);
 
-	t4p::BookmarkClass& operator=(const t4p::BookmarkClass& src);
+    t4p::BookmarkClass& operator=(const t4p::BookmarkClass& src);
 
-	bool operator==(const t4p::BookmarkClass& other);
+    bool operator==(const t4p::BookmarkClass& other);
 
-	void Copy(const t4p::BookmarkClass& src);
+    void Copy(const t4p::BookmarkClass& src);
 };
 
 /**
@@ -85,18 +85,18 @@ class BookmarkClass {
  * is because bookmarks are often used for short periods of time.
  */
 class BookmarkFeatureClass : public t4p::FeatureClass {
-	public:
-	/**
-	 * all bookmarks added by the user
-	 */
-	std::vector<t4p::BookmarkClass> Bookmarks;
+ public:
+    /**
+     * all bookmarks added by the user
+     */
+    std::vector<t4p::BookmarkClass> Bookmarks;
 
-	/**
-	 * holds the current bookmark being show
-	 */
-	int CurrentBookmarkIndex;
+    /**
+     * holds the current bookmark being show
+     */
+    int CurrentBookmarkIndex;
 
-	BookmarkFeatureClass(t4p::AppClass& app);
+    BookmarkFeatureClass(t4p::AppClass& app);
 };
 }  // namespace t4p
 

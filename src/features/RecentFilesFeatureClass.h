@@ -36,19 +36,19 @@ extern const int MAX_RECENT_FILES;
  * recent files that the user has opened in Triumph.
  */
 class RecentFilesFeatureClass : public FeatureClass {
-	public:
-	/**
-	 * class that encapsulates the logic
-	 */
-	wxFileHistory FileHistory;
+ public:
+    /**
+     * class that encapsulates the logic
+     */
+    wxFileHistory FileHistory;
 
-	RecentFilesFeatureClass(t4p::AppClass& app);
+    RecentFilesFeatureClass(t4p::AppClass& app);
 
-	void LoadPreferences(wxConfigBase* config);
+    void LoadPreferences(wxConfigBase* config);
 
-	void SavePreferences();
+    void SavePreferences();
 
-	private:
+ private:
 };
 }  // namespace t4p
 

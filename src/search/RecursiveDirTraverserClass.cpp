@@ -26,14 +26,14 @@
 #include <vector>
 
 t4p::RecursiveDirTraverserClass::RecursiveDirTraverserClass(std::vector<wxString>& fullPaths)
-	: FullPaths(fullPaths) {
+    : FullPaths(fullPaths) {
 }
 
 wxDirTraverseResult t4p::RecursiveDirTraverserClass::OnFile(const wxString& filename) {
-	FullPaths.push_back(filename);
-	return wxDIR_CONTINUE;
+    FullPaths.push_back(filename);
+    return wxDIR_CONTINUE;
 }
 
 wxDirTraverseResult t4p::RecursiveDirTraverserClass::OnDir(const wxString& WXUNUSED(dirname)) {
-	return wxDIR_CONTINUE;
+    return wxDIR_CONTINUE;
 }

@@ -30,6 +30,6 @@
 #include "Triumph.h"
 
 t4p::PhpCodeCompletionFeatureClass::PhpCodeCompletionFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+    : FeatureClass(app) {
 }
 

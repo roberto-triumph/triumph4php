@@ -36,100 +36,100 @@
 
 namespace t4p {
 class RunBrowserViewClass : public FeatureViewClass {
-	public:
-	RunBrowserViewClass(t4p::RunBrowserFeatureClass& feature);
+ public:
+    RunBrowserViewClass(t4p::RunBrowserFeatureClass& feature);
 
-	void AddWindows();
+    void AddWindows();
 
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+    void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
-	private:
-	/**
-	 * when a file is saved and that file is from an enabled project
-	 * we set a dirty flag so that we can re-run url detection
-	 * when the user clicks on the Search For Urls button
-	 */
-	void OnFileSaved(t4p::CodeControlEventClass& event);
+ private:
+    /**
+     * when a file is saved and that file is from an enabled project
+     * we set a dirty flag so that we can re-run url detection
+     * when the user clicks on the Search For Urls button
+     */
+    void OnFileSaved(t4p::CodeControlEventClass& event);
 
-	/**
-	 * run the chosen URL in (an external) web browser
-	 */
-	void OnRunInWebBrowser(wxCommandEvent& event);
+    /**
+     * run the chosen URL in (an external) web browser
+     */
+    void OnRunInWebBrowser(wxCommandEvent& event);
 
-	void OnBrowserToolDropDown(wxAuiToolBarEvent& event);
+    void OnBrowserToolDropDown(wxAuiToolBarEvent& event);
 
-	void OnBrowserToolMenuItem(wxCommandEvent& event);
+    void OnBrowserToolMenuItem(wxCommandEvent& event);
 
-	void OnUrlToolDropDown(wxAuiToolBarEvent& event);
+    void OnUrlToolDropDown(wxAuiToolBarEvent& event);
 
-	void OnUrlToolMenuItem(wxCommandEvent& event);
+    void OnUrlToolMenuItem(wxCommandEvent& event);
 
-	void OnUrlSearchTool(wxCommandEvent& event);
+    void OnUrlSearchTool(wxCommandEvent& event);
 
-	/**
-	 * to show progress to the user
-	 */
-	void OnProcessInProgress(wxCommandEvent& event);
+    /**
+     * to show progress to the user
+     */
+    void OnProcessInProgress(wxCommandEvent& event);
 
-	/**
-	 * show the user the URL dialog and open the chosen url
-	 */
-	void ShowUrlDialog();
+    /**
+     * show the user the URL dialog and open the chosen url
+     */
+    void ShowUrlDialog();
 
-	void SetCurrentBrowser();
+    void SetCurrentBrowser();
 
-	/**
-	 * if we started the URL detection process because of a user
-	 * click, then when url detection is complete we will show
-	 * the user the ChooseUrlDialog
-	 */
-	void OnUrlDetectionComplete(t4p::ActionEventClass& event);
+    /**
+     * if we started the URL detection process because of a user
+     * click, then when url detection is complete we will show
+     * the user the ChooseUrlDialog
+     */
+    void OnUrlDetectionComplete(t4p::ActionEventClass& event);
 
-	void OnPreferencesSaved(wxCommandEvent& event);
+    void OnPreferencesSaved(wxCommandEvent& event);
 
-	/**
-	 * contains the application logic
-	 */
-	t4p::RunBrowserFeatureClass& Feature;
+    /**
+     * contains the application logic
+     */
+    t4p::RunBrowserFeatureClass& Feature;
 
-	/**
-	 * A popup menu to show the currently configured browsers. The same popup menu will be
-	 * reused multiple times. This class will own it,  that's why we use auto_ptr here
-	 */
-	std::auto_ptr<wxMenu> BrowserMenu;
+    /**
+     * A popup menu to show the currently configured browsers. The same popup menu will be
+     * reused multiple times. This class will own it,  that's why we use auto_ptr here
+     */
+    std::auto_ptr<wxMenu> BrowserMenu;
 
-	/**
-	 * A popup menu to show the currently detected URLs. The same popup menu will be
-	 * reused multiple times. This class will own it,  that's why we use auto_ptr here
-	 */
-	std::auto_ptr<wxMenu> UrlMenu;
+    /**
+     * A popup menu to show the currently detected URLs. The same popup menu will be
+     * reused multiple times. This class will own it,  that's why we use auto_ptr here
+     */
+    std::auto_ptr<wxMenu> UrlMenu;
 
-	/**
-	 * a bigger progress bar to show the user while url detection is running. this
-	 * dialog is shown so that the user has more feedback that just the bottom
-	 * progress bar in the status bar.
-	 */
-	t4p::GaugeDialogClass* GaugeDialog;
+    /**
+     * a bigger progress bar to show the user while url detection is running. this
+     * dialog is shown so that the user has more feedback that just the bottom
+     * progress bar in the status bar.
+     */
+    t4p::GaugeDialogClass* GaugeDialog;
 
-	wxMenuItem* RunInBrowser;
+    wxMenuItem* RunInBrowser;
 
-	wxAuiToolBar* BrowserToolbar;
+    wxAuiToolBar* BrowserToolbar;
 
-	/**
-	 * A 'dirty' flag so that we can re-run url detection
-	 * when the user clicks on the Search For Urls button when we know that
-	 * the URL cache needs to be updated.
-	 */
-	bool IsUrlCacheStale;
+    /**
+     * A 'dirty' flag so that we can re-run url detection
+     * when the user clicks on the Search For Urls button when we know that
+     * the URL cache needs to be updated.
+     */
+    bool IsUrlCacheStale;
 
-	/**
-	 * a flag that will be set when we start the url detection process
-	 * from a user click. when the url detection ends we will show the
-	 * ChooseUrlDialog
-	 */
-	bool IsWaitingForUrlDetection;
+    /**
+     * a flag that will be set when we start the url detection process
+     * from a user click. when the url detection ends we will show the
+     * ChooseUrlDialog
+     */
+    bool IsWaitingForUrlDetection;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

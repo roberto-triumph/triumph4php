@@ -36,29 +36,29 @@ namespace t4p {
  * A SQLite result set of JsTag rows.
  */
 class JsTagResultClass : public t4p::SqliteResultClass {
-	public:
-	t4p::JsTagClass JsTag;
+ public:
+    t4p::JsTagClass JsTag;
 
-	JsTagResultClass();
+    JsTagResultClass();
 
-	void Next();
+    void Next();
 
-	protected:
-	void DoBind(soci::statement& stmt);
+ protected:
+    void DoBind(soci::statement& stmt);
 
-	private:
-	// the variables bound to the sqlite result set
-	int Id;
-	int FileItemId;
-	int SourceId;
-	std::string Key;
-	std::string Identifier;
-	std::string Signature;
-	std::string Comment;
-	std::string FullPath;
-	int IsFileNew;
-	int LineNumber;
-	int ColumnPosition;
+ private:
+    // the variables bound to the sqlite result set
+    int Id;
+    int FileItemId;
+    int SourceId;
+    std::string Key;
+    std::string Identifier;
+    std::string Signature;
+    std::string Comment;
+    std::string FullPath;
+    int IsFileNew;
+    int LineNumber;
+    int ColumnPosition;
 };
 
 /**
@@ -67,21 +67,21 @@ class JsTagResultClass : public t4p::SqliteResultClass {
  * is exactly equal to the Key column, in a case insensitive manner).
  */
 class ExactMatchJsTagResultClass : public t4p::JsTagResultClass {
-	public:
-	ExactMatchJsTagResultClass();
+ public:
+    ExactMatchJsTagResultClass();
 
-	/**
-	 * @param search the string to look for
-	 * @param sourceDirs restrict to only tags found in the given source directories
-	 */
-	void SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
+    /**
+     * @param search the string to look for
+     * @param sourceDirs restrict to only tags found in the given source directories
+     */
+    void SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
-	protected:
-	bool DoPrepare(soci::statement& stmt, bool doLimit);
+ protected:
+    bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-	private:
-	std::string Search;
-	std::vector<std::string> SourceDirs;
+ private:
+    std::string Search;
+    std::vector<std::string> SourceDirs;
 };
 
 /**
@@ -90,22 +90,22 @@ class ExactMatchJsTagResultClass : public t4p::JsTagResultClass {
  * starts with the input, in a case insensitive manner).
  */
 class NearMatchJsTagResultClass : public t4p::JsTagResultClass {
-	public:
-	NearMatchJsTagResultClass();
+ public:
+    NearMatchJsTagResultClass();
 
-	/**
-	 * @param search the string to look for
-	 * @param sourceDirs restrict to only tags found in the given source directories
-	 */
-	void SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
+    /**
+     * @param search the string to look for
+     * @param sourceDirs restrict to only tags found in the given source directories
+     */
+    void SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
-	protected:
-	bool DoPrepare(soci::statement& stmt, bool doLimit);
+ protected:
+    bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-	private:
-	std::string Search;
-	std::string SearchUpper;
-	std::vector<std::string> SourceDirs;
+ private:
+    std::string Search;
+    std::string SearchUpper;
+    std::vector<std::string> SourceDirs;
 };
 }  // namespace t4p
 

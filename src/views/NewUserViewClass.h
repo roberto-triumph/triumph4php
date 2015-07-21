@@ -37,21 +37,21 @@ namespace t4p {
  * the user runs the program.
  */
 class NewUserViewClass : public t4p::FeatureViewClass {
-	public:
-	NewUserViewClass(t4p::NewUserFeatureClass& feature);
+ public:
+    NewUserViewClass(t4p::NewUserFeatureClass& feature);
 
-	private:
-	void OnAppReady(wxCommandEvent& event);
+ private:
+    void OnAppReady(wxCommandEvent& event);
 
-	void OnTimer(wxTimerEvent& event);
+    void OnTimer(wxTimerEvent& event);
 
-	void OnWizardCancel(wxWizardEvent& event);
+    void OnWizardCancel(wxWizardEvent& event);
 
-	wxTimer Timer;
+    wxTimer Timer;
 
-	t4p::NewUserFeatureClass& Feature;
+    t4p::NewUserFeatureClass& Feature;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /**
@@ -60,20 +60,20 @@ class NewUserViewClass : public t4p::FeatureViewClass {
  * to the user - the first time the program is run on a machine.
 - */
 class NewUserSettingsPanelClass : public NewUserSettingsPanelGeneratedClass {
-	public:
-	NewUserSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals,
-		t4p::PreferencesClass& preferences, wxFileName& configFileDir);
+ public:
+    NewUserSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals,
+                              t4p::PreferencesClass& preferences, wxFileName& configFileDir);
 
-	bool TransferDataFromWindow();
+    bool TransferDataFromWindow();
 
-	private:
-	void OnUpdateUi(wxUpdateUIEvent& event);
+ private:
+    void OnUpdateUi(wxUpdateUIEvent& event);
 
-	t4p::PreferencesClass& Preferences;
+    t4p::PreferencesClass& Preferences;
 
-	wxFileName& ConfigFileDir;
+    wxFileName& ConfigFileDir;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /**
@@ -81,28 +81,28 @@ class NewUserSettingsPanelClass : public NewUserSettingsPanelGeneratedClass {
  * a type (language)
  */
 class NewUserAssociationsPanelClass : public NewUserAssociationsPanelGeneratedClass {
-	public:
-	NewUserAssociationsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
+ public:
+    NewUserAssociationsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
 
-	private:
-	t4p::GlobalsClass& Globals;
+ private:
+    t4p::GlobalsClass& Globals;
 };
 
 /**
  * The dialog that shows the user the php settings
  */
 class NewUserPhpSettingsPanelClass : public NewUserPhpSettingsPanelGeneratedClass {
-	public:
-	NewUserPhpSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
+ public:
+    NewUserPhpSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
 
-	bool TransferDataFromWindow();
+    bool TransferDataFromWindow();
 
-	private:
-	void OnUpdateUi(wxUpdateUIEvent& event);
+ private:
+    void OnUpdateUi(wxUpdateUIEvent& event);
 
-	t4p::GlobalsClass& Globals;
+    t4p::GlobalsClass& Globals;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

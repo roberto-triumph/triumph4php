@@ -37,62 +37,62 @@ namespace t4p {
  *
  */
 class CallStackActionClass : public t4p::GlobalActionClass {
-	public:
-	/**
-	 * @param runningThreads will be notified of EVENT_WORK_* events and EVENT_CALL_STACK_COMPLETE events as well
-	 */
-	CallStackActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    /**
+     * @param runningThreads will be notified of EVENT_WORK_* events and EVENT_CALL_STACK_COMPLETE events as well
+     */
+    CallStackActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * The SetCallStackStart method needs to
-	 * be called before Init() so that we can know where to start iterating code from.
-	 */
-	bool Init(t4p::GlobalsClass& globals);
+    /**
+     * The SetCallStackStart method needs to
+     * be called before Init() so that we can know where to start iterating code from.
+     */
+    bool Init(t4p::GlobalsClass& globals);
 
-	/**
-	 * The file, class, and method where to start the call stack recursion.
-	 * This is usually a controller action. This method should be called before
-	 * Init()
-	 */
-	bool SetCallStackStart(const wxFileName& fileName, const UnicodeString& className,
-		const UnicodeString& methodName, const wxFileName& detectorDbFileName);
+    /**
+     * The file, class, and method where to start the call stack recursion.
+     * This is usually a controller action. This method should be called before
+     * Init()
+     */
+    bool SetCallStackStart(const wxFileName& fileName, const UnicodeString& className,
+                           const UnicodeString& methodName, const wxFileName& detectorDbFileName);
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	void BackgroundWork();
+    void BackgroundWork();
 
-	private:
-	/**
-	 * This is used by the call stack class to find out the file name (full paths) of the
-	 * classes / methods.
-	 */
-	t4p::TagCacheClass TagCache;
+ private:
+    /**
+     * This is used by the call stack class to find out the file name (full paths) of the
+     * classes / methods.
+     */
+    t4p::TagCacheClass TagCache;
 
-	/**
-	 * Used to generate the call stack file (file of all function calls of a URL); call stack
-	 * file is required by the ViewInfos detector
-	 */
-	t4p::CallStackClass CallStack;
+    /**
+     * Used to generate the call stack file (file of all function calls of a URL); call stack
+     * file is required by the ViewInfos detector
+     */
+    t4p::CallStackClass CallStack;
 
-	/**
-	 * The results of the call stack will be written to this file.
-	 * This class will pick the file name (it will be a temporary file).
-	 */
-	wxFileName DetectorDbFileName;
+    /**
+     * The results of the call stack will be written to this file.
+     * This class will pick the file name (it will be a temporary file).
+     */
+    wxFileName DetectorDbFileName;
 
-	/**
-	 * The file, class, and method where to start the call stack recursion.
-	 * This is usually a controller action
-	 */
-	wxFileName StartFileName;
-	UnicodeString StartClassName;
-	UnicodeString StartMethodName;
+    /**
+     * The file, class, and method where to start the call stack recursion.
+     * This is usually a controller action
+     */
+    wxFileName StartFileName;
+    UnicodeString StartClassName;
+    UnicodeString StartMethodName;
 
-	/**
-	 * Need to know the PHP version of code so that we know which parser
-	 * to use.
-	 */
-	pelet::Versions Version;
+    /**
+     * Need to know the PHP version of code so that we know which parser
+     * to use.
+     */
+    pelet::Versions Version;
 };
 }  // namespace t4p
 

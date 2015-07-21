@@ -38,18 +38,18 @@ namespace t4p {
  * grouping of a tag and its member tags.
  */
 class OutlineSearchCompleteClass {
-	public:
-	wxString Label;
+ public:
+    wxString Label;
 
-	std::map<wxString, std::vector<t4p::PhpTagClass> > Tags;
+    std::map<wxString, std::vector<t4p::PhpTagClass> > Tags;
 
-	OutlineSearchCompleteClass();
+    OutlineSearchCompleteClass();
 
-	OutlineSearchCompleteClass(const t4p::OutlineSearchCompleteClass& src);
+    OutlineSearchCompleteClass(const t4p::OutlineSearchCompleteClass& src);
 
-	void Copy(const t4p::OutlineSearchCompleteClass& src);
+    void Copy(const t4p::OutlineSearchCompleteClass& src);
 
-	bool IsLabelFileName() const;
+    bool IsLabelFileName() const;
 };
 
 /**
@@ -57,15 +57,15 @@ class OutlineSearchCompleteClass {
  * contains the results of the search.
  */
 class OutlineSearchCompleteEventClass : public wxEvent {
-	public:
-	/**
-	 * Will contain all of the resulting tags.
-	 */
-	std::vector<t4p::OutlineSearchCompleteClass> Tags;
+ public:
+    /**
+     * Will contain all of the resulting tags.
+     */
+    std::vector<t4p::OutlineSearchCompleteClass> Tags;
 
-	OutlineSearchCompleteEventClass(int eventId, const std::vector<t4p::OutlineSearchCompleteClass>& tags);
+    OutlineSearchCompleteEventClass(int eventId, const std::vector<t4p::OutlineSearchCompleteClass>& tags);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 extern const wxEventType EVENT_OUTLINE_SEARCH_COMPLETE;
@@ -82,32 +82,32 @@ typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSea
  * the results will be posted in an event.
  */
 class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
-	public:
-	OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * set the search parameters.  this should be called before the action is
-	 * added to the run queue
-	 *
-	 * @param searches the search strings, can be either file names, full paths, or class names
-	 * @param globals to get the locations of the tag dbs
-	 */
-	void SetSearch(const std::vector<UnicodeString>& searches, t4p::GlobalsClass& globals);
+    /**
+     * set the search parameters.  this should be called before the action is
+     * added to the run queue
+     *
+     * @param searches the search strings, can be either file names, full paths, or class names
+     * @param globals to get the locations of the tag dbs
+     */
+    void SetSearch(const std::vector<UnicodeString>& searches, t4p::GlobalsClass& globals);
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	protected:
-	void BackgroundWork();
+ protected:
+    void BackgroundWork();
 
-	private:
-	t4p::TagCacheClass TagCache;
+ private:
+    t4p::TagCacheClass TagCache;
 
-	std::vector<UnicodeString> SearchStrings;
+    std::vector<UnicodeString> SearchStrings;
 
-	/**
-	 * the directories to look in
-	 */
-	std::vector<wxFileName> EnabledSourceDirs;
+    /**
+     * the directories to look in
+     */
+    std::vector<wxFileName> EnabledSourceDirs;
 };
 
 /**
@@ -116,11 +116,11 @@ class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
  * in the opened files.
  */
 class OutlineFeatureClass : public FeatureClass {
-	public:
-	/**
-	 * Creates a new OutlineViewFeature.
-	 */
-	OutlineFeatureClass(t4p::AppClass& app);
+ public:
+    /**
+     * Creates a new OutlineViewFeature.
+     */
+    OutlineFeatureClass(t4p::AppClass& app);
 };
 }  // namespace t4p
 

@@ -26,42 +26,42 @@
 #include <algorithm>
 
 t4p::BookmarkClass::BookmarkClass()
-: FileName()
-, LineNumber(0)
-, Handle(-1) {
+    : FileName()
+    , LineNumber(0)
+    , Handle(-1) {
 }
 
 t4p::BookmarkClass::BookmarkClass(const wxFileName& fileName, int lineNumber, int handle)
-: FileName(fileName)
-, LineNumber(lineNumber)
-, Handle(handle) {
+    : FileName(fileName)
+    , LineNumber(lineNumber)
+    , Handle(handle) {
 }
 
 t4p::BookmarkClass::BookmarkClass(const t4p::BookmarkClass& src)
-: FileName()
-, LineNumber(0) {
-	Copy(src);
+    : FileName()
+    , LineNumber(0) {
+    Copy(src);
 }
 
 bool t4p::BookmarkClass::operator==(const t4p::BookmarkClass& other) {
-	return other.LineNumber == LineNumber
-		&& other.FileName == FileName;
+    return other.LineNumber == LineNumber
+           && other.FileName == FileName;
 }
 
 t4p::BookmarkClass& t4p::BookmarkClass::operator=(const t4p::BookmarkClass& src) {
-	Copy(src);
-	return *this;
+    Copy(src);
+    return *this;
 }
 
 void t4p::BookmarkClass::Copy(const t4p::BookmarkClass& src) {
-	FileName = src.FileName;
-	LineNumber = src.LineNumber;
-	Handle = src.Handle;
+    FileName = src.FileName;
+    LineNumber = src.LineNumber;
+    Handle = src.Handle;
 }
 
 t4p::BookmarkFeatureClass::BookmarkFeatureClass(t4p::AppClass& app)
-: FeatureClass(app)
-, Bookmarks()
-, CurrentBookmarkIndex(-1) {
+    : FeatureClass(app)
+    , Bookmarks()
+    , CurrentBookmarkIndex(-1) {
 }
 

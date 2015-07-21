@@ -33,24 +33,24 @@
  * It seems that the wxGenericValidator or wxTextCtrl do not work for wxSearchCtrl
  */
 class SearchControlValidatorClass : public wxValidator {
-	public:
-	SearchControlValidatorClass(wxString* data);
+ public:
+    SearchControlValidatorClass(wxString* data);
 
-	virtual bool TransferToWindow();
+    virtual bool TransferToWindow();
 
-	virtual bool TransferFromWindow();
+    virtual bool TransferFromWindow();
 
-	virtual bool Validate(wxWindow* parent);
+    virtual bool Validate(wxWindow* parent);
 
-	virtual wxObject* Clone() const;
+    virtual wxObject* Clone() const;
 
-	private:
-	SearchControlValidatorClass();
+ private:
+    SearchControlValidatorClass();
 
-	/**
-	 * The data
-	 */
-	wxString* Data;
+    /**
+     * The data
+     */
+    wxString* Data;
 };
 
 #endif  // SRC_WIDGETS_SEARCHCONTROLVALIDATORCLASS_H_

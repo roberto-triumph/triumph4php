@@ -39,25 +39,25 @@ namespace t4p {
  * The action will only check the db files for enabled projects.
  */
 class TagCacheDbVersionActionClass : public t4p::GlobalActionClass {
-	public:
-	TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	bool Init(t4p::GlobalsClass& globals);
+    bool Init(t4p::GlobalsClass& globals);
 
-	void BackgroundWork();
+    void BackgroundWork();
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	private:
-	/**
-	 * files to check.
-	 */
-	std::vector<wxFileName> TagDbs;
+ private:
+    /**
+     * files to check.
+     */
+    std::vector<wxFileName> TagDbs;
 
-	/**
-	 * The opened connection to each tag db
-	 */
-	soci::session Session;
+    /**
+     * The opened connection to each tag db
+     */
+    soci::session Session;
 };
 
 /**
@@ -69,25 +69,25 @@ class TagCacheDbVersionActionClass : public t4p::GlobalActionClass {
  * The action will only check the db files for enabled projects.
  */
 class DetectorCacheDbVersionActionClass : public t4p::GlobalActionClass {
-	public:
-	DetectorCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    DetectorCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	bool Init(t4p::GlobalsClass& globals);
+    bool Init(t4p::GlobalsClass& globals);
 
-	void BackgroundWork();
+    void BackgroundWork();
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	private:
-	/**
-	 * files to check.
-	 */
-	std::vector<wxFileName> DetectorDbs;
+ private:
+    /**
+     * files to check.
+     */
+    std::vector<wxFileName> DetectorDbs;
 
-	/**
-	 * The opened connection to each detector db
-	 */
-	soci::session Session;
+    /**
+     * The opened connection to each detector db
+     */
+    soci::session Session;
 };
 }  // namespace t4p
 

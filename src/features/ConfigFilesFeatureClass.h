@@ -37,25 +37,25 @@ namespace t4p {
 * project, that way we can build the submenus.
 */
 class ConfigFilesFeaturePairClass {
-	public:
-	/**
-	 * the label of the project that the config files were
-	 * found in
-	 */
-	wxString ProjectLabel;
+ public:
+    /**
+     * the label of the project that the config files were
+     * found in
+     */
+    wxString ProjectLabel;
 
-	/**
-	 * the config files that were found in this project.
-	 */
-	std::vector<t4p::ConfigTagClass> ConfigTags;
+    /**
+     * the config files that were found in this project.
+     */
+    std::vector<t4p::ConfigTagClass> ConfigTags;
 
-	ConfigFilesFeaturePairClass();
+    ConfigFilesFeaturePairClass();
 
-	ConfigFilesFeaturePairClass(const t4p::ConfigFilesFeaturePairClass& src);
+    ConfigFilesFeaturePairClass(const t4p::ConfigFilesFeaturePairClass& src);
 
-	ConfigFilesFeaturePairClass& operator=(const t4p::ConfigFilesFeaturePairClass& src);
+    ConfigFilesFeaturePairClass& operator=(const t4p::ConfigFilesFeaturePairClass& src);
 
-	void Copy(const t4p::ConfigFilesFeaturePairClass& src);
+    void Copy(const t4p::ConfigFilesFeaturePairClass& src);
 };
 
 /**
@@ -65,47 +65,47 @@ class ConfigFilesFeaturePairClass {
  * and are read with the help of ConfigTagFinderClass.
  */
 class ConfigFilesFeatureClass : public t4p::FeatureClass {
-	public:
-	/**
-	 * max amount of menu items to show
-	 * the 100 is due to the menu ids allocated to each feature in
-	 * the FeatureClass MenuIds enum
-	 */
-	static const size_t MAX_CONFIG_MENU_ITEMS = 100;
+ public:
+    /**
+     * max amount of menu items to show
+     * the 100 is due to the menu ids allocated to each feature in
+     * the FeatureClass MenuIds enum
+     */
+    static const size_t MAX_CONFIG_MENU_ITEMS = 100;
 
-	ConfigFilesFeatureClass(t4p::AppClass& app);
+    ConfigFilesFeatureClass(t4p::AppClass& app);
 
-	/**
-	 * organizes all of the detected config files by grouping
-	 * them into separate vectors, one vector per project.
-	 * This method is required for the menu handlers to work.
-	 */
-	bool BuildConfigPairs(std::vector<t4p::ConfigFilesFeaturePairClass>& pairs);
+    /**
+     * organizes all of the detected config files by grouping
+     * them into separate vectors, one vector per project.
+     * This method is required for the menu handlers to work.
+     */
+    bool BuildConfigPairs(std::vector<t4p::ConfigFilesFeaturePairClass>& pairs);
 
-	 /**
-	 * When a menu item is selected; open the corresponding config
-	 * file
-	 *
-	 * @param index index into ConfigTags
-	 */
-	void OpenConfigItem(size_t index);
+    /**
+    * When a menu item is selected; open the corresponding config
+    * file
+    *
+    * @param index index into ConfigTags
+    */
+    void OpenConfigItem(size_t index);
 
-	private:
-	/**
-	 * Read all of the detected config tags into memory; that way we can
-	 * assign them a menu ID (the index into this vector will be used
-	 * as the menu ID).
-	 */
-	std::vector<t4p::ConfigTagClass> ConfigTags;
+ private:
+    /**
+     * Read all of the detected config tags into memory; that way we can
+     * assign them a menu ID (the index into this vector will be used
+     * as the menu ID).
+     */
+    std::vector<t4p::ConfigTagClass> ConfigTags;
 
-	/**
-	 * when a file has been saved; check to see if it is one of the config
-	 * files that has been changed.  If, so the trigger database
-	 * detection
-	 */
-	void OnFileSaved(t4p::CodeControlEventClass& event);
+    /**
+     * when a file has been saved; check to see if it is one of the config
+     * files that has been changed.  If, so the trigger database
+     * detection
+     */
+    void OnFileSaved(t4p::CodeControlEventClass& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

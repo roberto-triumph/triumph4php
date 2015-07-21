@@ -55,38 +55,38 @@ class TagCacheClass;
  * wxKeyBinder does not handle dynamic menus well.
  */
 enum MenuIds {
-	// start way out here to prevent collisions with default menus
-	// and action IDs ID_EVENT_ACTION_*
-	MENU_START = wxID_HIGHEST + 10000,
-	MENU_FINDER = wxID_HIGHEST + 10000,
-	MENU_FIND_IN_FILES = wxID_HIGHEST + 10100,
-	MENU_SQL = wxID_HIGHEST + 10200,
-	MENU_RUN_PHP = wxID_HIGHEST + 10300,
-	MENU_RESOURCE = wxID_HIGHEST + 10400,
-	MENU_PROJECT = wxID_HIGHEST + 10500,
-	MENU_OUTLINE = wxID_HIGHEST + 10600,
-	MENU_LINT_PHP = wxID_HIGHEST + 10700,
-	MENU_ENVIRONMENT = wxID_HIGHEST + 10800,
-	MENU_EDITOR_MESSAGES = wxID_HIGHEST + 10900,
-	MENU_CODE_IGNITER = wxID_HIGHEST + 11000,
-	MENU_RUN_BROWSER = wxID_HIGHEST + 11100,
-	MENU_TEMPLATE_FILES = wxID_HIGHEST + 11200,
-	MENU_RECENT_FILES = wxID_HIGHEST + 11300,
-	MENU_DETECTORS = wxID_HIGHEST + 11400,
-	CONFIG_DETECTORS = wxID_HIGHEST + 11500,
-	MENU_EXPLORER = wxID_HIGHEST + 11600,
-	MENU_VERSION_UPDATE = wxID_HIGHEST + 11700,
-	MENU_TOTAL_SEARCH = wxID_HIGHEST + 11800,
-	MENU_DOC_COMMENT = wxID_HIGHEST + 11900,
-	MENU_BEHAVIOR = wxID_HIGHEST + 12000,
-	MENU_CHANGELOG = wxID_HIGHEST + 12100,
-	MENU_BOOKMARK =  wxID_HIGHEST + 12200,
-	MENU_DEBUGGER =  wxID_HIGHEST + 12300,
-	MENU_FILE_CABINET = wxID_HIGHEST + 12400,
-	MENU_NOTEBOOK_PANE = wxID_HIGHEST + 12500,
-	MENU_FILE_OPERATIONS = wxID_HIGHEST + 12600,
-	MENU_NAVIGATION = wxID_HIGHEST + 12700,
-	MENU_END = wxID_HIGHEST + 12800,
+    // start way out here to prevent collisions with default menus
+    // and action IDs ID_EVENT_ACTION_*
+    MENU_START = wxID_HIGHEST + 10000,
+    MENU_FINDER = wxID_HIGHEST + 10000,
+    MENU_FIND_IN_FILES = wxID_HIGHEST + 10100,
+    MENU_SQL = wxID_HIGHEST + 10200,
+    MENU_RUN_PHP = wxID_HIGHEST + 10300,
+    MENU_RESOURCE = wxID_HIGHEST + 10400,
+    MENU_PROJECT = wxID_HIGHEST + 10500,
+    MENU_OUTLINE = wxID_HIGHEST + 10600,
+    MENU_LINT_PHP = wxID_HIGHEST + 10700,
+    MENU_ENVIRONMENT = wxID_HIGHEST + 10800,
+    MENU_EDITOR_MESSAGES = wxID_HIGHEST + 10900,
+    MENU_CODE_IGNITER = wxID_HIGHEST + 11000,
+    MENU_RUN_BROWSER = wxID_HIGHEST + 11100,
+    MENU_TEMPLATE_FILES = wxID_HIGHEST + 11200,
+    MENU_RECENT_FILES = wxID_HIGHEST + 11300,
+    MENU_DETECTORS = wxID_HIGHEST + 11400,
+    CONFIG_DETECTORS = wxID_HIGHEST + 11500,
+    MENU_EXPLORER = wxID_HIGHEST + 11600,
+    MENU_VERSION_UPDATE = wxID_HIGHEST + 11700,
+    MENU_TOTAL_SEARCH = wxID_HIGHEST + 11800,
+    MENU_DOC_COMMENT = wxID_HIGHEST + 11900,
+    MENU_BEHAVIOR = wxID_HIGHEST + 12000,
+    MENU_CHANGELOG = wxID_HIGHEST + 12100,
+    MENU_BOOKMARK =  wxID_HIGHEST + 12200,
+    MENU_DEBUGGER =  wxID_HIGHEST + 12300,
+    MENU_FILE_CABINET = wxID_HIGHEST + 12400,
+    MENU_NOTEBOOK_PANE = wxID_HIGHEST + 12500,
+    MENU_FILE_OPERATIONS = wxID_HIGHEST + 12600,
+    MENU_NAVIGATION = wxID_HIGHEST + 12700,
+    MENU_END = wxID_HIGHEST + 12800,
 };
 
 /**
@@ -144,33 +144,33 @@ enum MenuIds {
  *
  */
 class FeatureClass : public wxEvtHandler {
-	public:
-	/**
-	 * The application event dispatcher. Also holds all 'global' structures and settings.
-	 */
-	AppClass& App;
+ public:
+    /**
+     * The application event dispatcher. Also holds all 'global' structures and settings.
+     */
+    AppClass& App;
 
-	/**
-	 * Constructor
-	 * @param app the handler that may receive events from features.
-	 * Note that at the start, any window pointers are not yet initialized
- 	 */
-	FeatureClass(AppClass& app);
+    /**
+     * Constructor
+     * @param app the handler that may receive events from features.
+     * Note that at the start, any window pointers are not yet initialized
+     */
+    FeatureClass(AppClass& app);
 
-	/**
-	 * Destructor.  May be overidden by sub classes.
-	 */
-	virtual ~FeatureClass();
+    /**
+     * Destructor.  May be overidden by sub classes.
+     */
+    virtual ~FeatureClass();
 
-	/**
-	 * This method will be called during application startup; the feature should load the preferences from persistent
-	 * storage (confg) here
-	 *
-	 * @param wxConfigBase* the config where settings are stored.
-	 */
-	virtual void LoadPreferences(wxConfigBase* config);
+    /**
+     * This method will be called during application startup; the feature should load the preferences from persistent
+     * storage (confg) here
+     *
+     * @param wxConfigBase* the config where settings are stored.
+     */
+    virtual void LoadPreferences(wxConfigBase* config);
 
-	private:
+ private:
 };
 }  // namespace t4p
 

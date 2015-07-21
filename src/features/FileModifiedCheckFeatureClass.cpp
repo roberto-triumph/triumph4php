@@ -30,15 +30,15 @@
 const int t4p::ID_FILE_MODIFIED_ACTION = wxNewId();
 
 t4p::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+    : FeatureClass(app) {
 }
 
 
 void t4p::FileModifiedCheckFeatureClass::StartFilePoll(std::vector<t4p::FileModifiedTimeClass> filesToPoll) {
-	if (!filesToPoll.empty()) {
-		t4p::FileModifiedCheckActionClass* action = new t4p::FileModifiedCheckActionClass(App.RunningThreads,
-			t4p::ID_FILE_MODIFIED_ACTION);
-		action->SetFiles(filesToPoll);
-		App.RunningThreads.Queue(action);
-	}
+    if (!filesToPoll.empty()) {
+        t4p::FileModifiedCheckActionClass* action = new t4p::FileModifiedCheckActionClass(App.RunningThreads,
+                t4p::ID_FILE_MODIFIED_ACTION);
+        action->SetFiles(filesToPoll);
+        App.RunningThreads.Queue(action);
+    }
 }

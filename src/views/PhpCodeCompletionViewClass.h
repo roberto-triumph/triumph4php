@@ -36,116 +36,116 @@
 
 namespace t4p {
 class PhpCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
-	public:
-	PhpCodeCompletionProviderClass(t4p::GlobalsClass& globals);
+ public:
+    PhpCodeCompletionProviderClass(t4p::GlobalsClass& globals);
 
-	/**
-	 * @return bool TRUE if file type is php or html
-	 */
-	bool DoesSupport(t4p::FileType type);
+    /**
+     * @return bool TRUE if file type is php or html
+     */
+    bool DoesSupport(t4p::FileType type);
 
-	void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
+    void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
 
-	void RegisterAutoCompletionImages(wxStyledTextCtrl* ctrl);
+    void RegisterAutoCompletionImages(wxStyledTextCtrl* ctrl);
 
-	/**
-	 * Append the '(' for method calls that are completed
-	 */
-	void OnAutoCompletionSelected(wxStyledTextEvent& evt);
+    /**
+     * Append the '(' for method calls that are completed
+     */
+    void OnAutoCompletionSelected(wxStyledTextEvent& evt);
 
-	private:
-	/**
-	 * handles auto completion for PHP.
-	 *
-	 * @param code most current source code; but only up to the current position (this helps determine
-	 * the scope)
-	 * @param word the word to complete
-	 * @param syntax the token type that the cursor is currently on.  This helps
-	 *        in determining context (ie if the cursor is inside of a string)
-	 * @param ctrl the code control that contains the source
-	 * @param completeStatus a bit of text that will help the user understand
-	 *        why the complete box did not populate.
-	 */
-	void HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax,
-		t4p::CodeControlClass* ctrl, wxString& completeStatus);
+ private:
+    /**
+     * handles auto completion for PHP.
+     *
+     * @param code most current source code; but only up to the current position (this helps determine
+     * the scope)
+     * @param word the word to complete
+     * @param syntax the token type that the cursor is currently on.  This helps
+     *        in determining context (ie if the cursor is inside of a string)
+     * @param ctrl the code control that contains the source
+     * @param completeStatus a bit of text that will help the user understand
+     *        why the complete box did not populate.
+     */
+    void HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax,
+                                 t4p::CodeControlClass* ctrl, wxString& completeStatus);
 
-	/**
-	* handles auto completion for HTML.
-	*
-	* @param word the word to complete
-	* @param syntax the token type that the cursor is currently on.  This helps
-	*        in determining context (ie if the cursor is inside of a tag name or a tag value)
-	* @param ctrl the code control that contains the source
-	* @param completeStatus a bit of text that will help the user understand
-	*        why the complete box did not populate.
-	*/
-	void HandleAutoCompletionHtml(const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax,
-		wxStyledTextCtrl* ctrl, wxString& completeStatus);
+    /**
+    * handles auto completion for HTML.
+    *
+    * @param word the word to complete
+    * @param syntax the token type that the cursor is currently on.  This helps
+    *        in determining context (ie if the cursor is inside of a tag name or a tag value)
+    * @param ctrl the code control that contains the source
+    * @param completeStatus a bit of text that will help the user understand
+    *        why the complete box did not populate.
+    */
+    void HandleAutoCompletionHtml(const UnicodeString& word, pelet::LanguageDiscoveryClass::Syntax syntax,
+                                  wxStyledTextCtrl* ctrl, wxString& completeStatus);
 
-	/**
-	 * handles auto completion of stufff inside a PHP (single quote) string
-	 * @param word the word to complete
-	 * @param ctrl the code control that contains the source
-	 * @param completeStatus a bit of text that will help the user understand
-	 *        why the complete box did not populate.
-	 */
-	void HandleAutoCompletionString(const UnicodeString& word, wxStyledTextCtrl* ctrl, wxString& completeStats);
+    /**
+     * handles auto completion of stufff inside a PHP (single quote) string
+     * @param word the word to complete
+     * @param ctrl the code control that contains the source
+     * @param completeStatus a bit of text that will help the user understand
+     *        why the complete box did not populate.
+     */
+    void HandleAutoCompletionString(const UnicodeString& word, wxStyledTextCtrl* ctrl, wxString& completeStats);
 
-	/**
-	 * Fills completeStatus with a human-friendly version of the symbol table error
-	 */
-	void HandleAutoCompletionPhpStatus(const t4p::SymbolTableMatchErrorClass& error,
-		const UnicodeString& lastExpression, const pelet::VariableClass& parsedVariable,
-		const pelet::ScopeClass& variableScope, wxString& completeStatus);
+    /**
+     * Fills completeStatus with a human-friendly version of the symbol table error
+     */
+    void HandleAutoCompletionPhpStatus(const t4p::SymbolTableMatchErrorClass& error,
+                                       const UnicodeString& lastExpression, const pelet::VariableClass& parsedVariable,
+                                       const pelet::ScopeClass& variableScope, wxString& completeStatus);
 
-	/**
-	 * share code between HandleAutoCompletionString and HandleAutoCompletionPhp since
-	 * we want to autocomplete sql table and column names on both single and double quoted
-	 * string, but we want to keep autocompletion of PHP variables in
-	 * double-quoted strings only
-	 */
-	void AppendSqlTableNames(const UnicodeString& word, std::vector<wxString>& matches);
+    /**
+     * share code between HandleAutoCompletionString and HandleAutoCompletionPhp since
+     * we want to autocomplete sql table and column names on both single and double quoted
+     * string, but we want to keep autocompletion of PHP variables in
+     * double-quoted strings only
+     */
+    void AppendSqlTableNames(const UnicodeString& word, std::vector<wxString>& matches);
 
-	/**
-	 * Return a list of possible keyword matches for the given word. For example, if word="cl"
-	 * then this method would return "class"
-	 */
-	std::vector<wxString> CollectNearMatchKeywords(wxString word);
+    /**
+     * Return a list of possible keyword matches for the given word. For example, if word="cl"
+     * then this method would return "class"
+     */
+    std::vector<wxString> CollectNearMatchKeywords(wxString word);
 
-	/**
-	 * In order to show the proper auto complete keywords we must know what language is
-	 * being edited at any given position.  This class will help in this regard.
-	 */
-	pelet::LanguageDiscoveryClass LanguageDiscovery;
+    /**
+     * In order to show the proper auto complete keywords we must know what language is
+     * being edited at any given position.  This class will help in this regard.
+     */
+    pelet::LanguageDiscoveryClass LanguageDiscovery;
 
-	/**
-	* To parse a code snippet to make it suitable for code completion
-	* @var pelet::ParserClass
-	*/
-	pelet::ParserClass Parser;
+    /**
+    * To parse a code snippet to make it suitable for code completion
+    * @var pelet::ParserClass
+    */
+    pelet::ParserClass Parser;
 
-	/**
-	 * To get the last expression in the source code
-	 * @var pelet::LexicalAnalyzerClass
-	 */
-	pelet::LexicalAnalyzerClass Lexer;
+    /**
+     * To get the last expression in the source code
+     * @var pelet::LexicalAnalyzerClass
+     */
+    pelet::LexicalAnalyzerClass Lexer;
 
-	/**
-	 * This will be used to find the scope of any position in a piece of PHP code
-	 * @var ScopeFinderClass
-	 */
-	t4p::ScopeFinderClass ScopeFinder;
+    /**
+     * This will be used to find the scope of any position in a piece of PHP code
+     * @var ScopeFinderClass
+     */
+    t4p::ScopeFinderClass ScopeFinder;
 
-	/**
-	 * To access any global structures: the tag cache, template variables
-	 */
-	t4p::GlobalsClass& Globals;
+    /**
+     * To access any global structures: the tag cache, template variables
+     */
+    t4p::GlobalsClass& Globals;
 
-	/**
-	 * The resources that are shown in the code completion list. Keeping these around
-	 * so that we can append the '(' for method calls.
-	 */
-	std::vector<t4p::PhpTagClass> AutoCompletionResourceMatches;
+    /**
+     * The resources that are shown in the code completion list. Keeping these around
+     * so that we can append the '(' for method calls.
+     */
+    std::vector<t4p::PhpTagClass> AutoCompletionResourceMatches;
 };
 
 /**
@@ -154,61 +154,61 @@ class PhpCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
  * is currently on.
  */
 class PhpCallTipProviderClass : public t4p::CallTipProviderClass {
-	public:
-	PhpCallTipProviderClass(t4p::GlobalsClass& globals);
+ public:
+    PhpCallTipProviderClass(t4p::GlobalsClass& globals);
 
-	/**
-	 * @return bool TRUE if file type is php or html
-	 */
-	bool DoesSupport(t4p::FileType type);
+    /**
+     * @return bool TRUE if file type is php or html
+     */
+    bool DoesSupport(t4p::FileType type);
 
-	/**
-	 *
-	 * @param ch the last character that the user typed in
-	 *        providers can use this to automatically show/hide
-	 *        the tip.
-	 * @param force TRUE if the user forced the tip
-	 * @param status any errors to show the user; these are useful so that
-	 *        the user knows why completion did not suggest any items
-	 */
-	void ProvideTip(t4p::CodeControlClass* ctrl, wxChar ch, bool force, wxString& status);
+    /**
+     *
+     * @param ch the last character that the user typed in
+     *        providers can use this to automatically show/hide
+     *        the tip.
+     * @param force TRUE if the user forced the tip
+     * @param status any errors to show the user; these are useful so that
+     *        the user knows why completion did not suggest any items
+     */
+    void ProvideTip(t4p::CodeControlClass* ctrl, wxChar ch, bool force, wxString& status);
 
-	/**
-	 * Handle the call tip up/down arrow events
-	 */
-	void OnCallTipClick(wxStyledTextEvent& evt);
+    /**
+     * Handle the call tip up/down arrow events
+     */
+    void OnCallTipClick(wxStyledTextEvent& evt);
 
-	private:
-	/**
-	 * To access any global structures: the tag cache, template variables
-	 */
-	t4p::GlobalsClass& Globals;
+ private:
+    /**
+     * To access any global structures: the tag cache, template variables
+     */
+    t4p::GlobalsClass& Globals;
 
-	/**
-	 * The resources used to populate the call tips
-	 */
-	std::vector<t4p::PhpTagClass> CurrentCallTipResources;
+    /**
+     * The resources used to populate the call tips
+     */
+    std::vector<t4p::PhpTagClass> CurrentCallTipResources;
 
-	/**
-	 * The tag signature currently being displayed in the calltip.
-	 * index into CurrentCallTipResources
-	 */
-	size_t CurrentCallTipIndex;
+    /**
+     * The tag signature currently being displayed in the calltip.
+     * index into CurrentCallTipResources
+     */
+    size_t CurrentCallTipIndex;
 };
 
 /**
  * this class highlights matching braces {}, [], and ()
  */
 class PhpBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
-	public:
-	PhpBraceMatchStylerClass();
+ public:
+    PhpBraceMatchStylerClass();
 
-	/**
-	 * @return bool TRUE if file type is php or html
-	 */
-	bool DoesSupport(t4p::FileType type);
+    /**
+     * @return bool TRUE if file type is php or html
+     */
+    bool DoesSupport(t4p::FileType type);
 
-	void Style(t4p::CodeControlClass* ctrl, int postToCheck);
+    void Style(t4p::CodeControlClass* ctrl, int postToCheck);
 };
 
 /**
@@ -218,19 +218,19 @@ class PhpBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
  * <?php tags.
  */
 class PhpCodeCompletionViewClass : public t4p::FeatureViewClass {
-	public:
-	PhpCodeCompletionViewClass(t4p::PhpCodeCompletionFeatureClass& feature);
+ public:
+    PhpCodeCompletionViewClass(t4p::PhpCodeCompletionFeatureClass& feature);
 
-	private:
-	void OnAppFileOpened(t4p::CodeControlEventClass& event);
-	void OnAutoCompletionSelected(wxStyledTextEvent& event);
-	void OnCallTipClick(wxStyledTextEvent& event);
+ private:
+    void OnAppFileOpened(t4p::CodeControlEventClass& event);
+    void OnAutoCompletionSelected(wxStyledTextEvent& event);
+    void OnCallTipClick(wxStyledTextEvent& event);
 
-	t4p::PhpCodeCompletionProviderClass CodeCompletionProvider;
-	t4p::PhpCallTipProviderClass CallTipProvider;
-	t4p::PhpBraceMatchStylerClass BraceStyler;
+    t4p::PhpCodeCompletionProviderClass CodeCompletionProvider;
+    t4p::PhpCallTipProviderClass CallTipProvider;
+    t4p::PhpBraceMatchStylerClass BraceStyler;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

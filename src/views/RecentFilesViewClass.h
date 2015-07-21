@@ -32,44 +32,44 @@
 
 namespace t4p {
 class RecentFilesViewClass : public FeatureViewClass {
-	public:
-	RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature);
+ public:
+    RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature);
 
-	~RecentFilesViewClass();
+    ~RecentFilesViewClass();
 
-	void AddFileMenuItems(wxMenu* fileMenu);
+    void AddFileMenuItems(wxMenu* fileMenu);
 
-	void SavePreferences();
+    void SavePreferences();
 
-	private:
-	/**
-	 * sub-menu to hold the recent files
-	 */
-	wxMenu* RecentFilesMenu;
+ private:
+    /**
+     * sub-menu to hold the recent files
+     */
+    wxMenu* RecentFilesMenu;
 
-	/**
-	 * class that encapsulates the logic
-	 */
-	t4p::RecentFilesFeatureClass& Feature;
+    /**
+     * class that encapsulates the logic
+     */
+    t4p::RecentFilesFeatureClass& Feature;
 
-	/**
-	 * handler for the file menu event
-	 */
-	void OnRecentFileMenu(wxCommandEvent& event);
+    /**
+     * handler for the file menu event
+     */
+    void OnRecentFileMenu(wxCommandEvent& event);
 
-	/**
-	 * when a file has been opened, add it to the recent
-	 * list.
-	 */
-	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+    /**
+     * when a file has been opened, add it to the recent
+     * list.
+     */
+    void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
-	/**
-	 * when a file has been created, add it to the recent
-	 * list.
-	 */
-	void OnAppFileCreated(wxCommandEvent& event);
+    /**
+     * when a file has been created, add it to the recent
+     * list.
+     */
+    void OnAppFileCreated(wxCommandEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

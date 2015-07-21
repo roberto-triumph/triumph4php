@@ -28,32 +28,32 @@
 #include "globals/ProjectClass.h"
 
 void t4p::TagListRemoveNativeMatches(std::vector<t4p::PhpTagClass>& matches) {
-	std::vector<t4p::PhpTagClass>::iterator it = matches.begin();
-	while (it != matches.end()) {
-		if (it->IsNative) {
-			it = matches.erase(it);
-		} else {
-			it++;
-		}
-	}
+    std::vector<t4p::PhpTagClass>::iterator it = matches.begin();
+    while (it != matches.end()) {
+        if (it->IsNative) {
+            it = matches.erase(it);
+        } else {
+            it++;
+        }
+    }
 }
 
 void t4p::TagListKeepMatchesFromProjects(std::vector<t4p::PhpTagClass>& matches,
-		std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType) {
-	std::vector<t4p::PhpTagClass>::iterator tag = matches.begin();
-	std::vector<t4p::ProjectClass*>::const_iterator project;
-	while (tag != matches.end()) {
-		bool isInProjects = false;
-		for (project = projects.begin(); project != projects.end(); ++project) {
-			isInProjects = (*project)->IsASourceFile(tag->GetFullPath(), fileType);
-			if (isInProjects) {
-				break;
-			}
-		}
-		if (!isInProjects) {
-			tag = matches.erase(tag);
-		} else {
-			tag++;
-		}
-	}
+        std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType) {
+    std::vector<t4p::PhpTagClass>::iterator tag = matches.begin();
+    std::vector<t4p::ProjectClass*>::const_iterator project;
+    while (tag != matches.end()) {
+        bool isInProjects = false;
+        for (project = projects.begin(); project != projects.end(); ++project) {
+            isInProjects = (*project)->IsASourceFile(tag->GetFullPath(), fileType);
+            if (isInProjects) {
+                break;
+            }
+        }
+        if (!isInProjects) {
+            tag = matches.erase(tag);
+        } else {
+            tag++;
+        }
+    }
 }

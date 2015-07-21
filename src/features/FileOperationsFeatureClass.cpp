@@ -25,6 +25,6 @@
 #include "features/FileOperationsFeatureClass.h"
 
 t4p::FileOperationsFeatureClass::FileOperationsFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+    : FeatureClass(app) {
 }
 

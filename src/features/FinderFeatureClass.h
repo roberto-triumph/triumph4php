@@ -35,38 +35,38 @@ namespace t4p {
  * and POST FinderHitEventClas for each found hit.
  */
 class FinderActionClass : public t4p::ActionClass {
-	public:
-	/**
-	 * @param utf8buf this class will take ownership of this pointer
-	 */
-	FinderActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
-		const UnicodeString& search, char* utf8Buf, int bufLength);
+ public:
+    /**
+     * @param utf8buf this class will take ownership of this pointer
+     */
+    FinderActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
+                      const UnicodeString& search, char* utf8Buf, int bufLength);
 
-	protected:
-	void BackgroundWork();
+ protected:
+    void BackgroundWork();
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	private:
-	/**
-	 * to perform the search
-	 */
-	t4p::FinderClass Finder;
+ private:
+    /**
+     * to perform the search
+     */
+    t4p::FinderClass Finder;
 
-	/**
-	 *  unicode representation of ut8buf
-	 */
-	UnicodeString Code;
+    /**
+     *  unicode representation of ut8buf
+     */
+    UnicodeString Code;
 
-	/**
-	 * this class will own the pointer
-	 */
-	char* Utf8Buf;
+    /**
+     * this class will own the pointer
+     */
+    char* Utf8Buf;
 
-	/**
-	 * the number of characters in Utf8Buf
-	 */
-	int BufferLength;
+    /**
+     * the number of characters in Utf8Buf
+     */
+    int BufferLength;
 };
 
 /**
@@ -77,20 +77,20 @@ class FinderActionClass : public t4p::ActionClass {
  * background thread.
  */
 class FinderHitEventClass : public wxEvent {
-	public:
-	/**
-	 * this is the index into the utf8 buffer, not character pos
-	 */
-	int Start;
+ public:
+    /**
+     * this is the index into the utf8 buffer, not character pos
+     */
+    int Start;
 
-	/**
-	 * this is the number of utf8 bytes, not number of characters
-	 */
-	int Length;
+    /**
+     * this is the number of utf8 bytes, not number of characters
+     */
+    int Length;
 
-	FinderHitEventClass(int id, int start, int length);
+    FinderHitEventClass(int id, int start, int length);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 extern const wxEventType EVENT_FINDER_ACTION;
@@ -99,35 +99,35 @@ extern const int ID_FINDER_ACTION;
 typedef void (wxEvtHandler::*FinderHitEventClassFunction)(t4p::FinderHitEventClass&);
 
 #define EVT_FINDER(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FINDER_ACTION, id, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FINDER_ACTION, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(FinderHitEventClassFunction, & fn), (wxObject *) NULL),
 
 
 class FinderFeatureClass : public FeatureClass {
-	public:
-	/**
-	 * will perform the searching
-	 */
-	t4p::FinderClass Finder;
-	t4p::FinderClass FinderReplace;
+ public:
+    /**
+     * will perform the searching
+     */
+    t4p::FinderClass Finder;
+    t4p::FinderClass FinderReplace;
 
-	/**
-	 * Constructor
- 	 */
-	FinderFeatureClass(t4p::AppClass& app);
+    /**
+     * Constructor
+     */
+    FinderFeatureClass(t4p::AppClass& app);
 
-	void LoadPreferences(wxConfigBase* config);
+    void LoadPreferences(wxConfigBase* config);
 
-	/**
-	 * start a search in the background thread to look for word
-	 * inside buf
-	 *
-	 * @param word
-	 * @param buf not owned by this class
-	 * @param documentLength length of buf
-	 */
-	void StartFinderAction(UnicodeString word, char* buf, int documentLength);
+    /**
+     * start a search in the background thread to look for word
+     * inside buf
+     *
+     * @param word
+     * @param buf not owned by this class
+     * @param documentLength length of buf
+     */
+    void StartFinderAction(UnicodeString word, char* buf, int documentLength);
 };
 }  // namespace t4p
 

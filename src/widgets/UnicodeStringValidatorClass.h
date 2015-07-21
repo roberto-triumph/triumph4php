@@ -34,27 +34,27 @@ namespace t4p {
  * can handle either wxTextCtrl of wxComboBox only.
  */
 class UnicodeStringValidatorClass : public wxValidator {
-	public:
-	UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty);
+ public:
+    UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty);
 
-	virtual bool TransferToWindow();
+    virtual bool TransferToWindow();
 
-	virtual bool TransferFromWindow();
+    virtual bool TransferFromWindow();
 
-	virtual bool Validate(wxWindow* parent);
+    virtual bool Validate(wxWindow* parent);
 
-	virtual wxObject* Clone() const;
+    virtual wxObject* Clone() const;
 
-	private:
-	/**
-	 * The data
-	 */
-	UnicodeString* Data;
+ private:
+    /**
+     * The data
+     */
+    UnicodeString* Data;
 
-	/**
-	 * if FALSE, then empty strings will not be valid
-	 */
-	bool DoAllowEmpty;
+    /**
+     * if FALSE, then empty strings will not be valid
+     */
+    bool DoAllowEmpty;
 };
 }  // namespace t4p
 

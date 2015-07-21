@@ -49,16 +49,16 @@ extern const int ID_FILE_MODIFIED_ACTION;
  * feel lag.
  */
 class FileModifiedCheckFeatureClass : public t4p::FeatureClass {
-	public:
-	FileModifiedCheckFeatureClass(t4p::AppClass& app);
+ public:
+    FileModifiedCheckFeatureClass(t4p::AppClass& app);
 
-	/**
-	 * starts a background action that will check the file mod
-	 * timestamps of the files vs. the timestamps we last got
-	 * for those files. The results will be posted in events
-	 * by the FileModifiedCheckActionClass.
-	 */
-	void StartFilePoll(std::vector<t4p::FileModifiedTimeClass> filesToPoll);
+    /**
+     * starts a background action that will check the file mod
+     * timestamps of the files vs. the timestamps we last got
+     * for those files. The results will be posted in events
+     * by the FileModifiedCheckActionClass.
+     */
+    void StartFilePoll(std::vector<t4p::FileModifiedTimeClass> filesToPoll);
 };
 }  // namespace t4p
 

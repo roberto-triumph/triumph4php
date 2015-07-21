@@ -39,20 +39,20 @@ namespace t4p {
 extern const wxEventType EVENT_APP_LOG;
 
 class EditorLogEventClass : public wxEvent {
-	public:
-	wxString Message;
-	wxLogLevel Level;
-	time_t Timestamp;
+ public:
+    wxString Message;
+    wxLogLevel Level;
+    time_t Timestamp;
 
-	EditorLogEventClass(const wxString& msg, wxLogLevel level, time_t timestamp);
+    EditorLogEventClass(const wxString& msg, wxLogLevel level, time_t timestamp);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 typedef void (wxEvtHandler::*EditorLogEventClassFunction)(EditorLogEventClass&);
 
 #define EVT_APP_LOG(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_LOG, -1, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_LOG, -1, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(EditorLogEventClassFunction, &fn), (wxObject *) NULL),
 
@@ -62,13 +62,13 @@ typedef void (wxEvtHandler::*EditorLogEventClassFunction)(EditorLogEventClass&);
  * This class is the handler for the editor message menu items.
  */
 class EditorMessagesFeatureClass : public FeatureClass {
-	public:
-	EditorMessagesFeatureClass(t4p::AppClass& app);
+ public:
+    EditorMessagesFeatureClass(t4p::AppClass& app);
 
-	private:
-	void OnAppReady(wxCommandEvent& event);
+ private:
+    void OnAppReady(wxCommandEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /**
@@ -79,13 +79,13 @@ class EditorMessagesFeatureClass : public FeatureClass {
  * give it a pointer that is managed by wxWidgets
  */
 class EditorMessagesLoggerClass : public wxLog {
-	public:
-	EditorMessagesLoggerClass(EditorMessagesFeatureClass& feature);
+ public:
+    EditorMessagesLoggerClass(EditorMessagesFeatureClass& feature);
 
-	void DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info);
+    void DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info);
 
-	private:
-	EditorMessagesFeatureClass& Feature;
+ private:
+    EditorMessagesFeatureClass& Feature;
 };
 }  // namespace t4p
 

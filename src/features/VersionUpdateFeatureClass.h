@@ -36,22 +36,22 @@ namespace t4p {
  * latest version from the response.
  */
 class VersionUpdateFeatureClass : public FeatureClass {
-	public:
-	VersionUpdateFeatureClass(t4p::AppClass& app);
+ public:
+    VersionUpdateFeatureClass(t4p::AppClass& app);
 
-	void LoadPreferences(wxConfigBase* config);
+    void LoadPreferences(wxConfigBase* config);
 
-	wxString GetCurrentVersion() const;
+    wxString GetCurrentVersion() const;
 
-	/**
-	 * the next time we are to check for a new version
-	 */
-	wxDateTime NextCheckTime;
+    /**
+     * the next time we are to check for a new version
+     */
+    wxDateTime NextCheckTime;
 
-	private:
-	void OnAppReady(wxCommandEvent& event);
+ private:
+    void OnAppReady(wxCommandEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 
@@ -63,23 +63,23 @@ class VersionUpdateFeatureClass : public FeatureClass {
  * response is returned from the server.
  */
 class VersionUpdateActionClass : public t4p::ActionClass {
-	public:
-	VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads,
-		int eventId, const wxString& currentVersion);
+ public:
+    VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads,
+                             int eventId, const wxString& currentVersion);
 
-	protected:
-	void BackgroundWork();
+ protected:
+    void BackgroundWork();
 
-	wxString GetNewVersion(const wxString& currentVersion, long& statusCode);
+    wxString GetNewVersion(const wxString& currentVersion, long& statusCode);
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	private:
-	wxString CurrentVersion;
+ private:
+    wxString CurrentVersion;
 
-	void OnAppReady(wxCommandEvent& event);
+    void OnAppReady(wxCommandEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

@@ -80,75 +80,75 @@ class FileOperationsFeatureClass;
 class NotebookLayoutFeatureClass;
 
 class FeatureFactoryClass {
-	public:
-	/**
-	 * This class owns these pointers; do not delete them
-	 */
-	std::vector<t4p::FeatureClass*> Features;
-	std::vector<t4p::FeatureViewClass*> FeatureViews;
+ public:
+    /**
+     * This class owns these pointers; do not delete them
+     */
+    std::vector<t4p::FeatureClass*> Features;
+    std::vector<t4p::FeatureViewClass*> FeatureViews;
 
-	FeatureFactoryClass(t4p::AppClass& app);
+    FeatureFactoryClass(t4p::AppClass& app);
 
-	~FeatureFactoryClass();
+    ~FeatureFactoryClass();
 
-	bool CreateFeatures();
-	void DeleteFeatures();
+    bool CreateFeatures();
+    void DeleteFeatures();
 
-	/**
-	 * Feature views are view specific functionality; a view
-	 * is the class that makes updates to the GUI of the editor
-	 * (adds menu items, buttons, panels, etc).
-	 * Each feature view is created once at app start, and will
-	 * be deleted when the app main frame is deleted. Note that
-	 * on Mac OS X, an application may run without a main frame,
-	 * so during a run feature views may be created more than once
-	 * (but there will be at most 1 instance to each view).
-	 *
-	 * @return bool TRUE if views were created; false f views
-	 *         were not created. View will not be created if
-	 *         at least 1 view is instantiated. This is an all-or
-	 *         nothing operation; either all views are created
-	 *         or none are created.
-	 */
-	bool CreateViews();
+    /**
+     * Feature views are view specific functionality; a view
+     * is the class that makes updates to the GUI of the editor
+     * (adds menu items, buttons, panels, etc).
+     * Each feature view is created once at app start, and will
+     * be deleted when the app main frame is deleted. Note that
+     * on Mac OS X, an application may run without a main frame,
+     * so during a run feature views may be created more than once
+     * (but there will be at most 1 instance to each view).
+     *
+     * @return bool TRUE if views were created; false f views
+     *         were not created. View will not be created if
+     *         at least 1 view is instantiated. This is an all-or
+     *         nothing operation; either all views are created
+     *         or none are created.
+     */
+    bool CreateViews();
 
-	void DeleteViews();
+    void DeleteViews();
 
-	private:
-	t4p::AppClass& App;
+ private:
+    t4p::AppClass& App;
 
-	t4p::FileOperationsFeatureClass*       FileOperations;
-	t4p::EditorBehaviorFeatureClass*       EditorBehavior;
-	t4p::EnvironmentFeatureClass*          Environment;
-	t4p::FindInFilesFeatureClass*          FindInFiles;
-	t4p::FinderFeatureClass*               Finder;
-	t4p::ProjectFeatureClass*              Project;
-	t4p::OutlineFeatureClass*              Outline;
-	t4p::TagFeatureClass*                  Tag;
-	t4p::RunConsoleFeatureClass*           RunConsole;
-	t4p::RunBrowserFeatureClass*           RunBrowser;
-	t4p::LintFeatureClass*                 Lint;
-	t4p::SqlBrowserFeatureClass*           SqlBrowser;
-	t4p::EditorMessagesFeatureClass*       EditorMessages;
-	t4p::RecentFilesFeatureClass*          RecentFiles;
-	t4p::DetectorFeatureClass*             Detector;
-	t4p::TemplateFilesFeatureClass*        TemplateFiles;
-	t4p::ConfigFilesFeatureClass*          ConfigFiles;
-	t4p::FileModifiedCheckFeatureClass*    FileModifiedCheck;
-	t4p::FileWatcherFeatureClass*          FileWatcher;
-	t4p::ExplorerFeatureClass*             Explorer;
-	t4p::NewUserFeatureClass*              NewUser;
-	t4p::VersionUpdateFeatureClass*        VersionUpdate;
-	t4p::TotalSearchFeatureClass*          TotalSearch;
-	t4p::DocCommentFeatureClass*           DocComment;
-	t4p::SyntaxHighlightFeatureClass*      SyntaxHighlight;
-	t4p::ChangelogFeatureClass*            Changelog;
-	t4p::BookmarkFeatureClass*             Bookmark;
-	t4p::DebuggerFeatureClass*             Debugger;
-	t4p::FileCabinetFeatureClass*          FileCabinet;
-	t4p::PhpCodeCompletionFeatureClass*    PhpCodeCompletion;
-	t4p::NotebookLayoutFeatureClass*       NotebookLayout;
-	t4p::TestFeatureClass*                 Test;
+    t4p::FileOperationsFeatureClass*       FileOperations;
+    t4p::EditorBehaviorFeatureClass*       EditorBehavior;
+    t4p::EnvironmentFeatureClass*          Environment;
+    t4p::FindInFilesFeatureClass*          FindInFiles;
+    t4p::FinderFeatureClass*               Finder;
+    t4p::ProjectFeatureClass*              Project;
+    t4p::OutlineFeatureClass*              Outline;
+    t4p::TagFeatureClass*                  Tag;
+    t4p::RunConsoleFeatureClass*           RunConsole;
+    t4p::RunBrowserFeatureClass*           RunBrowser;
+    t4p::LintFeatureClass*                 Lint;
+    t4p::SqlBrowserFeatureClass*           SqlBrowser;
+    t4p::EditorMessagesFeatureClass*       EditorMessages;
+    t4p::RecentFilesFeatureClass*          RecentFiles;
+    t4p::DetectorFeatureClass*             Detector;
+    t4p::TemplateFilesFeatureClass*        TemplateFiles;
+    t4p::ConfigFilesFeatureClass*          ConfigFiles;
+    t4p::FileModifiedCheckFeatureClass*    FileModifiedCheck;
+    t4p::FileWatcherFeatureClass*          FileWatcher;
+    t4p::ExplorerFeatureClass*             Explorer;
+    t4p::NewUserFeatureClass*              NewUser;
+    t4p::VersionUpdateFeatureClass*        VersionUpdate;
+    t4p::TotalSearchFeatureClass*          TotalSearch;
+    t4p::DocCommentFeatureClass*           DocComment;
+    t4p::SyntaxHighlightFeatureClass*      SyntaxHighlight;
+    t4p::ChangelogFeatureClass*            Changelog;
+    t4p::BookmarkFeatureClass*             Bookmark;
+    t4p::DebuggerFeatureClass*             Debugger;
+    t4p::FileCabinetFeatureClass*          FileCabinet;
+    t4p::PhpCodeCompletionFeatureClass*    PhpCodeCompletion;
+    t4p::NotebookLayoutFeatureClass*       NotebookLayout;
+    t4p::TestFeatureClass*                 Test;
 };
 }  // namespace t4p
 

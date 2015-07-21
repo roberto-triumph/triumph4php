@@ -27,137 +27,137 @@
 #include <vector>
 
 t4p::EventSinkClass::EventSinkClass()
-	: Handlers() {
+    : Handlers() {
 }
 
 void t4p::EventSinkClass::PushHandler(wxEvtHandler *handler) {
-	Handlers.push_back(handler);
+    Handlers.push_back(handler);
 }
 
 void t4p::EventSinkClass::RemoveAllHandlers() {
-	Handlers.clear();
+    Handlers.clear();
 }
 
 void t4p::EventSinkClass::RemoveHandler(wxEvtHandler *handler) {
-	std::vector<wxEvtHandler*>::iterator it = std::find(Handlers.begin(), Handlers.end(), handler);
-	if (it != Handlers.end()) {
-		Handlers.erase(it);
-	}
+    std::vector<wxEvtHandler*>::iterator it = std::find(Handlers.begin(), Handlers.end(), handler);
+    if (it != Handlers.end()) {
+        Handlers.erase(it);
+    }
 }
 
 void t4p::EventSinkClass::Publish(wxEvent& event) {
-	for (size_t i = 0; i < Handlers.size(); ++i) {
-		// wont use wxPostEvent for now
-		// using wxPostEvent would cause any Popup menus triggered in the
-		// handlers to not work correctly in linux
-		Handlers[i]->ProcessEvent(event);
-	}
+    for (size_t i = 0; i < Handlers.size(); ++i) {
+        // wont use wxPostEvent for now
+        // using wxPostEvent would cause any Popup menus triggered in the
+        // handlers to not work correctly in linux
+        Handlers[i]->ProcessEvent(event);
+    }
 }
 
 void t4p::EventSinkClass::Post(wxEvent& event) {
-	for (size_t i = 0; i < Handlers.size(); ++i) {
-		wxPostEvent(Handlers[i], event);
-	}
+    for (size_t i = 0; i < Handlers.size(); ++i) {
+        wxPostEvent(Handlers[i], event);
+    }
 }
 
 t4p::EventSinkLockerClass::EventSinkLockerClass()
-: EventSink()
-, Mutex() {
+    : EventSink()
+    , Mutex() {
 }
 
 void t4p::EventSinkLockerClass::PushHandler(wxEvtHandler *handler) {
-	wxMutexLocker locker(Mutex);
-	wxASSERT(locker.IsOk());
-	EventSink.PushHandler(handler);
+    wxMutexLocker locker(Mutex);
+    wxASSERT(locker.IsOk());
+    EventSink.PushHandler(handler);
 }
 
 void t4p::EventSinkLockerClass::RemoveAllHandlers() {
-	wxMutexLocker locker(Mutex);
-	wxASSERT(locker.IsOk());
-	EventSink.RemoveAllHandlers();
+    wxMutexLocker locker(Mutex);
+    wxASSERT(locker.IsOk());
+    EventSink.RemoveAllHandlers();
 }
 
 void t4p::EventSinkLockerClass::RemoveHandler(wxEvtHandler *handler) {
-	wxMutexLocker locker(Mutex);
-	wxASSERT(locker.IsOk());
-	EventSink.RemoveHandler(handler);
+    wxMutexLocker locker(Mutex);
+    wxASSERT(locker.IsOk());
+    EventSink.RemoveHandler(handler);
 }
 
 void t4p::EventSinkLockerClass::Post(wxEvent& event) {
-	wxMutexLocker locker(Mutex);
-	wxASSERT(locker.IsOk());
-	EventSink.Post(event);
+    wxMutexLocker locker(Mutex);
+    wxASSERT(locker.IsOk());
+    EventSink.Post(event);
 }
 
 t4p::CodeControlEventClass::CodeControlEventClass(wxEventType type, t4p::CodeControlClass* codeControl)
-	: wxEvent(wxID_ANY, type)
-	, CodeControl(codeControl) {
+    : wxEvent(wxID_ANY, type)
+    , CodeControl(codeControl) {
 }
 
 t4p::CodeControlClass* t4p::CodeControlEventClass::GetCodeControl() const {
-	return CodeControl;
+    return CodeControl;
 }
 
 wxEvent* t4p::CodeControlEventClass::Clone() const {
-	t4p::CodeControlEventClass* newEvt = new t4p::CodeControlEventClass(GetEventType(), CodeControl);
-	return newEvt;
+    t4p::CodeControlEventClass* newEvt = new t4p::CodeControlEventClass(GetEventType(), CodeControl);
+    return newEvt;
 }
 
 t4p::RenameEventClass::RenameEventClass(wxEventType type, const wxString& oldPath, const wxString& newPath)
-: wxEvent(wxID_ANY, type)
-, OldPath()
-, NewPath() {
-	if (t4p::EVENT_APP_FILE_RENAMED == type) {
-		OldPath.Assign(oldPath);
-		NewPath.Assign(newPath);
-	} else if (t4p::EVENT_APP_DIR_RENAMED == type) {
-		OldPath.AssignDir(oldPath);
-		NewPath.AssignDir(newPath);
-	}
+    : wxEvent(wxID_ANY, type)
+    , OldPath()
+    , NewPath() {
+    if (t4p::EVENT_APP_FILE_RENAMED == type) {
+        OldPath.Assign(oldPath);
+        NewPath.Assign(newPath);
+    } else if (t4p::EVENT_APP_DIR_RENAMED == type) {
+        OldPath.AssignDir(oldPath);
+        NewPath.AssignDir(newPath);
+    }
 }
 
 wxEvent* t4p::RenameEventClass::Clone() const {
-	if (t4p::EVENT_APP_DIR_RENAMED == GetEventType()) {
-		return new t4p::RenameEventClass(GetEventType(), OldPath.GetPath(), OldPath.GetPath());
-	}
-	return new t4p::RenameEventClass(GetEventType(), OldPath.GetFullPath(), OldPath.GetFullPath());
+    if (t4p::EVENT_APP_DIR_RENAMED == GetEventType()) {
+        return new t4p::RenameEventClass(GetEventType(), OldPath.GetPath(), OldPath.GetPath());
+    }
+    return new t4p::RenameEventClass(GetEventType(), OldPath.GetFullPath(), OldPath.GetFullPath());
 }
 
 t4p::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPath, int startingPos,
-	int length, int lineNumber)
-: wxEvent(wxID_ANY, t4p::EVENT_CMD_FILE_OPEN)
-, FullPath(fullPath.c_str())
-, StartingPos(startingPos)
-, Length(length)
-, LineNumber(lineNumber) {
+        int length, int lineNumber)
+    : wxEvent(wxID_ANY, t4p::EVENT_CMD_FILE_OPEN)
+    , FullPath(fullPath.c_str())
+    , StartingPos(startingPos)
+    , Length(length)
+    , LineNumber(lineNumber) {
 }
 
 wxEvent* t4p::OpenFileCommandEventClass::Clone() const {
-	return new t4p::OpenFileCommandEventClass(FullPath, StartingPos, Length, LineNumber);
+    return new t4p::OpenFileCommandEventClass(FullPath, StartingPos, Length, LineNumber);
 }
 
 
 t4p::OpenDbTableCommandEventClass::OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable,
-	const wxString& connectionHash)
-: wxEvent(wxID_ANY, type)
-, DbTableName(dbTable.c_str())
-, ConnectionHash(connectionHash.c_str()) {
+        const wxString& connectionHash)
+    : wxEvent(wxID_ANY, type)
+    , DbTableName(dbTable.c_str())
+    , ConnectionHash(connectionHash.c_str()) {
 }
 
 wxEvent* t4p::OpenDbTableCommandEventClass::Clone() const {
-	t4p::OpenDbTableCommandEventClass* evt = new t4p::OpenDbTableCommandEventClass(
-		GetEventType(), DbTableName, ConnectionHash);
-	return evt;
+    t4p::OpenDbTableCommandEventClass* evt = new t4p::OpenDbTableCommandEventClass(
+        GetEventType(), DbTableName, ConnectionHash);
+    return evt;
 }
 
 t4p::ProjectEventClass::ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects)
-: wxEvent(wxID_ANY, type)
-, Projects(projects) {
+    : wxEvent(wxID_ANY, type)
+    , Projects(projects) {
 }
 
 wxEvent* t4p::ProjectEventClass::Clone() const {
-	t4p::ProjectEventClass* evt = new t4p::ProjectEventClass(GetEventType(), Projects);
-	return evt;
+    t4p::ProjectEventClass* evt = new t4p::ProjectEventClass(GetEventType(), Projects);
+    return evt;
 }
 
 

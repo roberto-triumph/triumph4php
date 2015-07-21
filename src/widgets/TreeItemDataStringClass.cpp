@@ -25,6 +25,6 @@
 #include "widgets/TreeItemDataStringClass.h"
 
 t4p::TreeItemDataStringClass::TreeItemDataStringClass(const wxString& str)
-	: wxTreeItemData()
-	, Str(str) {
+    : wxTreeItemData()
+    , Str(str) {
 }

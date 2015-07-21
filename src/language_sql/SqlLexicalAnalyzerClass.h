@@ -38,107 +38,107 @@ namespace t4p {
  * @example SQLAnalyzerExample.cpp
  */
 class SqlLexicalAnalyzerClass {
-	public:
-	SqlLexicalAnalyzerClass();
+ public:
+    SqlLexicalAnalyzerClass();
 
-	/**
-	 * Prepare to tokenize given string.
-	 * @return bool true if queries is not empty
-	 */
-	bool OpenString(const UnicodeString& queries);
+    /**
+     * Prepare to tokenize given string.
+     * @return bool true if queries is not empty
+     */
+    bool OpenString(const UnicodeString& queries);
 
-	/**
-	 * Clean up any resources after lexing. This should be done so that
-	 * the string given in the Open() call can be released.
-	 */
-	void Close();
+    /**
+     * Clean up any resources after lexing. This should be done so that
+     * the string given in the Open() call can be released.
+     */
+    void Close();
 
-	/**
-	 * Method to parse out an entire query out of the text. This method is usually in a
-	 * while() loop that iterates until this method returns false; like this
-	 *
-	 * @code
-	 *   UnicodeString query;
-	 *   while (sqlLexer.NextQuery(query)) {
-	 *     // query contains the query
-	 *   }
-	 * @endcode
-	 *
-	 * @param UnicodeString the next query. query will have the
-	 * same whitespace as the original text; this will help in
-	 * interpreting any SQL errors. Any previous contents in this string will
-	 * be discarded.
-	 * @return bool TRUE if there is still more input left. (whitespace
-	 * or comments do NOT count as input).
-	 */
-	bool NextQuery(UnicodeString& query);
+    /**
+     * Method to parse out an entire query out of the text. This method is usually in a
+     * while() loop that iterates until this method returns false; like this
+     *
+     * @code
+     *   UnicodeString query;
+     *   while (sqlLexer.NextQuery(query)) {
+     *     // query contains the query
+     *   }
+     * @endcode
+     *
+     * @param UnicodeString the next query. query will have the
+     * same whitespace as the original text; this will help in
+     * interpreting any SQL errors. Any previous contents in this string will
+     * be discarded.
+     * @return bool TRUE if there is still more input left. (whitespace
+     * or comments do NOT count as input).
+     */
+    bool NextQuery(UnicodeString& query);
 
-	/**
-	 * @return int the line number that the query (set by the NextQuery() method) STARTS IN.
-	 * This is a 1-based number.
-	 */
-	int GetLineNumber() const;
+    /**
+     * @return int the line number that the query (set by the NextQuery() method) STARTS IN.
+     * This is a 1-based number.
+     */
+    int GetLineNumber() const;
 
-	private:
-	/**
-	 * the different conditions that the lexer can be in
-	 */
-	enum Conditions {
-		/**
-		 * any SQL keywords or identifier
-		 */
-		SQL_ANY,
+ private:
+    /**
+     * the different conditions that the lexer can be in
+     */
+    enum Conditions {
+        /**
+         * any SQL keywords or identifier
+         */
+        SQL_ANY,
 
-		/**
-		 * A string scalar
-		 */
-		SQL_SINGLE_QUOTE_STRING,
+        /**
+         * A string scalar
+         */
+        SQL_SINGLE_QUOTE_STRING,
 
-		/**
-		 * A string identifier
-		 */
-		SQL_DOUBLE_QUOTE_STRING,
+        /**
+         * A string identifier
+         */
+        SQL_DOUBLE_QUOTE_STRING,
 
-		/**
-		 * A SQL single line comment (#, --)
-		 */
-		SQL_LINE_COMMENT,
+        /**
+         * A SQL single line comment (#, --)
+         */
+        SQL_LINE_COMMENT,
 
-		/**
-		 * multi-line comments (/ *)
-		 */
-		SQL_BLOCK_COMMENT
-	};
+        /**
+         * multi-line comments (/ *)
+         */
+        SQL_BLOCK_COMMENT
+    };
 
-	/**
-	 * The only tokens that are differentiated. These tokens are
-	 * enough to be able to detect the end of a query in the middle of a
-	 * string.
-	 */
-	enum Tokens {
-		SEMICOLON,
-		SQL_EOF
-	};
+    /**
+     * The only tokens that are differentiated. These tokens are
+     * enough to be able to detect the end of a query in the middle of a
+     * string.
+     */
+    enum Tokens {
+        SEMICOLON,
+        SQL_EOF
+    };
 
-	/**
-	 * Get the next token from the string.
-	 */
-	int NextToken();
+    /**
+     * Get the next token from the string.
+     */
+    int NextToken();
 
-	/**
-	 * The buffer that will hold the SQL queries.
-	 */
-	pelet::UCharBufferClass Buffer;
+    /**
+     * The buffer that will hold the SQL queries.
+     */
+    pelet::UCharBufferClass Buffer;
 
-	/**
-	 * The starting line number of the current query that was returned by NextQuery()
-	 */
-	int QueryStartLineNumber;
+    /**
+     * The starting line number of the current query that was returned by NextQuery()
+     */
+    int QueryStartLineNumber;
 
-	/**
-	 * Keeps track of the current lexer state
-	 */
-	Conditions CurrentCondition;
+    /**
+     * Keeps track of the current lexer state
+     */
+    Conditions CurrentCondition;
 };
 }  // namespace t4p
 

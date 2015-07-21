@@ -60,107 +60,107 @@ namespace t4p {
  *
  */
 class SqliteResultClass {
-	public:
-	SqliteResultClass();
-	virtual ~SqliteResultClass();
+ public:
+    SqliteResultClass();
+    virtual ~SqliteResultClass();
 
-	/**
-	 * initializes this result by preparing the statement. Init
-	 * creates the statement in an exception-safe manner (no exceptions
-	 * are thrown from this method)
-	 *
-	 * @param session the connection.  must be around for as long as this result is alive.
-	 * @param doLimit boolean if TRUE there should be a limit on the query
-	 * @return bool TRUE if statement was prepare.  False if there was a connection
-	 *         failure, or invalid sql.
-	 */
-	bool Init(soci::session& session, bool doLimit);
+    /**
+     * initializes this result by preparing the statement. Init
+     * creates the statement in an exception-safe manner (no exceptions
+     * are thrown from this method)
+     *
+     * @param session the connection.  must be around for as long as this result is alive.
+     * @param doLimit boolean if TRUE there should be a limit on the query
+     * @return bool TRUE if statement was prepare.  False if there was a connection
+     *         failure, or invalid sql.
+     */
+    bool Init(soci::session& session, bool doLimit);
 
-	/**
-	 * will prepare the SQL if its not already prepared, and will execute the statement.
-	 * the statement is created / executed in an exception-safe manner (no execeptions
-	 * are thrown from this method)
-	 *
-	 * @param session the connection.  must be around for as long as this result is alive.
-	 * @param doLimit boolean if TRUE there should be a limit on the query
-	 * @return bool will return TRUE if there is at least one result row
-	 */
-	bool Exec(soci::session& session, bool doLimit);
+    /**
+     * will prepare the SQL if its not already prepared, and will execute the statement.
+     * the statement is created / executed in an exception-safe manner (no execeptions
+     * are thrown from this method)
+     *
+     * @param session the connection.  must be around for as long as this result is alive.
+     * @param doLimit boolean if TRUE there should be a limit on the query
+     * @return bool will return TRUE if there is at least one result row
+     */
+    bool Exec(soci::session& session, bool doLimit);
 
-	/**
-	 * advance to the next row. in this method subclasses will construct their
-	 * next object from the current DB row.
-	 */
-	virtual void Next() = 0;
+    /**
+     * advance to the next row. in this method subclasses will construct their
+     * next object from the current DB row.
+     */
+    virtual void Next() = 0;
 
-	/**
-	 * @return boolean TRUE if this result has been prepared
-	 */
-	bool IsOk() const;
+    /**
+     * @return boolean TRUE if this result has been prepared
+     */
+    bool IsOk() const;
 
-	/**
-	 * @return boolean TRUE if the query returned zero rows.
-	 */
-	bool Empty() const;
+    /**
+     * @return boolean TRUE if the query returned zero rows.
+     */
+    bool Empty() const;
 
-	/**
-	 * @return boolean TRUE if there are more results to be iterated through
-	 */
-	bool More() const;
+    /**
+     * @return boolean TRUE if there are more results to be iterated through
+     */
+    bool More() const;
 
-	/**
-	 * Executes the prepared statement again
-	 * This should be called if the variables that were bound to the
-	 * statement were changed and the query need to be executed again
-	 *
-	 * @param error out parameter, will be set to the error message if one is encountered
-	 * @param bool TRUE if the statement was successfully run
-	 */
-	bool ReExec(wxString& error);
+    /**
+     * Executes the prepared statement again
+     * This should be called if the variables that were bound to the
+     * statement were changed and the query need to be executed again
+     *
+     * @param error out parameter, will be set to the error message if one is encountered
+     * @param bool TRUE if the statement was successfully run
+     */
+    bool ReExec(wxString& error);
 
-	protected:
-	/**
-	 * in this method subclasses will build the SQL and bind the input
-	 * parameters as needed.
-	 *
-	 * @param stmt the statement to prepare and bind input parameters to.
-	 * @param doLimit boolean if TRUE there should be a limit on the query
-	 * @return bool subclasses should return TRUE if the statement was prepared
-	 *         successfully.  A false here means a connection failure or bad sql
-	 */
-	virtual bool DoPrepare(soci::statement& stmt, bool doLimit) = 0;
+ protected:
+    /**
+     * in this method subclasses will build the SQL and bind the input
+     * parameters as needed.
+     *
+     * @param stmt the statement to prepare and bind input parameters to.
+     * @param doLimit boolean if TRUE there should be a limit on the query
+     * @return bool subclasses should return TRUE if the statement was prepared
+     *         successfully.  A false here means a connection failure or bad sql
+     */
+    virtual bool DoPrepare(soci::statement& stmt, bool doLimit) = 0;
 
-	/**
-	 * in this method subclasses will bind output parameters (columns of
-	 * the sql result set to instance variables).
-	 *
-	 * @param stmt the statement to bind the output parameters to.
-	 */
-	virtual void DoBind(soci::statement& stmt) = 0;
+    /**
+     * in this method subclasses will bind output parameters (columns of
+     * the sql result set to instance variables).
+     *
+     * @param stmt the statement to bind the output parameters to.
+     */
+    virtual void DoBind(soci::statement& stmt) = 0;
 
-	/**
-	 * fetches the next row of the result.
-	 * @param bool TRUE if there was another row to fetch
-	 */
-	bool Fetch();
+    /**
+     * fetches the next row of the result.
+     * @param bool TRUE if there was another row to fetch
+     */
+    bool Fetch();
 
-	private:
-	/**
-	 * the statement to iterate through
-	 */
-	soci::statement* Stmt;
+ private:
+    /**
+     * the statement to iterate through
+     */
+    soci::statement* Stmt;
 
-	/**
-	 * TRUE if the query returned zero rows.
-	 * @var boolean
-	 */
-	bool IsEmpty;
+    /**
+     * TRUE if the query returned zero rows.
+     * @var boolean
+     */
+    bool IsEmpty;
 
-	/**
-	 * TRUE if the entire result set has been fetched.
-	 * @var boolean
-	 */
-	bool IsFetched;
+    /**
+     * TRUE if the entire result set has been fetched.
+     * @var boolean
+     */
+    bool IsFetched;
 };
 }  // namespace t4p
 

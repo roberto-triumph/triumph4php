@@ -28,55 +28,55 @@
 #include "Triumph.h"
 
 t4p::ChangelogFeatureClass::ChangelogFeatureClass(t4p::AppClass& app)
-: FeatureClass(app)
-, LastVersion() {
+    : FeatureClass(app)
+    , LastVersion() {
 }
 
 void t4p::ChangelogFeatureClass::LoadPreferences(wxConfigBase* config) {
-	config->Read(wxT("Changelog/LastVersion"), &LastVersion);
+    config->Read(wxT("Changelog/LastVersion"), &LastVersion);
 }
 
 void t4p::ChangelogFeatureClass::OnAppReady(wxCommandEvent& event) {
-	// version info is stored in a file
-	// for releases, the distribution script will properly fill in the
-	// version number using git describe
-	wxString version;
-	wxFileName versionFileName = t4p::VersionFileAsset();
-	wxFFile file(versionFileName.GetFullPath());
-	if (file.IsOpened()) {
-		file.ReadAll(&version);
-	}
-	version.Trim(false).Trim(true);
-	LastVersion.Trim(false).Trim(true);
+    // version info is stored in a file
+    // for releases, the distribution script will properly fill in the
+    // version number using git describe
+    wxString version;
+    wxFileName versionFileName = t4p::VersionFileAsset();
+    wxFFile file(versionFileName.GetFullPath());
+    if (file.IsOpened()) {
+        file.ReadAll(&version);
+    }
+    version.Trim(false).Trim(true);
+    LastVersion.Trim(false).Trim(true);
 
-	if (version.CmpNoCase(LastVersion) != 0) {
-		// version changed, show the changelog
-		ShowChangeLog();
+    if (version.CmpNoCase(LastVersion) != 0) {
+        // version changed, show the changelog
+        ShowChangeLog();
 
 
-		// store the version opened so that next time that the app
-		// is opened we don't show the changelog
-		LastVersion = version;
-		wxConfigBase* config = wxConfigBase::Get(false);
-		config->Write(wxT("Changelog/LastVersion"), LastVersion);
-		config->Flush();
-	}
+        // store the version opened so that next time that the app
+        // is opened we don't show the changelog
+        LastVersion = version;
+        wxConfigBase* config = wxConfigBase::Get(false);
+        config->Write(wxT("Changelog/LastVersion"), LastVersion);
+        config->Flush();
+    }
 }
 
 void t4p::ChangelogFeatureClass::OnSavePreferences(wxCommandEvent& event) {
-	wxConfigBase* config = wxConfigBase::Get(false);
-	config->Write(wxT("Changelog/LastVersion"), LastVersion);
+    wxConfigBase* config = wxConfigBase::Get(false);
+    config->Write(wxT("Changelog/LastVersion"), LastVersion);
 }
 
 void t4p::ChangelogFeatureClass::ShowChangeLog() {
-	wxFileName changelogFile = t4p::ChangeLogFileAsset();
+    wxFileName changelogFile = t4p::ChangeLogFileAsset();
 
-	wxCommandEvent fileCmd(t4p::EVENT_CMD_FILE_OPEN);
-	fileCmd.SetString(changelogFile.GetFullPath());
-	App.EventSink.Publish(fileCmd);
+    wxCommandEvent fileCmd(t4p::EVENT_CMD_FILE_OPEN);
+    fileCmd.SetString(changelogFile.GetFullPath());
+    App.EventSink.Publish(fileCmd);
 }
 
 
 BEGIN_EVENT_TABLE(t4p::ChangelogFeatureClass, t4p::FeatureClass)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::ChangelogFeatureClass::OnAppReady)
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::ChangelogFeatureClass::OnAppReady)
 END_EVENT_TABLE()

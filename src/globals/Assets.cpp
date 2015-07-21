@@ -42,10 +42,10 @@
  *         the asset directory is relative or absolute.
  */
 static wxFileName AssetRootDir() {
-	std::string stdRoot;
-	#ifdef T4P_ASSET_DIR
-		stdRoot = T4P_STR(T4P_ASSET_DIR);
-	#endif
+    std::string stdRoot;
+#ifdef T4P_ASSET_DIR
+    stdRoot = T4P_STR(T4P_ASSET_DIR);
+#endif
 
     wxFileName assetRoot;
     wxString assetDir = wxString::FromAscii(stdRoot.c_str());
@@ -53,354 +53,354 @@ static wxFileName AssetRootDir() {
         assetRoot.AssignDir(assetDir);
     } else {
         // assume that the path is relative to the executable
-		wxStandardPaths paths = wxStandardPaths::Get();
-		wxFileName pathExecutableFileName(paths.GetExecutablePath());
-		wxString assetStr = pathExecutableFileName.GetPathWithSep() + assetDir;
-		assetRoot.AssignDir(assetStr);
-		assetRoot.Normalize();
+        wxStandardPaths paths = wxStandardPaths::Get();
+        wxFileName pathExecutableFileName(paths.GetExecutablePath());
+        wxString assetStr = pathExecutableFileName.GetPathWithSep() + assetDir;
+        assetRoot.AssignDir(assetStr);
+        assetRoot.Normalize();
     }
     return assetRoot;
 }
 
 wxFileName t4p::NativeFunctionsAsset() {
-	wxFileName asset = AssetRootDir();
-	wxFileName dbFile(asset.GetPath(), wxT("php.db"));
-	return dbFile;
+    wxFileName asset = AssetRootDir();
+    wxFileName dbFile(asset.GetPath(), wxT("php.db"));
+    return dbFile;
 }
 
 wxFileName t4p::ResourceSqlSchemaAsset() {
-	wxFileName asset = AssetRootDir();
+    wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("sql"));
 
-	wxFileName sqlFile(asset.GetPath(), wxT("resources.sql"));
-	return sqlFile;
+    wxFileName sqlFile(asset.GetPath(), wxT("resources.sql"));
+    return sqlFile;
 }
 
 wxFileName t4p::JsTagsSqlSchemaAsset() {
-	wxFileName asset = AssetRootDir();
+    wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("sql"));
 
-	wxFileName sqlFile(asset.GetPath(), wxT("js_tags.sql"));
-	return sqlFile;
+    wxFileName sqlFile(asset.GetPath(), wxT("js_tags.sql"));
+    return sqlFile;
 }
 
 wxBitmap t4p::AutoCompleteImageAsset(wxString imageName) {
-	if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
-		wxImage::AddHandler(new wxXPMHandler);
-	}
-	wxFileName asset = AssetRootDir();
+    if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
+        wxImage::AddHandler(new wxXPMHandler);
+    }
+    wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("auto_complete"));
-	wxFileName iconFile(asset.GetPath(), imageName + wxT(".xpm"));
+    wxFileName iconFile(asset.GetPath(), imageName + wxT(".xpm"));
 
-	wxASSERT(iconFile.IsOk());
-	wxBitmap bitmap;
-	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_XPM);
-	wxUnusedVar(loaded);
-	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
-	return bitmap;
+    wxASSERT(iconFile.IsOk());
+    wxBitmap bitmap;
+    bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_XPM);
+    wxUnusedVar(loaded);
+    wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
+    return bitmap;
 }
 
 wxBitmap t4p::BitmapImageAsset(wxString imageName) {
-	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
-		wxImage::AddHandler(new wxPNGHandler());
-	}
-	wxFileName asset = AssetRootDir();
+    if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
+        wxImage::AddHandler(new wxPNGHandler());
+    }
+    wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("icons"));
     wxFileName iconFile(asset.GetPath(), imageName + wxT(".png"));
 
-	wxASSERT(iconFile.IsOk());
-	wxBitmap bitmap;
-	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxUnusedVar(loaded);
-	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
-	return bitmap;
+    wxASSERT(iconFile.IsOk());
+    wxBitmap bitmap;
+    bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
+    wxUnusedVar(loaded);
+    wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
+    return bitmap;
 }
 
 wxBitmap t4p::BitmapImageButtonPrepAsset(wxString imageName) {
-	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
-		wxImage::AddHandler(new wxPNGHandler());
-	}
-	wxFileName asset = AssetRootDir();
+    if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
+        wxImage::AddHandler(new wxPNGHandler());
+    }
+    wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("icons"));
     wxFileName iconFile(asset.GetPath(), imageName + wxT(".png"));
 
-	wxASSERT(iconFile.IsOk());
-	wxBitmap bitmap;
-	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
-	wxUnusedVar(loaded);
-	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
+    wxASSERT(iconFile.IsOk());
+    wxBitmap bitmap;
+    bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
+    wxUnusedVar(loaded);
+    wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
 
 #ifdef __WXMAC__
 
-	// make images bigger, that way buttons have extra padding
-	// on retina screens, the buttons look ugly
-	bitmap.SetWidth(24);
-	bitmap.SetHeight(24);
+    // make images bigger, that way buttons have extra padding
+    // on retina screens, the buttons look ugly
+    bitmap.SetWidth(24);
+    bitmap.SetHeight(24);
 #endif
-	return bitmap;
+    return bitmap;
 }
 
 wxIcon t4p::IconImageAsset(wxString imageName) {
-	if (!wxImage::FindHandler(wxBITMAP_TYPE_ICO)) {
-		wxImage::AddHandler(new wxICOHandler());
-	}
-	wxFileName asset = AssetRootDir();
+    if (!wxImage::FindHandler(wxBITMAP_TYPE_ICO)) {
+        wxImage::AddHandler(new wxICOHandler());
+    }
+    wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("icons"));
     wxFileName iconFile(asset.GetPath(), imageName + wxT(".ico"));
 
-	wxASSERT(iconFile.IsOk());
-	wxIcon icon;
-	bool loaded = icon.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_ICO);
-	wxUnusedVar(loaded);
-	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
-	return icon;
+    wxASSERT(iconFile.IsOk());
+    wxIcon icon;
+    bool loaded = icon.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_ICO);
+    wxUnusedVar(loaded);
+    wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
+    return icon;
 }
 
 wxFileName t4p::PhpDetectorsBaseAsset() {
     wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("php_detectors"));
 
-	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(asset.GetPath());
-	return scriptsFileName;
+    wxFileName scriptsFileName;
+    scriptsFileName.AssignDir(asset.GetPath());
+    return scriptsFileName;
 }
 
 wxFileName t4p::UrlTagDetectorsGlobalAsset() {
-	wxFileName asset = AssetRootDir();
-	asset.AppendDir(wxT("php_detectors"));
-	asset.AppendDir(wxT("url_detectors"));
+    wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("php_detectors"));
+    asset.AppendDir(wxT("url_detectors"));
 
-	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(asset.GetPath());
-	return scriptsFileName;
+    wxFileName scriptsFileName;
+    scriptsFileName.AssignDir(asset.GetPath());
+    return scriptsFileName;
 }
 
 wxFileName t4p::UrlTagDetectorsLocalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = t4p::ConfigDirAsset();
-	configDir.AppendDir(wxT("url_detectors"));
-	if (!configDir.DirExists()) {
-		wxMkdir(configDir.GetPath(), 0777);
-	}
-	return configDir;
+    wxStandardPaths paths = wxStandardPaths::Get();
+    wxFileName configDir = t4p::ConfigDirAsset();
+    configDir.AppendDir(wxT("url_detectors"));
+    if (!configDir.DirExists()) {
+        wxMkdir(configDir.GetPath(), 0777);
+    }
+    return configDir;
 }
 
 wxFileName t4p::TemplateFilesDetectorsGlobalAsset() {
-	wxFileName asset = AssetRootDir();
-	asset.AppendDir(wxT("php_detectors"));
-	asset.AppendDir(wxT("template_files_detectors"));
+    wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("php_detectors"));
+    asset.AppendDir(wxT("template_files_detectors"));
 
-	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(asset.GetPath());
-	return scriptsFileName;
+    wxFileName scriptsFileName;
+    scriptsFileName.AssignDir(asset.GetPath());
+    return scriptsFileName;
 }
 
 wxFileName t4p::TemplateFileTagsDetectorsLocalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = t4p::ConfigDirAsset();
-	configDir.AppendDir(wxT("template_files_detectors"));
-	if (!configDir.DirExists()) {
-		wxMkdir(configDir.GetPath(), 0777);
-	}
-	return configDir;
+    wxStandardPaths paths = wxStandardPaths::Get();
+    wxFileName configDir = t4p::ConfigDirAsset();
+    configDir.AppendDir(wxT("template_files_detectors"));
+    if (!configDir.DirExists()) {
+        wxMkdir(configDir.GetPath(), 0777);
+    }
+    return configDir;
 }
 
 wxFileName t4p::TagDetectorsLocalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = t4p::ConfigDirAsset();
-	configDir.AppendDir(wxT("tag_detectors"));
-	if (!configDir.DirExists()) {
-		wxMkdir(configDir.GetPath(), 0777);
-	}
-	return configDir;
+    wxStandardPaths paths = wxStandardPaths::Get();
+    wxFileName configDir = t4p::ConfigDirAsset();
+    configDir.AppendDir(wxT("tag_detectors"));
+    if (!configDir.DirExists()) {
+        wxMkdir(configDir.GetPath(), 0777);
+    }
+    return configDir;
 }
 
 wxFileName t4p::TagDetectorsGlobalAsset() {
-	wxFileName asset = AssetRootDir();
-	asset.AppendDir(wxT("php_detectors"));
-	asset.AppendDir(wxT("tag_detectors"));
+    wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("php_detectors"));
+    asset.AppendDir(wxT("tag_detectors"));
 
-	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(asset.GetPath());
-	return scriptsFileName;
+    wxFileName scriptsFileName;
+    scriptsFileName.AssignDir(asset.GetPath());
+    return scriptsFileName;
 }
 
 wxFileName t4p::DatabaseTagDetectorsLocalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = t4p::ConfigDirAsset();
-	configDir.AppendDir(wxT("database_detectors"));
-	if (!configDir.DirExists()) {
-		wxMkdir(configDir.GetPath(), 0777);
-	}
-	return configDir;
+    wxStandardPaths paths = wxStandardPaths::Get();
+    wxFileName configDir = t4p::ConfigDirAsset();
+    configDir.AppendDir(wxT("database_detectors"));
+    if (!configDir.DirExists()) {
+        wxMkdir(configDir.GetPath(), 0777);
+    }
+    return configDir;
 }
 
 wxFileName t4p::DatabaseTagDetectorsGlobalAsset() {
-	wxFileName asset = AssetRootDir();
-	asset.AppendDir(wxT("php_detectors"));
-	asset.AppendDir(wxT("database_detectors"));
+    wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("php_detectors"));
+    asset.AppendDir(wxT("database_detectors"));
 
-	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(asset.GetPath());
-	return scriptsFileName;
+    wxFileName scriptsFileName;
+    scriptsFileName.AssignDir(asset.GetPath());
+    return scriptsFileName;
 }
 
 wxFileName t4p::ConfigTagDetectorsLocalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = t4p::ConfigDirAsset();
-	configDir.AppendDir(wxT("config_detectors"));
-	if (!configDir.DirExists()) {
-		wxMkdir(configDir.GetPath(), 0777);
-	}
-	return configDir;
+    wxStandardPaths paths = wxStandardPaths::Get();
+    wxFileName configDir = t4p::ConfigDirAsset();
+    configDir.AppendDir(wxT("config_detectors"));
+    if (!configDir.DirExists()) {
+        wxMkdir(configDir.GetPath(), 0777);
+    }
+    return configDir;
 }
 
 wxFileName t4p::ConfigTagDetectorsGlobalAsset() {
-	wxFileName asset = AssetRootDir();
-	asset.AppendDir(wxT("php_detectors"));
-	asset.AppendDir(wxT("config_detectors"));
+    wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("php_detectors"));
+    asset.AppendDir(wxT("config_detectors"));
 
-	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(asset.GetPath());
-	return scriptsFileName;
+    wxFileName scriptsFileName;
+    scriptsFileName.AssignDir(asset.GetPath());
+    return scriptsFileName;
 }
 
 wxFileName t4p::TempDirAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName tempDir;
-	tempDir.AssignDir(paths.GetTempDir());
-	tempDir.AppendDir(wxT("triumph4php"));
-	if (!tempDir.DirExists()) {
-		wxMkdir(tempDir.GetPath(), 0777);
-	}
-	return tempDir;
+    wxStandardPaths paths = wxStandardPaths::Get();
+    wxFileName tempDir;
+    tempDir.AssignDir(paths.GetTempDir());
+    tempDir.AppendDir(wxT("triumph4php"));
+    if (!tempDir.DirExists()) {
+        wxMkdir(tempDir.GetPath(), 0777);
+    }
+    return tempDir;
 }
 
 wxFileName t4p::ConfigDirAsset() {
-	// the config dir is in the bootstrap file
-	// the bootstrap file could be located in the same dir as the executable
-	// or in the user data directory
-	wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
-	wxFileConfig config(wxT("bootstrap"), wxEmptyString,
-		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
-	wxString configDirString;
-	if (!config.Read("SettingsDirectory", &configDirString)) {
-		// the first time the program runs there is no bootstrap config,
-		// use the bootstrap dir as the config dir
-		configDirString = bootstrapConfigFile.GetPath();
-	}
-	wxFileName configDir;
-	configDir.AssignDir(configDirString);
-	return configDir;
+    // the config dir is in the bootstrap file
+    // the bootstrap file could be located in the same dir as the executable
+    // or in the user data directory
+    wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
+    wxFileConfig config(wxT("bootstrap"), wxEmptyString,
+                        bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+    wxString configDirString;
+    if (!config.Read("SettingsDirectory", &configDirString)) {
+        // the first time the program runs there is no bootstrap config,
+        // use the bootstrap dir as the config dir
+        configDirString = bootstrapConfigFile.GetPath();
+    }
+    wxFileName configDir;
+    configDir.AssignDir(configDirString);
+    return configDir;
 }
 
 wxFileName t4p::BootstrapConfigFileAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName bootstrapConfigFile;
+    wxStandardPaths paths = wxStandardPaths::Get();
+    wxFileName bootstrapConfigFile;
 
-	// look at the local bootstrap config file
-	bootstrapConfigFile.Assign(paths.GetExecutablePath());
-	bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
-	if (!bootstrapConfigFile.FileExists()) {
-		// look at the global config file
-		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
-		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
-	}
-	return bootstrapConfigFile;
+    // look at the local bootstrap config file
+    bootstrapConfigFile.Assign(paths.GetExecutablePath());
+    bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
+    if (!bootstrapConfigFile.FileExists()) {
+        // look at the global config file
+        bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
+        bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
+    }
+    return bootstrapConfigFile;
 }
 
 
 wxFileName t4p::SettingsDirAsset() {
-	// get the location of the settings dir from the bootstrap file
-	wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
-	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
-	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString,
-		bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
-	wxString settingsDirString;
-	bootstrapConfig.Read(wxT("SettingsDirectory"), &settingsDirString);
-	wxFileName settingsDir;
-	settingsDir.AssignDir(settingsDirString);
-	return settingsDir;
+    // get the location of the settings dir from the bootstrap file
+    wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
+    wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
+    wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString,
+                                 bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+    wxString settingsDirString;
+    bootstrapConfig.Read(wxT("SettingsDirectory"), &settingsDirString);
+    wxFileName settingsDir;
+    settingsDir.AssignDir(settingsDirString);
+    return settingsDir;
 }
 
 void t4p::SetSettingsDirLocation(const wxFileName& settingsDir) {
-	wxFileName bootstrapConfigFile;
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName executableDir(paths.GetExecutablePath());
+    wxFileName bootstrapConfigFile;
+    wxStandardPaths paths = wxStandardPaths::Get();
+    wxFileName executableDir(paths.GetExecutablePath());
 
-	// the settings dir is in the same directory as the executable. save
-	// settings dir in the local bootstrap file
-	if (settingsDir.GetPathWithSep().Find(executableDir.GetPathWithSep()) != wxNOT_FOUND) {
-		bootstrapConfigFile.Assign(paths.GetExecutablePath());
-		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
-	} else {
-		// save settings dire in the global bootstrap config file
-		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
-		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
-	}
-	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
-	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString,
-		bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
-	wxString s = settingsDir.GetPath();
-	bootstrapConfig.Write(wxT("SettingsDirectory"), s);
-	bootstrapConfig.Flush();
+    // the settings dir is in the same directory as the executable. save
+    // settings dir in the local bootstrap file
+    if (settingsDir.GetPathWithSep().Find(executableDir.GetPathWithSep()) != wxNOT_FOUND) {
+        bootstrapConfigFile.Assign(paths.GetExecutablePath());
+        bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
+    } else {
+        // save settings dire in the global bootstrap config file
+        bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
+        bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
+    }
+    wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
+    wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString,
+                                 bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+    wxString s = settingsDir.GetPath();
+    bootstrapConfig.Write(wxT("SettingsDirectory"), s);
+    bootstrapConfig.Flush();
 }
 
 wxFileName t4p::DetectorSqlSchemaAsset() {
-	wxFileName asset = AssetRootDir();
-	asset.AppendDir(wxT("sql"));
+    wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("sql"));
 
-	wxFileName sqlFile(asset.GetPath(), wxT("detectors.sql"));
-	return sqlFile;
+    wxFileName sqlFile(asset.GetPath(), wxT("detectors.sql"));
+    return sqlFile;
 }
 
 wxFileName t4p::SkeletonsBaseAsset() {
-	wxFileName asset = AssetRootDir();
-	asset.AppendDir(wxT("skeletons"));
+    wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("skeletons"));
 
-	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(asset.GetPath());
-	return scriptsFileName;
+    wxFileName scriptsFileName;
+    scriptsFileName.AssignDir(asset.GetPath());
+    return scriptsFileName;
 }
 
 wxFileName t4p::TagCacheAsset() {
-	wxFileName configDir = t4p::ConfigDirAsset();
-	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("tags.db"));
-	return tagCacheFileName;
+    wxFileName configDir = t4p::ConfigDirAsset();
+    wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("tags.db"));
+    return tagCacheFileName;
 }
 
 wxFileName t4p::TagCacheWorkingAsset() {
-	wxFileName configDir = t4p::ConfigDirAsset();
-	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("working_tags.db"));
-	return tagCacheFileName;
+    wxFileName configDir = t4p::ConfigDirAsset();
+    wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("working_tags.db"));
+    return tagCacheFileName;
 }
 
 wxFileName t4p::DetectorCacheAsset() {
-	wxFileName configDir = t4p::ConfigDirAsset();
-	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("detectors.db"));
-	return tagCacheFileName;
+    wxFileName configDir = t4p::ConfigDirAsset();
+    wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("detectors.db"));
+    return tagCacheFileName;
 }
 
 wxFileName t4p::JsTagCacheAsset() {
-	wxFileName configDir = t4p::ConfigDirAsset();
-	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("js_tags.db"));
-	return tagCacheFileName;
+    wxFileName configDir = t4p::ConfigDirAsset();
+    wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("js_tags.db"));
+    return tagCacheFileName;
 }
 
 wxFileName t4p::VersionFileAsset() {
-	wxFileName asset = AssetRootDir();
-	wxFileName versionFile(asset.GetPath(), wxT("version.txt"));
-	return versionFile;
+    wxFileName asset = AssetRootDir();
+    wxFileName versionFile(asset.GetPath(), wxT("version.txt"));
+    return versionFile;
 }
 
 wxFileName t4p::ChangeLogFileAsset() {
-	wxFileName asset = AssetRootDir();
-	wxFileName changeLogFile(asset.GetPath(), wxT("ChangeLog.md"));
-	return changeLogFile;
+    wxFileName asset = AssetRootDir();
+    wxFileName changeLogFile(asset.GetPath(), wxT("ChangeLog.md"));
+    return changeLogFile;
 }
 
 wxFileName t4p::LintSuppressionsFileAsset() {
-	wxFileName configDir = t4p::ConfigDirAsset();
-	wxFileName suppressionsFile(configDir.GetPath(), wxT("lint_suppressions.csv"));
-	return suppressionsFile;
+    wxFileName configDir = t4p::ConfigDirAsset();
+    wxFileName suppressionsFile(configDir.GetPath(), wxT("lint_suppressions.csv"));
+    return suppressionsFile;
 }

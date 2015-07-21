@@ -35,30 +35,30 @@ namespace t4p {
  * cache database.
  */
 class DetectorDbClass {
-	public:
-	DetectorDbClass();
+ public:
+    DetectorDbClass();
 
-	/**
-	 * @param session opened db connection. This class will not own the pointer.
-	 */
-	void Init(soci::session* session);
+    /**
+     * @param session opened db connection. This class will not own the pointer.
+     */
+    void Init(soci::session* session);
 
-	/**
-	 * deletes all detected tags (db, config, urls, templates, etc...)
-	 * that were detected from the given source directory.
-	 */
-	void DeleteSource(const wxFileName& sourceDir);
+    /**
+     * deletes all detected tags (db, config, urls, templates, etc...)
+     * that were detected from the given source directory.
+     */
+    void DeleteSource(const wxFileName& sourceDir);
 
-	/**
-	 * deletes all rows from all tables.
-	 */
-	void Wipe();
+    /**
+     * deletes all rows from all tables.
+     */
+    void Wipe();
 
-	private:
-	/**
-	 * This class will not own the pointer.
-	 */
-	soci::session* Session;
+ private:
+    /**
+     * This class will not own the pointer.
+     */
+    soci::session* Session;
 };
 }  // namespace t4p
 

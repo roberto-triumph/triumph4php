@@ -32,80 +32,79 @@
 #include "globals/String.h"
 
 t4p::TemplateFileTagClass::TemplateFileTagClass()
-	:  FullPath()
-	, Variables() {
+    :  FullPath()
+    , Variables() {
 }
 
 t4p::TemplateFileTagClass::TemplateFileTagClass(const t4p::TemplateFileTagClass& src)
-	: FullPath()
-	, Variables() {
-	Copy(src);
+    : FullPath()
+    , Variables() {
+    Copy(src);
 }
 
 void t4p::TemplateFileTagClass::Copy(const t4p::TemplateFileTagClass& src) {
-	// copy is thread-safe, wxString needs to be cloned
-	FullPath = src.FullPath.c_str();
-	Variables.clear();
-	for (size_t i = 0; i < src.Variables.size(); ++i) {
-		Variables.push_back(src.Variables[i].c_str());
-	}
+    // copy is thread-safe, wxString needs to be cloned
+    FullPath = src.FullPath.c_str();
+    Variables.clear();
+    for (size_t i = 0; i < src.Variables.size(); ++i) {
+        Variables.push_back(src.Variables[i].c_str());
+    }
 }
 
 t4p::TemplateFileTagClass& t4p::TemplateFileTagClass::operator=(const t4p::TemplateFileTagClass& src) {
-	Copy(src);
-	return *this;
+    Copy(src);
+    return *this;
 }
 
 void t4p::TemplateFileTagClass::Init(const wxString& fullPath, const std::vector<wxString>& variables) {
-	FullPath = fullPath;
-	Variables = variables;
+    FullPath = fullPath;
+    Variables = variables;
 }
 
 t4p::TemplateFileTagFinderClass::TemplateFileTagFinderClass()
-	: Session()
-	, IsInitialized(false) {
+    : Session()
+    , IsInitialized(false) {
 }
 
 void t4p::TemplateFileTagFinderClass::Init(const wxFileName& detectorDbFileName) {
-	IsInitialized = false;
-	try {
-		Session.close();
-		std::string stdDbName = t4p::WxToChar(detectorDbFileName.GetFullPath());
+    IsInitialized = false;
+    try {
+        Session.close();
+        std::string stdDbName = t4p::WxToChar(detectorDbFileName.GetFullPath());
 
-		// we should be able to open this since it has been created by
-		// the DetectorCacheDbVersionActionClass
-		Session.open(*soci::factory_sqlite3(), stdDbName);
-		IsInitialized = true;
-	} catch (std::exception& e) {
-		wxString msg = t4p::CharToWx(e.what());
-		wxUnusedVar(msg);
-		wxASSERT_MSG(false, msg);
-	}
+        // we should be able to open this since it has been created by
+        // the DetectorCacheDbVersionActionClass
+        Session.open(*soci::factory_sqlite3(), stdDbName);
+        IsInitialized = true;
+    } catch (std::exception& e) {
+        wxString msg = t4p::CharToWx(e.what());
+        wxUnusedVar(msg);
+        wxASSERT_MSG(false, msg);
+    }
 }
 
 std::vector<t4p::TemplateFileTagClass> t4p::TemplateFileTagFinderClass::All() {
-	std::vector<t4p::TemplateFileTagClass> templates;
-	if (!IsInitialized) {
-		return templates;
-	}
+    std::vector<t4p::TemplateFileTagClass> templates;
+    if (!IsInitialized) {
+        return templates;
+    }
 
-	std::string fullPath,
-				variables;
-	soci::statement stmt = (Session.prepare <<
-		"SELECT full_path, variables FROM template_file_tags;",
-		soci::into(fullPath), soci::into(variables)
-	);
-	if (stmt.execute(true)) {
-		do {
-			t4p::TemplateFileTagClass templateFile;
-			templateFile.FullPath = t4p::CharToWx(fullPath.c_str());
-			wxString wxVariables = t4p::CharToWx(variables.c_str());
-			wxStringTokenizer tok(wxVariables, wxT(","));
-			while (tok.HasMoreTokens()) {
-				templateFile.Variables.push_back(tok.NextToken());
-			}
-			templates.push_back(templateFile);
-		} while (stmt.fetch());
-	}
-	return templates;
+    std::string fullPath,
+        variables;
+    soci::statement stmt = (Session.prepare <<
+                            "SELECT full_path, variables FROM template_file_tags;",
+                            soci::into(fullPath), soci::into(variables));
+    if (stmt.execute(true)) {
+        do {
+            t4p::TemplateFileTagClass templateFile;
+            templateFile.FullPath = t4p::CharToWx(fullPath.c_str());
+            wxString wxVariables = t4p::CharToWx(variables.c_str());
+            wxStringTokenizer tok(wxVariables, wxT(","));
+            while (tok.HasMoreTokens()) {
+                templateFile.Variables.push_back(tok.NextToken());
+            }
+            templates.push_back(templateFile);
+        } while (stmt.fetch());
+    }
+    return templates;
 }

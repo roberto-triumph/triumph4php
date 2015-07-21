@@ -25,18 +25,18 @@
 #include "main_frame/MacCommonMenuBarClass.h"
 
 t4p::MacCommonMenuBarClass::MacCommonMenuBarClass(wxApp& app)
-: App(app)
-, CommonMenuBar() {
-	// on mac, let the app stay running when the main frame is
-	// closed.  this is the correct behavior (like most mac apps)
-	#ifdef __WXMAC__
-		App.SetExitOnFrameDelete(false);
-		CommonMenuBar.reset(new wxMenuBar());
-		wxMenu* menu = new wxMenu();
-		menu->Append(ID_COMMON_MENU_NEW, _("New File"),  _("Create a new file"), wxITEM_NORMAL);
-		menu->Append(ID_COMMON_MENU_OPEN, _("Open File"),  _("Open an existing file"), wxITEM_NORMAL);
-		CommonMenuBar->Append(menu, _("File"));
-		wxMenuBar::MacSetCommonMenuBar(CommonMenuBar.get());
-	#endif
+    : App(app)
+    , CommonMenuBar() {
+    // on mac, let the app stay running when the main frame is
+    // closed.  this is the correct behavior (like most mac apps)
+#ifdef __WXMAC__
+    App.SetExitOnFrameDelete(false);
+    CommonMenuBar.reset(new wxMenuBar());
+    wxMenu* menu = new wxMenu();
+    menu->Append(ID_COMMON_MENU_NEW, _("New File"),  _("Create a new file"), wxITEM_NORMAL);
+    menu->Append(ID_COMMON_MENU_OPEN, _("Open File"),  _("Open an existing file"), wxITEM_NORMAL);
+    CommonMenuBar->Append(menu, _("File"));
+    wxMenuBar::MacSetCommonMenuBar(CommonMenuBar.get());
+#endif
 }
 

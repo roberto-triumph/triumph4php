@@ -26,9 +26,9 @@
 #include "Triumph.h"
 
 t4p::DocCommentFeatureClass::DocCommentFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+    : FeatureClass(app) {
 }
 
 bool t4p::DocCommentFeatureClass::IsEnabled() const {
-	return App.Preferences.CodeControlOptions.EnableCallTipsOnMouseHover;
+    return App.Preferences.CodeControlOptions.EnableCallTipsOnMouseHover;
 }

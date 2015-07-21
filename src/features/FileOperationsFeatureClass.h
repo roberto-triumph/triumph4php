@@ -33,7 +33,7 @@ namespace t4p {
  * Opening, closing, checking for dirty, reverting.
  */
 class FileOperationsFeatureClass : public t4p::FeatureClass {
-	public:
+ public:
     FileOperationsFeatureClass(t4p::AppClass& app);
 };
 }  // namespace t4p

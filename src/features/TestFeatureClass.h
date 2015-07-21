@@ -34,13 +34,13 @@ namespace t4p {
  * repeating steps just put the code in the Go() method )
  */
 class TestFeatureClass : public FeatureClass {
-	public:
-	TestFeatureClass(t4p::AppClass& app);
+ public:
+    TestFeatureClass(t4p::AppClass& app);
 
-	/**
-	 * the actual code that will get executed when the "GO" button is clicked
-	 */
-	void Go();
+    /**
+     * the actual code that will get executed when the "GO" button is clicked
+     */
+    void Go();
 };
 }  // namespace t4p
 

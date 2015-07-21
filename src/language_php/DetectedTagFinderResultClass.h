@@ -34,74 +34,74 @@
 
 namespace t4p {
 class DetectedTagTotalCountResultClass : public t4p::SqliteResultClass {
-	public:
-	DetectedTagTotalCountResultClass();
+ public:
+    DetectedTagTotalCountResultClass();
 
-	int GetTotalCount() const;
+    int GetTotalCount() const;
 
-	void Next();
+    void Next();
 
-	protected:
-	bool DoPrepare(soci::statement& stmt, bool doLimit);
+ protected:
+    bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-	void DoBind(soci::statement& stmt);
+    void DoBind(soci::statement& stmt);
 
-	private:
-	int TotalCount;
+ private:
+    int TotalCount;
 };
 
 class DetectedTagExactMemberResultClass : public t4p::SqliteResultClass {
-	public:
-	/**
-	 * this object is the current row of the result.
-	 */
-	t4p::PhpTagClass Tag;
+ public:
+    /**
+     * this object is the current row of the result.
+     */
+    t4p::PhpTagClass Tag;
 
-	DetectedTagExactMemberResultClass();
+    DetectedTagExactMemberResultClass();
 
-	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
-		const std::vector<wxFileName>& sourceDirectories);
+    virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
+                     const std::vector<wxFileName>& sourceDirectories);
 
-	void Next();
+    void Next();
 
-	protected:
-	bool DoPrepare(soci::statement& stmt, bool doLimit);
+ protected:
+    bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-	void DoBind(soci::statement& stmt);
+    void DoBind(soci::statement& stmt);
 
-	std::vector<std::string> Keys;
+    std::vector<std::string> Keys;
 
-	std::vector<std::string> SourceDirectories;
+    std::vector<std::string> SourceDirectories;
 
-	std::string MemberName;
+    std::string MemberName;
 
-	std::vector<int> TagTypes;
+    std::vector<int> TagTypes;
 
-	// the output variables to bind to the statement
-	std::string Key;
-	int Type;
-	std::string ClassName;
-	std::string Identifier;
-	std::string ReturnType;
-	std::string NamespaceName;
-	std::string Signature;
-	std::string Comment;
-	int IsStatic;
+    // the output variables to bind to the statement
+    std::string Key;
+    int Type;
+    std::string ClassName;
+    std::string Identifier;
+    std::string ReturnType;
+    std::string NamespaceName;
+    std::string Signature;
+    std::string Comment;
+    int IsStatic;
 };
 
 class DetectedTagNearMatchMemberResultClass : public t4p::DetectedTagExactMemberResultClass {
-	public:
-	DetectedTagNearMatchMemberResultClass();
+ public:
+    DetectedTagNearMatchMemberResultClass();
 
-	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
-		const std::vector<wxFileName>& sourceDirectories);
+    void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
+             const std::vector<wxFileName>& sourceDirectories);
 
-	protected:
-	bool DoPrepare(soci::statement& stmt, bool doLimit);
-	private:
-	std::string KeyUpper;
+ protected:
+    bool DoPrepare(soci::statement& stmt, bool doLimit);
+ private:
+    std::string KeyUpper;
 
-	int ClassCount;
+    int ClassCount;
 };
 }  // namespace t4p
 

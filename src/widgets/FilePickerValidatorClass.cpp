@@ -27,43 +27,43 @@
 #include <wx/msgdlg.h>
 
 t4p::FilePickerValidatorClass::FilePickerValidatorClass(wxFileName* data)
-: wxValidator()
-, Data(data) {
+    : wxValidator()
+    , Data(data) {
 }
 
 bool t4p::FilePickerValidatorClass::TransferToWindow() {
-	bool ret = false;
-	wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
-	if (ctrl) {
-		ctrl->SetPath(Data->GetFullPath());
-		ret = true;
-	}
-	return ret;
+    bool ret = false;
+    wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
+    if (ctrl) {
+        ctrl->SetPath(Data->GetFullPath());
+        ret = true;
+    }
+    return ret;
 }
 
 bool t4p::FilePickerValidatorClass::TransferFromWindow() {
-	bool ret = false;
-	wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
-	if (ctrl) {
-		Data->Assign(ctrl->GetPath());
-		ret = true;
-	}
-	return ret;
+    bool ret = false;
+    wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
+    if (ctrl) {
+        Data->Assign(ctrl->GetPath());
+        ret = true;
+    }
+    return ret;
 }
 
 bool t4p::FilePickerValidatorClass::Validate(wxWindow* parent) {
-	bool ret = false;
-	wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
-	if (ctrl) {
-		ret = !ctrl->GetPath().IsEmpty();
-		if (!ret) {
-			wxMessageBox(ctrl->GetName() + _(" must have a value"), _("Error"));
-		}
-	}
-	return ret;
+    bool ret = false;
+    wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
+    if (ctrl) {
+        ret = !ctrl->GetPath().IsEmpty();
+        if (!ret) {
+            wxMessageBox(ctrl->GetName() + _(" must have a value"), _("Error"));
+        }
+    }
+    return ret;
 }
 
 wxObject* t4p::FilePickerValidatorClass::Clone() const {
-	t4p::FilePickerValidatorClass* other = new t4p::FilePickerValidatorClass(Data);
-	return other;
+    t4p::FilePickerValidatorClass* other = new t4p::FilePickerValidatorClass(Data);
+    return other;
 }

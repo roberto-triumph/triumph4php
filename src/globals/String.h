@@ -36,8 +36,8 @@ namespace t4p {
  * Case-sensitive string comparator for use as STL Predicate
  */
 class UnicodeStringComparatorClass {
-	public:
-	bool operator()(const UnicodeString& str1, const UnicodeString& str2) const;
+ public:
+    bool operator()(const UnicodeString& str1, const UnicodeString& str2) const;
 };
 
 /**

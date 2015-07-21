@@ -41,29 +41,29 @@ namespace t4p {
  * cabinet.
  */
 class FileCabinetFeatureClass : public t4p::FeatureClass {
-	public:
-	FileCabinetFeatureClass(t4p::AppClass& app);
+ public:
+    FileCabinetFeatureClass(t4p::AppClass& app);
 
-	/**
-	 * add a file to the file cabinet store (sqlite)
-	 */
-	t4p::FileCabinetItemClass AddFileToCabinet(const wxString& file);
+    /**
+     * add a file to the file cabinet store (sqlite)
+     */
+    t4p::FileCabinetItemClass AddFileToCabinet(const wxString& file);
 
-	/**
-	 * add a directory to the file cabinet store (sqlite)
-	 */
-	t4p::FileCabinetItemClass AddDirectoryToCabinet(const wxString& dir);
+    /**
+     * add a directory to the file cabinet store (sqlite)
+     */
+    t4p::FileCabinetItemClass AddDirectoryToCabinet(const wxString& dir);
 
-	/**
-	 * removes the given cabinet item from the file cabinet store (sqlite)
-	 */
-	void DeleteCabinetItem(int id);
+    /**
+     * removes the given cabinet item from the file cabinet store (sqlite)
+     */
+    void DeleteCabinetItem(int id);
 
-	private:
-	/**
-	 * to modify the file cabinet
-	 */
-	t4p::FileCabinetStoreClass Store;
+ private:
+    /**
+     * to modify the file cabinet
+     */
+    t4p::FileCabinetStoreClass Store;
 };
 }  // namespace t4p
 

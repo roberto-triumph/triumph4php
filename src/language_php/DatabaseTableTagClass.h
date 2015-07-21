@@ -34,23 +34,23 @@ namespace t4p {
  * configured SQL connections
  */
 class DatabaseTableTagClass {
-	public:
-	/**
-	 * The name of the table.  Note that this is case sensitive
-	 * on some platforms (ie MySQL on MSW)
-	 */
-	wxString TableName;
+ public:
+    /**
+     * The name of the table.  Note that this is case sensitive
+     * on some platforms (ie MySQL on MSW)
+     */
+    wxString TableName;
 
-	/**
-	 * The connection where this table can be found
-	 */
-	wxString ConnectionHash;
+    /**
+     * The connection where this table can be found
+     */
+    wxString ConnectionHash;
 
-	DatabaseTableTagClass();
+    DatabaseTableTagClass();
 
-	DatabaseTableTagClass(const t4p::DatabaseTableTagClass& src);
+    DatabaseTableTagClass(const t4p::DatabaseTableTagClass& src);
 
-	void Copy(const t4p::DatabaseTableTagClass& src);
+    void Copy(const t4p::DatabaseTableTagClass& src);
 };
 }  // namespace t4p
 

@@ -29,124 +29,124 @@
 
 namespace t4p {
 class DetectorClass {
-	public:
-	DetectorClass();
+ public:
+    DetectorClass();
 
-	virtual ~DetectorClass();
+    virtual ~DetectorClass();
 
-	virtual bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) = 0;
+    virtual bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) = 0;
 
-	virtual wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
-		const wxString& detectorScriptFullPath) = 0;
+    virtual wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
+                                     const wxString& detectorScriptFullPath) = 0;
 
-	virtual wxFileName LocalRootDir()  = 0;
+    virtual wxFileName LocalRootDir()  = 0;
 
-	virtual wxFileName GlobalRootDir()  = 0;
+    virtual wxFileName GlobalRootDir()  = 0;
 
-	virtual wxFileName SkeletonFile() = 0;
+    virtual wxFileName SkeletonFile() = 0;
 
-	virtual wxString Label() = 0;
+    virtual wxString Label() = 0;
 };
 
 class UrlTagDetectorClass : public t4p::DetectorClass {
-	public:
-	UrlTagDetectorClass();
+ public:
+    UrlTagDetectorClass();
 
-	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
+    bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
-		const wxString& detectorScriptFullPath);
+    wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
+                             const wxString& detectorScriptFullPath);
 
-	wxFileName LocalRootDir();
+    wxFileName LocalRootDir();
 
-	wxFileName GlobalRootDir();
+    wxFileName GlobalRootDir();
 
-	wxFileName SkeletonFile();
+    wxFileName SkeletonFile();
 
-	wxString Label();
+    wxString Label();
 };
 
 class TemplateFileTagsDetectorClass : public t4p::DetectorClass {
-	public:
-	TemplateFileTagsDetectorClass();
+ public:
+    TemplateFileTagsDetectorClass();
 
-	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
+    bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
-		const wxString& detectorScriptFullPath);
+    wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
+                             const wxString& detectorScriptFullPath);
 
-	wxFileName LocalRootDir();
+    wxFileName LocalRootDir();
 
-	wxFileName GlobalRootDir();
+    wxFileName GlobalRootDir();
 
-	wxFileName SkeletonFile();
+    wxFileName SkeletonFile();
 
-	wxString Label();
+    wxString Label();
 };
 
 class TagDetectorClass : public t4p::DetectorClass {
-	public:
-	TagDetectorClass();
+ public:
+    TagDetectorClass();
 
-	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
+    bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
-		const wxString& detectorScriptFullPath);
+    wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
+                             const wxString& detectorScriptFullPath);
 
-	wxFileName LocalRootDir();
+    wxFileName LocalRootDir();
 
-	wxFileName GlobalRootDir();
+    wxFileName GlobalRootDir();
 
-	wxFileName SkeletonFile();
+    wxFileName SkeletonFile();
 
-	wxString Label();
+    wxString Label();
 };
 
 class DatabaseTagDetectorClass : public t4p::DetectorClass {
-	public:
-	DatabaseTagDetectorClass();
+ public:
+    DatabaseTagDetectorClass();
 
-	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
+    bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
-		const wxString& detectorScriptFullPath);
+    wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
+                             const wxString& detectorScriptFullPath);
 
-	wxFileName LocalRootDir();
+    wxFileName LocalRootDir();
 
-	wxFileName GlobalRootDir();
+    wxFileName GlobalRootDir();
 
-	wxFileName SkeletonFile();
+    wxFileName SkeletonFile();
 
-	wxString Label();
+    wxString Label();
 };
 
 class ConfigTagDetectorClass : public t4p::DetectorClass {
-	public:
-	ConfigTagDetectorClass();
+ public:
+    ConfigTagDetectorClass();
 
-	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
+    bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
-		const wxString& detectorScriptFullPath);
+    wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
+                             const wxString& detectorScriptFullPath);
 
-	wxFileName LocalRootDir();
+    wxFileName LocalRootDir();
 
-	wxFileName GlobalRootDir();
+    wxFileName GlobalRootDir();
 
-	wxFileName SkeletonFile();
+    wxFileName SkeletonFile();
 
-	wxString Label();
+    wxString Label();
 };
 
 class DetectorFeatureClass : public t4p::FeatureClass {
-	public:
-	DetectorFeatureClass(t4p::AppClass& app);
+ public:
+    DetectorFeatureClass(t4p::AppClass& app);
 
-	void RunUrlDetectors();
-	void RunTemplateFileDetectors();
-	void RunTagDetectors();
-	void RunDatabaseDetectors();
-	void RunConfigDetectors();
+    void RunUrlDetectors();
+    void RunTemplateFileDetectors();
+    void RunTagDetectors();
+    void RunDatabaseDetectors();
+    void RunConfigDetectors();
 };
 }  // namespace t4p
 

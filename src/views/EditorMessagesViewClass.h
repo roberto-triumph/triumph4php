@@ -34,29 +34,29 @@ namespace t4p {
 class EditorLogEventClass;
 
 class EditorMessagesViewClass : public t4p::FeatureViewClass {
-	public:
-	EditorMessagesViewClass();
+ public:
+    EditorMessagesViewClass();
 
-	void AddViewMenuItems(wxMenu* toolsMenu);
+    void AddViewMenuItems(wxMenu* toolsMenu);
 
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+    void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
-	private:
-	/**
-	 * When the user clicks on the editor messages menu
-	 * show the editor messages window
-	 */
-	void OnMenu(wxCommandEvent& event);
+ private:
+    /**
+     * When the user clicks on the editor messages menu
+     * show the editor messages window
+     */
+    void OnMenu(wxCommandEvent& event);
 
-	void OnAppLog(t4p::EditorLogEventClass& event);
+    void OnAppLog(t4p::EditorLogEventClass& event);
 
-	/**
-	 * create the messages panel (or use the existing one) and
-	 * add a message to it.
-	 */
-	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
+    /**
+     * create the messages panel (or use the existing one) and
+     * add a message to it.
+     */
+    void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 /**
@@ -64,19 +64,19 @@ class EditorMessagesViewClass : public t4p::FeatureViewClass {
  * messages.
  */
 class EditorMessagesPanelClass : public EditorMessagesGeneratedPanelClass {
-	public:
-	EditorMessagesPanelClass(wxWindow* parent, int id);
+ public:
+    EditorMessagesPanelClass(wxWindow* parent, int id);
 
-	/**
-	 * Add a message to the display grid.
-	 */
-	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
+    /**
+     * Add a message to the display grid.
+     */
+    void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
 
-	protected:
-	/**
-	 * Removes all messages from the display grid.
-	 */
-	void OnClearButton(wxCommandEvent& event);
+ protected:
+    /**
+     * Removes all messages from the display grid.
+     */
+    void OnClearButton(wxCommandEvent& event);
 };
 }  // namespace t4p
 

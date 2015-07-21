@@ -36,78 +36,78 @@ namespace t4p {
  * the JsTagFinderClass.
  */
 class JsTagClass {
-	public:
-	/**
-	 * primary key, unique identifier for this tag.
-	 * @var int
-	 */
-	int Id;
+ public:
+    /**
+     * primary key, unique identifier for this tag.
+     * @var int
+     */
+    int Id;
 
-	/**
-	 * The index to the file where this tag was found.
-	 */
-	int FileTagId;
+    /**
+     * The index to the file where this tag was found.
+     */
+    int FileTagId;
 
-	/**
-	 * The index to the source directory where this tag was found.
-	 */
-	int SourceId;
+    /**
+     * The index to the source directory where this tag was found.
+     */
+    int SourceId;
 
-	/**
-	 * This is the "key" that we will use for lookups. This is the string that will be used to index resources
-	 * by so that we can use binary search.
-	 * The key is a single identifier (function name, property  name),
-	 * or a a full object property member name (object.property or object.function)
-	 */
-	UnicodeString Key;
+    /**
+     * This is the "key" that we will use for lookups. This is the string that will be used to index resources
+     * by so that we can use binary search.
+     * The key is a single identifier (function name, property  name),
+     * or a a full object property member name (object.property or object.function)
+     */
+    UnicodeString Key;
 
-	/**
-	 * The identifer name of this tag. The name of the function.
-	 * @var UnicodeString
-	 */
-	UnicodeString Identifier;
+    /**
+     * The identifer name of this tag. The name of the function.
+     * @var UnicodeString
+     */
+    UnicodeString Identifier;
 
-	/**
-	 * The tag signature. For functions; it is the entire argument list
-	 * @var UnicodeString
-	 */
-	UnicodeString Signature;
+    /**
+     * The tag signature. For functions; it is the entire argument list
+     * @var UnicodeString
+     */
+    UnicodeString Signature;
 
-	/**
-	 * The comment attached to the tag.
-	 * @var UnicodeString
-	 */
-	UnicodeString Comment;
+    /**
+     * The comment attached to the tag.
+     * @var UnicodeString
+     */
+    UnicodeString Comment;
 
-	/**
-	 * Full path to the file where this tag was found.
-	 */
-	wxString FullPath;
+    /**
+     * Full path to the file where this tag was found.
+     */
+    wxString FullPath;
 
-	/**
-	 * Same as FileTagClass::IsNew ie TRUE if this tag was parsed from contents
-	 * not yet written to disk
-	 * @see FileTagClass::IsNew
-	 */
-	bool FileIsNew;
+    /**
+     * Same as FileTagClass::IsNew ie TRUE if this tag was parsed from contents
+     * not yet written to disk
+     * @see FileTagClass::IsNew
+     */
+    bool FileIsNew;
 
-	/**
-	 * @var int 1-based number where this tag starts in the file
-	 */
-	int LineNumber;
+    /**
+     * @var int 1-based number where this tag starts in the file
+     */
+    int LineNumber;
 
-	/**
-	 * @var int 0-based number where this tag starts in the line
-	 */
-	int ColumnPosition;
+    /**
+     * @var int 0-based number where this tag starts in the line
+     */
+    int ColumnPosition;
 
-	JsTagClass();
+    JsTagClass();
 
-	JsTagClass(const t4p::JsTagClass& src);
+    JsTagClass(const t4p::JsTagClass& src);
 
-	t4p::JsTagClass& operator=(const t4p::JsTagClass& src);
+    t4p::JsTagClass& operator=(const t4p::JsTagClass& src);
 
-	void Copy(const t4p::JsTagClass& src);
+    void Copy(const t4p::JsTagClass& src);
 };
 }  // namespace t4p
 

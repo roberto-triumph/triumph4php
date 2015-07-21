@@ -25,58 +25,58 @@
 #include "widgets/ListWidget.h"
 
 void t4p::ListCtrlAdd(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value) {
-	int newRowNumber = list->GetItemCount();
+    int newRowNumber = list->GetItemCount();
 
-	// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
-	wxListItem column1;
-	column1.SetColumn(0);
-	column1.SetId(newRowNumber);
-	column1.SetText(column1Value);
-	list->InsertItem(column1);
+    // list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
+    wxListItem column1;
+    column1.SetColumn(0);
+    column1.SetId(newRowNumber);
+    column1.SetText(column1Value);
+    list->InsertItem(column1);
 
-	wxListItem column2;
-	column2.SetId(newRowNumber);
-	column2.SetColumn(1);
-	column2.SetText(column2Value);
-	list->SetItem(column2);
+    wxListItem column2;
+    column2.SetId(newRowNumber);
+    column2.SetColumn(1);
+    column2.SetText(column2Value);
+    list->SetItem(column2);
 }
 
 void t4p::ListCtrlEdit(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value, int rowIndex) {
-	wxListItem column1;
-	column1.SetColumn(0);
-	column1.SetId(rowIndex);
-	column1.SetText(column1Value);
-	list->SetItem(column1);
+    wxListItem column1;
+    column1.SetColumn(0);
+    column1.SetId(rowIndex);
+    column1.SetText(column1Value);
+    list->SetItem(column1);
 
-	wxListItem column2;
-	column2.SetId(rowIndex);
-	column2.SetColumn(1);
-	column2.SetText(column2Value);
-	list->SetItem(column2);
+    wxListItem column2;
+    column2.SetId(rowIndex);
+    column2.SetColumn(1);
+    column2.SetText(column2Value);
+    list->SetItem(column2);
 }
 
 void t4p::ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Value, int rowIndex) {
-	// need to set the mask flag; otherwise in MSW the text will not be set
-	// this assumes the given list is set to LC_REPORT mode
-	wxListItem column1,
-		column2;
-	column1.SetColumn(0);
-	column1.SetId(rowIndex);
-	column1.m_mask = wxLIST_MASK_TEXT;
-	column2.SetColumn(1);
-	column2.SetId(rowIndex);
-	column2.m_mask = wxLIST_MASK_TEXT;
+    // need to set the mask flag; otherwise in MSW the text will not be set
+    // this assumes the given list is set to LC_REPORT mode
+    wxListItem column1,
+               column2;
+    column1.SetColumn(0);
+    column1.SetId(rowIndex);
+    column1.m_mask = wxLIST_MASK_TEXT;
+    column2.SetColumn(1);
+    column2.SetId(rowIndex);
+    column2.m_mask = wxLIST_MASK_TEXT;
 
-	if (list->GetItem(column1) && list->GetItem(column2)) {
-		column1Value = column1.GetText();
-		column2Value = column2.GetText();
-	}
+    if (list->GetItem(column1) && list->GetItem(column2)) {
+        column1Value = column1.GetText();
+        column2Value = column2.GetText();
+    }
 }
 
 int t4p::ListCtrlSelected(wxListCtrl* ctrl) {
-	int selected = ctrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (selected >= 0 && selected < ctrl->GetItemCount()) {
-		return selected;
-	}
-	return wxNOT_FOUND;
+    int selected = ctrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+    if (selected >= 0 && selected < ctrl->GetItemCount()) {
+        return selected;
+    }
+    return wxNOT_FOUND;
 }

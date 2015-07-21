@@ -29,64 +29,64 @@
 #include "globals/String.h"
 
 t4p::UnicodeStringValidatorClass::UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty)
-	: wxValidator()
-	, Data(data)
-	, DoAllowEmpty(doAllowEmpty) {
+    : wxValidator()
+    , Data(data)
+    , DoAllowEmpty(doAllowEmpty) {
 }
 
 wxObject* t4p::UnicodeStringValidatorClass::Clone() const {
-	t4p::UnicodeStringValidatorClass* other = new UnicodeStringValidatorClass(Data, DoAllowEmpty);
-	return other;
+    t4p::UnicodeStringValidatorClass* other = new UnicodeStringValidatorClass(Data, DoAllowEmpty);
+    return other;
 }
 
 bool t4p::UnicodeStringValidatorClass::TransferFromWindow() {
-	bool ret = false;
-	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
-	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
-	if (t) {
-		wxString val = t->GetValue();
-		*Data = t4p::WxToIcu(val);
-		ret = true;
-	} else if (combo) {
-		wxString val = combo->GetValue();
-		*Data = t4p::WxToIcu(val);
-		ret = true;
-	}
-	return ret;
+    bool ret = false;
+    wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
+    wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
+    if (t) {
+        wxString val = t->GetValue();
+        *Data = t4p::WxToIcu(val);
+        ret = true;
+    } else if (combo) {
+        wxString val = combo->GetValue();
+        *Data = t4p::WxToIcu(val);
+        ret = true;
+    }
+    return ret;
 }
 
 bool t4p::UnicodeStringValidatorClass::TransferToWindow() {
-	bool ret = false;
-	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
-	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
-	if (t) {
-		wxString val = t4p::IcuToWx(*Data);
-		t->SetValue(val);
-		ret = true;
-	}
-	if (combo) {
-		wxString val = t4p::IcuToWx(*Data);
-		combo->SetValue(val);
-		ret = true;
-	}
-	return ret;
+    bool ret = false;
+    wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
+    wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
+    if (t) {
+        wxString val = t4p::IcuToWx(*Data);
+        t->SetValue(val);
+        ret = true;
+    }
+    if (combo) {
+        wxString val = t4p::IcuToWx(*Data);
+        combo->SetValue(val);
+        ret = true;
+    }
+    return ret;
 }
 
 bool t4p::UnicodeStringValidatorClass::Validate(wxWindow* parent) {
-	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
-	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
-	wxString val;
-	if (t) {
-		val = t->GetValue();
-	} else if (combo) {
-		val = combo->GetValue();
-	}
+    wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
+    wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
+    wxString val;
+    if (t) {
+        val = t->GetValue();
+    } else if (combo) {
+        val = combo->GetValue();
+    }
 
-	if (val.IsEmpty() && !DoAllowEmpty) {
-		wxString msg = GetWindow()->GetName();
-		msg += _(" cannot be empty");
-		wxMessageBox(msg, _("Error"), wxOK | wxCENTRE, parent);
-		return false;
-	}
-	return true;
+    if (val.IsEmpty() && !DoAllowEmpty) {
+        wxString msg = GetWindow()->GetName();
+        msg += _(" cannot be empty");
+        wxMessageBox(msg, _("Error"), wxOK | wxCENTRE, parent);
+        return false;
+    }
+    return true;
 }

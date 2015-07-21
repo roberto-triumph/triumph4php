@@ -38,25 +38,25 @@ namespace t4p {
  */
 
 enum DbgpXmlErrors {
-	/**
-	 * no error when parsing the response
-	 */
-	DBGP_XML_ERROR_NONE,
+    /**
+     * no error when parsing the response
+     */
+    DBGP_XML_ERROR_NONE,
 
-	/**
-	 * could not parse XML (no well-formed)
-	 */
-	DBGP_XML_ERROR_PARSE,
+    /**
+     * could not parse XML (no well-formed)
+     */
+    DBGP_XML_ERROR_PARSE,
 
-	/**
-	 * xml does not contain the expected tag
-	 */
-	DBGP_XML_ERROR_TAG,
+    /**
+     * xml does not contain the expected tag
+     */
+    DBGP_XML_ERROR_TAG,
 
-	/**
-	 * xml does not contain the expected attribute
-	 */
-	DBGP_XML_ERROR_ATTRIBUTE
+    /**
+     * xml does not contain the expected attribute
+     */
+    DBGP_XML_ERROR_ATTRIBUTE
 };
 
 /*
@@ -65,21 +65,21 @@ enum DbgpXmlErrors {
  * See section 5.2
  */
 class DbgpInitEventClass : public wxEvent {
-	public:
-	wxString AppId;
-	wxString IdeKey;
-	wxString Session;
-	wxString Thread;
-	wxString Parent;
-	wxString Language;
-	wxString ProtocolVersion;
-	wxString FileUri;
+ public:
+    wxString AppId;
+    wxString IdeKey;
+    wxString Session;
+    wxString Thread;
+    wxString Parent;
+    wxString Language;
+    wxString ProtocolVersion;
+    wxString FileUri;
 
-	DbgpInitEventClass();
+    DbgpInitEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -88,18 +88,18 @@ class DbgpInitEventClass : public wxEvent {
  * See Section 6.5
  */
 class DbgpErrorEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
-	int ErrorCode;
-	wxString AppErrorCode;
-	wxString Message;
+ public:
+    wxString Command;
+    wxString TransactionId;
+    int ErrorCode;
+    wxString AppErrorCode;
+    wxString Message;
 
-	DbgpErrorEventClass();
+    DbgpErrorEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -107,37 +107,37 @@ class DbgpErrorEventClass : public wxEvent {
  * See Section 7.1
  */
 enum DbgpStatus {
-	DBGP_STATUS_UNKNOWN,
-	DBGP_STATUS_STARTING,
-	DBGP_STATUS_STOPPING,
-	DBGP_STATUS_STOPPED,
-	DBGP_STATUS_RUNNING,
-	DBGP_STATUS_BREAK
+    DBGP_STATUS_UNKNOWN,
+    DBGP_STATUS_STARTING,
+    DBGP_STATUS_STOPPING,
+    DBGP_STATUS_STOPPED,
+    DBGP_STATUS_RUNNING,
+    DBGP_STATUS_BREAK
 };
 
 enum DbgpReason {
-	DBGP_REASON_UNKNOWN,
-	DBGP_REASON_OK,
-	DBGP_REASON_ERROR,
-	DBGP_REASON_ABORTED,
-	DBGP_REASON_EXCEPTION
+    DBGP_REASON_UNKNOWN,
+    DBGP_REASON_OK,
+    DBGP_REASON_ERROR,
+    DBGP_REASON_ABORTED,
+    DBGP_REASON_EXCEPTION
 };
 
 class DbgpStatusEventClass : public wxEvent {
-	public:
-	/** starting|stopping|stopped|running|break */
-	t4p::DbgpStatus Status;
+ public:
+    /** starting|stopping|stopped|running|break */
+    t4p::DbgpStatus Status;
 
-	/* ok|error|aborted|exception */
-	t4p::DbgpReason Reason;
-	wxString TransactionId;
-	wxString MessageData;
+    /* ok|error|aborted|exception */
+    t4p::DbgpReason Reason;
+    wxString TransactionId;
+    wxString MessageData;
 
-	DbgpStatusEventClass();
+    DbgpStatusEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -145,41 +145,41 @@ class DbgpStatusEventClass : public wxEvent {
  * See Section 7.2.2
  */
 enum DbgpFeatures {
-	DBGP_FEATURE_UNKNOWN,
-	DBGP_FEATURE_LANGUAGE_SUPPORTS_THREADS,
-	DBGP_FEATURE_LANGUAGE_NAME,
-	DBGP_FEATURE_LANGUAGE_VERSION,
-	DBGP_FEATURE_ENCODING,
-	DBGP_FEATURE_PROTOCOL_VERSION,
-	DBGP_FEATURE_DATA_ENCODING,
-	DBGP_FEATURE_BREAKPOINT_LANGUAGES,
-	DBGP_FEATURE_BREAKPOINT_TYPES,
-	DBGP_FEATURE_MULTIPLE_SESSIONS,
-	DBGP_FEATURE_MAX_CHILDREN,
-	DBGP_FEATURE_MAX_DATA,
-	DBGP_FEATURE_MAX_DEPTH
+    DBGP_FEATURE_UNKNOWN,
+    DBGP_FEATURE_LANGUAGE_SUPPORTS_THREADS,
+    DBGP_FEATURE_LANGUAGE_NAME,
+    DBGP_FEATURE_LANGUAGE_VERSION,
+    DBGP_FEATURE_ENCODING,
+    DBGP_FEATURE_PROTOCOL_VERSION,
+    DBGP_FEATURE_DATA_ENCODING,
+    DBGP_FEATURE_BREAKPOINT_LANGUAGES,
+    DBGP_FEATURE_BREAKPOINT_TYPES,
+    DBGP_FEATURE_MULTIPLE_SESSIONS,
+    DBGP_FEATURE_MAX_CHILDREN,
+    DBGP_FEATURE_MAX_DATA,
+    DBGP_FEATURE_MAX_DEPTH
 };
 
 class DbgpFeatureGetEventClass : public wxEvent {
-	public:
-	wxString Command;
-	t4p::DbgpFeatures Feature;
+ public:
+    wxString Command;
+    t4p::DbgpFeatures Feature;
 
-	/*
-	 * supported means that the feature_name given was a
-	 * a valid feature name, not that the feature itself is
-	 * available. whether or not the feature is available ca
-	 * be seen by looking at the data
+    /*
+     * supported means that the feature_name given was a
+     * a valid feature name, not that the feature itself is
+     * available. whether or not the feature is available ca
+     * be seen by looking at the data
      */
-	bool Supported;
-	wxString TransactionId;
-	wxString Data;
+    bool Supported;
+    wxString TransactionId;
+    wxString Data;
 
-	DbgpFeatureGetEventClass();
+    DbgpFeatureGetEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -187,17 +187,17 @@ class DbgpFeatureGetEventClass : public wxEvent {
  * See Section 7.2.3
  */
 class DbgpFeatureSetEventClass : public wxEvent {
-	public:
-	wxString Command;
-	t4p::DbgpFeatures Feature;
-	bool Success;
-	wxString TransactionId;
+ public:
+    wxString Command;
+    t4p::DbgpFeatures Feature;
+    bool Success;
+    wxString TransactionId;
 
-	DbgpFeatureSetEventClass();
+    DbgpFeatureSetEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -205,26 +205,26 @@ class DbgpFeatureSetEventClass : public wxEvent {
  * See Section 7.5
  */
 enum DbgpContinuations {
-	DBGP_CONTINUE_UNKNOWN,
-	DBGP_CONTINUE_RUN,
-	DBGP_CONTINUE_STEP_INTO,
-	DBGP_CONTINUE_STEP_OVER,
-	DBGP_CONTINUE_STEP_OUT,
-	DBGP_CONTINUE_STOP,
+    DBGP_CONTINUE_UNKNOWN,
+    DBGP_CONTINUE_RUN,
+    DBGP_CONTINUE_STEP_INTO,
+    DBGP_CONTINUE_STEP_OVER,
+    DBGP_CONTINUE_STEP_OUT,
+    DBGP_CONTINUE_STOP,
 };
 
 class DbgpContinueEventClass : public wxEvent {
-	public:
-	wxString Command;
-	t4p::DbgpStatus Status;
-	t4p::DbgpReason Reason;
-	wxString TransactionId;
+ public:
+    wxString Command;
+    t4p::DbgpStatus Status;
+    t4p::DbgpReason Reason;
+    wxString TransactionId;
 
-	DbgpContinueEventClass();
+    DbgpContinueEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -232,44 +232,44 @@ class DbgpContinueEventClass : public wxEvent {
  * See Section 7.6.1
  */
 class DbgpBreakpointSetEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
-	bool Enabled;
-	wxString BreakpointId;
+ public:
+    wxString Command;
+    wxString TransactionId;
+    bool Enabled;
+    wxString BreakpointId;
 
-	DbgpBreakpointSetEventClass();
+    DbgpBreakpointSetEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 class DbgpBreakpointClass {
-	public:
-	wxString BreakpointId;
-	wxString BreakpointType;
-	bool IsEnabled;
-	wxString Filename;
+ public:
+    wxString BreakpointId;
+    wxString BreakpointType;
+    bool IsEnabled;
+    wxString Filename;
 
-	/**
-	 * 1-based
-	 */
-	int LineNumber;
-	wxString Function;
-	wxString Exception;
-	int HitValue;
-	wxString HitCondition;
-	int HitCount;
-	wxString Expression;
+    /**
+     * 1-based
+     */
+    int LineNumber;
+    wxString Function;
+    wxString Exception;
+    int HitValue;
+    wxString HitCondition;
+    int HitCount;
+    wxString Expression;
 
-	DbgpBreakpointClass();
+    DbgpBreakpointClass();
 
-	DbgpBreakpointClass(const t4p::DbgpBreakpointClass& src);
+    DbgpBreakpointClass(const t4p::DbgpBreakpointClass& src);
 
-	t4p::DbgpBreakpointClass& operator=(const t4p::DbgpBreakpointClass& src);
+    t4p::DbgpBreakpointClass& operator=(const t4p::DbgpBreakpointClass& src);
 
-	void Copy(const t4p::DbgpBreakpointClass& src);
+    void Copy(const t4p::DbgpBreakpointClass& src);
 };
 
 /**
@@ -277,14 +277,14 @@ class DbgpBreakpointClass {
  * See Section 7.6.2
  */
 class DbgpBreakpointGetEventClass : public wxEvent {
-	public:
-	t4p::DbgpBreakpointClass Breakpoint;
+ public:
+    t4p::DbgpBreakpointClass Breakpoint;
 
-	DbgpBreakpointGetEventClass();
+    DbgpBreakpointGetEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -292,15 +292,15 @@ class DbgpBreakpointGetEventClass : public wxEvent {
  * See Section 7.6.3
  */
 class DbgpBreakpointUpdateEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
+ public:
+    wxString Command;
+    wxString TransactionId;
 
-	DbgpBreakpointUpdateEventClass();
+    DbgpBreakpointUpdateEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -308,15 +308,15 @@ class DbgpBreakpointUpdateEventClass : public wxEvent {
  * See Section 7.6.4
  */
 class DbgpBreakpointRemoveEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
+ public:
+    wxString Command;
+    wxString TransactionId;
 
-	DbgpBreakpointRemoveEventClass();
+    DbgpBreakpointRemoveEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -324,16 +324,16 @@ class DbgpBreakpointRemoveEventClass : public wxEvent {
  * See Section 7.6.5
  */
 class DbgpBreakpointListEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
-	std::vector<t4p::DbgpBreakpointClass> Breakpoints;
+ public:
+    wxString Command;
+    wxString TransactionId;
+    std::vector<t4p::DbgpBreakpointClass> Breakpoints;
 
-	DbgpBreakpointListEventClass();
+    DbgpBreakpointListEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -341,37 +341,37 @@ class DbgpBreakpointListEventClass : public wxEvent {
  * See Section 7.7
  */
 class DbgpStackDepthEventClass : public wxEvent {
-	public:
-	int Depth;
+ public:
+    int Depth;
 
-	DbgpStackDepthEventClass();
+    DbgpStackDepthEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 class DbgpStackClass {
-	public:
-	int Level;
-	wxString Type;
-	wxString Filename;
+ public:
+    int Level;
+    wxString Type;
+    wxString Filename;
 
-	/**
-	 * 1-based
-	 */
-	int LineNumber;
-	wxString Where;
-	wxString CmdBegin;
-	wxString CmdEnd;
+    /**
+     * 1-based
+     */
+    int LineNumber;
+    wxString Where;
+    wxString CmdBegin;
+    wxString CmdEnd;
 
-	DbgpStackClass();
+    DbgpStackClass();
 
-	DbgpStackClass(const t4p::DbgpStackClass& src);
+    DbgpStackClass(const t4p::DbgpStackClass& src);
 
-	t4p::DbgpStackClass& operator=(const t4p::DbgpStackClass& src);
+    t4p::DbgpStackClass& operator=(const t4p::DbgpStackClass& src);
 
-	void Copy(const t4p::DbgpStackClass& src);
+    void Copy(const t4p::DbgpStackClass& src);
 };
 
 /**
@@ -379,14 +379,14 @@ class DbgpStackClass {
  * See Section 7.8
  */
 class DbgpStackGetEventClass : public wxEvent {
-	public:
-	std::vector<t4p::DbgpStackClass> Stack;
+ public:
+    std::vector<t4p::DbgpStackClass> Stack;
 
-	DbgpStackGetEventClass();
+    DbgpStackGetEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -395,15 +395,15 @@ class DbgpStackGetEventClass : public wxEvent {
  * See Section 7.9
  */
 class DbgpContextNamesEventClass : public wxEvent {
-	public:
-	std::vector<wxString> Names;
-	std::vector<int> Ids;
+ public:
+    std::vector<wxString> Names;
+    std::vector<int> Ids;
 
-	DbgpContextNamesEventClass();
+    DbgpContextNamesEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -411,37 +411,37 @@ class DbgpContextNamesEventClass : public wxEvent {
  * See Section 7.11
  */
 class DbgpPropertyClass {
-	public:
-	wxString Name;
-	wxString FullName;
-	wxString DataType;
-	wxString Facet;
-	wxString ClassName;
-	bool Constant;
-	bool HasChildren;
-	int Size;
-	int Page;
-	int PageSize;
-	int Address;
-	wxString Key;
-	wxString Encoding;
+ public:
+    wxString Name;
+    wxString FullName;
+    wxString DataType;
+    wxString Facet;
+    wxString ClassName;
+    bool Constant;
+    bool HasChildren;
+    int Size;
+    int Page;
+    int PageSize;
+    int Address;
+    wxString Key;
+    wxString Encoding;
 
-	// this is all of the children that this property has, counting
-	// the ones that the debug engine did not return because of
-	// maxChildren feature
-	int NumChildren;
-	wxString Value;
+    // this is all of the children that this property has, counting
+    // the ones that the debug engine did not return because of
+    // maxChildren feature
+    int NumChildren;
+    wxString Value;
 
-	// this may not include all of the children of this property
-	std::vector<t4p::DbgpPropertyClass> ChildProperties;
+    // this may not include all of the children of this property
+    std::vector<t4p::DbgpPropertyClass> ChildProperties;
 
-	DbgpPropertyClass();
+    DbgpPropertyClass();
 
-	DbgpPropertyClass(const t4p::DbgpPropertyClass& src);
+    DbgpPropertyClass(const t4p::DbgpPropertyClass& src);
 
-	t4p::DbgpPropertyClass& operator=(const t4p::DbgpPropertyClass& src);
+    t4p::DbgpPropertyClass& operator=(const t4p::DbgpPropertyClass& src);
 
-	void Copy(const t4p::DbgpPropertyClass& src);
+    void Copy(const t4p::DbgpPropertyClass& src);
 };
 
 /**
@@ -452,16 +452,16 @@ class DbgpPropertyClass {
  * See Section 7.10
  */
 class DbgpContextGetEventClass : public wxEvent {
-	public:
-	std::vector<t4p::DbgpPropertyClass> Properties;
+ public:
+    std::vector<t4p::DbgpPropertyClass> Properties;
 
-	int ContextId;
+    int ContextId;
 
-	DbgpContextGetEventClass();
+    DbgpContextGetEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -473,16 +473,16 @@ class DbgpContextGetEventClass : public wxEvent {
  * See Section  7.13
  */
 class DbgpPropertyGetEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
-	t4p::DbgpPropertyClass Property;
+ public:
+    wxString Command;
+    wxString TransactionId;
+    t4p::DbgpPropertyClass Property;
 
-	DbgpPropertyGetEventClass();
+    DbgpPropertyGetEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 
@@ -494,16 +494,16 @@ class DbgpPropertyGetEventClass : public wxEvent {
  * See Section  7.13
  */
 class DbgpPropertyValueEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
-	wxString Value;
+ public:
+    wxString Command;
+    wxString TransactionId;
+    wxString Value;
 
-	DbgpPropertyValueEventClass();
+    DbgpPropertyValueEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 
@@ -512,16 +512,16 @@ class DbgpPropertyValueEventClass : public wxEvent {
  * See Section  7.13
  */
 class DbgpPropertySetEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
-	bool Success;
+ public:
+    wxString Command;
+    wxString TransactionId;
+    bool Success;
 
-	DbgpPropertySetEventClass();
+    DbgpPropertySetEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -529,16 +529,16 @@ class DbgpPropertySetEventClass : public wxEvent {
  * See Section 8.3
  */
 class DbgpBreakEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
-	bool Success;
+ public:
+    wxString Command;
+    wxString TransactionId;
+    bool Success;
 
-	DbgpBreakEventClass();
+    DbgpBreakEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -546,17 +546,17 @@ class DbgpBreakEventClass : public wxEvent {
  * See Section 8.3.1
  */
 class DbgpEvalEventClass : public wxEvent {
-	public:
-	wxString Command;
-	wxString TransactionId;
-	t4p::DbgpPropertyClass Property;
-	bool Success;
+ public:
+    wxString Command;
+    wxString TransactionId;
+    t4p::DbgpPropertyClass Property;
+    bool Success;
 
-	DbgpEvalEventClass();
+    DbgpEvalEventClass();
 
-	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
+    bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -567,178 +567,178 @@ class DbgpEvalEventClass : public wxEvent {
  * See Section 6.3
  */
 class DbgpCommandClass {
-	public:
-	DbgpCommandClass();
+ public:
+    DbgpCommandClass();
 
-	/**
-	 * Get the debugger engine status
-	 * See section 7.1
-	 */
-	std::string Status();
+    /**
+     * Get the debugger engine status
+     * See section 7.1
+     */
+    std::string Status();
 
-	/**
-	 * Gets the status for a single feature
-	 * See section 7.2.2
-	 */
-	std::string FeatureGet(const wxString& featureName);
+    /**
+     * Gets the status for a single feature
+     * See section 7.2.2
+     */
+    std::string FeatureGet(const wxString& featureName);
 
-	/**
-	 * Sets the value for a single feature
-	 * See section 7.2.3
-	 */
-	std::string FeatureSet(const wxString& featureName, const wxString& value);
+    /**
+     * Sets the value for a single feature
+     * See section 7.2.3
+     */
+    std::string FeatureSet(const wxString& featureName, const wxString& value);
 
-	/**
-	 * Resumes / stops the execution of the script
-	 * See section 7.5
-	 */
-	std::string Run();
-	std::string StepInto();
-	std::string StepOver();
-	std::string StepOut();
-	std::string Stop();
+    /**
+     * Resumes / stops the execution of the script
+     * See section 7.5
+     */
+    std::string Run();
+    std::string StepInto();
+    std::string StepOver();
+    std::string StepOut();
+    std::string Stop();
 
-	/**
-	 * Sets a file breakpoint
-	 * See section 7.6
-	 */
-	std::string BreakpointFile(const wxString& filename, int lineNumber, bool enabled, int hitValue = 0, const wxString& hitCondition = wxEmptyString);
+    /**
+     * Sets a file breakpoint
+     * See section 7.6
+     */
+    std::string BreakpointFile(const wxString& filename, int lineNumber, bool enabled, int hitValue = 0, const wxString& hitCondition = wxEmptyString);
 
-	/**
-	 * Sets a call function breakpoint
-	 * See section 7.6
-	 */
-	std::string BreakpointCall(const wxString& function, bool enabled, int hitValue = 0, const wxString& hitCondition = wxEmptyString);
+    /**
+     * Sets a call function breakpoint
+     * See section 7.6
+     */
+    std::string BreakpointCall(const wxString& function, bool enabled, int hitValue = 0, const wxString& hitCondition = wxEmptyString);
 
-	/**
-	 * Sets a return function breakpoint
-	 * See section 7.6
-	 */
-	std::string BreakpointReturn(const wxString& function, bool enabled, int hitValue = 0, const wxString& hitCondition = wxEmptyString);
+    /**
+     * Sets a return function breakpoint
+     * See section 7.6
+     */
+    std::string BreakpointReturn(const wxString& function, bool enabled, int hitValue = 0, const wxString& hitCondition = wxEmptyString);
 
-	/**
-	 * Sets an exception breakpoint
-	 * See section 7.6
-	 */
-	std::string BreakpointException(const wxString& exception, bool enabled);
+    /**
+     * Sets an exception breakpoint
+     * See section 7.6
+     */
+    std::string BreakpointException(const wxString& exception, bool enabled);
 
-	/**
-	 * Sets a conditonal (file) breakpoint
-	 * See section 7.6
-	 */
-	std::string BreakpointConditional(const wxString& filename, int lineNumber, const wxString& expression, bool enabled);
+    /**
+     * Sets a conditonal (file) breakpoint
+     * See section 7.6
+     */
+    std::string BreakpointConditional(const wxString& filename, int lineNumber, const wxString& expression, bool enabled);
 
-	/**
-	 * Sets a watch breakpoint
-	 * See section 7.6.1
-	 */
-	std::string BreakpointWatch(const wxString& expression, bool enabled);
+    /**
+     * Sets a watch breakpoint
+     * See section 7.6.1
+     */
+    std::string BreakpointWatch(const wxString& expression, bool enabled);
 
-	/**
-	 * Sets a temporary breakpoint
-	 * See section 7.6.1
-	 */
-	std::string BreakpointRunToCursor(const wxString& filename, int lineNumber);
+    /**
+     * Sets a temporary breakpoint
+     * See section 7.6.1
+     */
+    std::string BreakpointRunToCursor(const wxString& filename, int lineNumber);
 
-	/**
-	 * gets breakpoint info
-	 * See section 7.6.2
-	 */
-	std::string BreakpointGet(const wxString& breakpointId);
+    /**
+     * gets breakpoint info
+     * See section 7.6.2
+     */
+    std::string BreakpointGet(const wxString& breakpointId);
 
-	/**
-	 * disable a breakpoint
-	 * See section 7.6.3
-	 */
-	std::string BreakpointDisable(const wxString& breakpointId);
+    /**
+     * disable a breakpoint
+     * See section 7.6.3
+     */
+    std::string BreakpointDisable(const wxString& breakpointId);
 
-	/**
-	 * enables a breakpoint
-	 * See section 7.6.3
-	 */
-	std::string BreakpointEnable(const wxString& breakpointId);
+    /**
+     * enables a breakpoint
+     * See section 7.6.3
+     */
+    std::string BreakpointEnable(const wxString& breakpointId);
 
-	/**
-	 * removes a breakpoint
-	 * See section 7.6.4
-	 */
-	std::string BreakpointRemove(const wxString& breakpointId);
+    /**
+     * removes a breakpoint
+     * See section 7.6.4
+     */
+    std::string BreakpointRemove(const wxString& breakpointId);
 
-	/**
-	 * gets all of the breakpoints
-	 * See section 7.6.5
-	 */
-	std::string BreakpointList();
+    /**
+     * gets all of the breakpoints
+     * See section 7.6.5
+     */
+    std::string BreakpointList();
 
-	/**
-	 * get the stack depth
-	 * See section 7.7
-	 */
-	std::string StackDepth();
+    /**
+     * get the stack depth
+     * See section 7.7
+     */
+    std::string StackDepth();
 
-	/**
-	 * get the stack
-	 * See section 7.8
-	 */
-	std::string StackGet(int stackDepth);
+    /**
+     * get the stack
+     * See section 7.8
+     */
+    std::string StackGet(int stackDepth);
 
-	/**
-	 * get the context name
-	 * See section 7.9
-	 */
-	std::string ContextNames(int stackDepth);
+    /**
+     * get the context name
+     * See section 7.9
+     */
+    std::string ContextNames(int stackDepth);
 
-	/**
-	 * get all properties in a context
-	 * See section 7.10
-	 */
-	std::string ContextGet(int stackDepth, int contextId);
+    /**
+     * get all properties in a context
+     * See section 7.10
+     */
+    std::string ContextGet(int stackDepth, int contextId);
 
-	/**
-	 * get a single property (restricted to a max size)
-	 * See section 7.13
-	 */
-	std::string PropertyGet(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& propertyKey);
+    /**
+     * get a single property (restricted to a max size)
+     * See section 7.13
+     */
+    std::string PropertyGet(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& propertyKey);
 
-	/**
-	 * set a single property
-	 * See section 7.13
-	 */
-	std::string PropertySet(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& dataType, const wxString& value);
+    /**
+     * set a single property
+     * See section 7.13
+     */
+    std::string PropertySet(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& dataType, const wxString& value);
 
-	/**
-	 * get a single property (unrestricted size)
-	 * See section 7.1
-	 */
-	std::string PropertyValue(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& propertyKey);
+    /**
+     * get a single property (unrestricted size)
+     * See section 7.1
+     */
+    std::string PropertyValue(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& propertyKey);
 
-	/**
-	 * interrupt the debugger while the engine is running
-	 * See section 8.2
-	 */
-	std::string Break();
+    /**
+     * interrupt the debugger while the engine is running
+     * See section 8.2
+     */
+    std::string Break();
 
-	/**
-	 * evaluates the given expression in the current context.
-	 * See section 8.3
-	 */
-	std::string Eval(const wxString& expression);
+    /**
+     * evaluates the given expression in the current context.
+     * See section 8.3
+     */
+    std::string Eval(const wxString& expression);
 
-	/**
-	 * @return the transaction Id that will be used for the
-	 *         next command.
-	 */
-	std::string CurrentTransactionId() const;
+    /**
+     * @return the transaction Id that will be used for the
+     *         next command.
+     */
+    std::string CurrentTransactionId() const;
 
-	private:
-	// all three are used to produce a unique transaction id
-	int TransactionId;
-	int Pid;
-	wxString MachineName;
+ private:
+    // all three are used to produce a unique transaction id
+    int TransactionId;
+    int Pid;
+    wxString MachineName;
 
-	std::string Build(const std::string& cmd, const wxString& args, const wxString& data = wxEmptyString);
+    std::string Build(const std::string& cmd, const wxString& args, const wxString& data = wxEmptyString);
 
-	wxString EscapeArg(const wxString& arg);
+    wxString EscapeArg(const wxString& arg);
 };
 
 /**
@@ -771,140 +771,140 @@ extern const wxEventType EVENT_DBGP_EVAL;
 typedef void (wxEvtHandler::*DbgpInitEventClassFunction)(t4p::DbgpInitEventClass&);
 
 #define EVT_DBGP_INIT(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_INIT, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_INIT, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpInitEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpErrorEventClassFunction)(t4p::DbgpErrorEventClass&);
 
 #define EVT_DBGP_ERROR(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_ERROR, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_ERROR, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpErrorEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpStatusEventClassFunction)(t4p::DbgpStatusEventClass&);
 
 #define EVT_DBGP_STATUS(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STATUS, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STATUS, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpStatusEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpFeatureGetEventClassFunction)(t4p::DbgpFeatureGetEventClass&);
 
 #define EVT_DBGP_FEATUREGET(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_FEATUREGET, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_FEATUREGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpFeatureGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpFeatureSetEventClassFunction)(t4p::DbgpFeatureSetEventClass&);
 
 #define EVT_DBGP_FEATURESET(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_FEATURESET, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_FEATURESET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpFeatureSetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpContinueEventClassFunction)(t4p::DbgpContinueEventClass&);
 
 #define EVT_DBGP_CONTINUE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTINUE, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTINUE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpContinueEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointSetEventClassFunction)(t4p::DbgpBreakpointSetEventClass&);
 
 #define EVT_DBGP_BREAKPOINTSET(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTSET, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTSET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpBreakpointSetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointGetEventClassFunction)(t4p::DbgpBreakpointGetEventClass&);
 
 #define EVT_DBGP_BREAKPOINTGET(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTGET, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpBreakpointGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointUpdateEventClassFunction)(t4p::DbgpBreakpointUpdateEventClass&);
 
 #define EVT_DBGP_BREAKPOINTUPDATE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTUPDATE, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTUPDATE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpBreakpointUpdateEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointRemoveEventClassFunction)(t4p::DbgpBreakpointRemoveEventClass&);
 
 #define EVT_DBGP_BREAKPOINTREMOVE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTREMOVE, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTREMOVE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpBreakpointRemoveEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointListEventClassFunction)(t4p::DbgpBreakpointListEventClass&);
 
 #define EVT_DBGP_BREAKPOINTLIST(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTLIST, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTLIST, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpBreakpointListEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpStackDepthEventClassFunction)(t4p::DbgpStackDepthEventClass&);
 
 #define EVT_DBGP_STACKDEPTH(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STACKDEPTH, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STACKDEPTH, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpStackDepthEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpStackGetEventClassFunction)(t4p::DbgpStackGetEventClass&);
 
 #define EVT_DBGP_STACKGET(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STACKGET, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STACKGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpStackGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpContextNamesEventClassFunction)(t4p::DbgpContextNamesEventClass&);
 
 #define EVT_DBGP_CONTEXTNAMES(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTEXTNAMES, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTEXTNAMES, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpContextNamesEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpContextGetEventClassFunction)(t4p::DbgpContextGetEventClass&);
 
 #define EVT_DBGP_CONTEXTGET(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTEXTGET, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTEXTGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpContextGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpPropertyGetEventClassFunction)(t4p::DbgpPropertyGetEventClass&);
 
 #define EVT_DBGP_PROPERTYGET(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYGET, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpPropertyGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpPropertyValueEventClassFunction)(t4p::DbgpPropertyValueEventClass&);
 
 #define EVT_DBGP_PROPERTYVALUE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYVALUE, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYVALUE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpPropertyValueEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpPropertySetEventClassFunction)(t4p::DbgpPropertySetEventClass&);
 
 #define EVT_DBGP_PROPERTYSET(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYSET, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYSET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpPropertySetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakEventClassFunction)(t4p::DbgpBreakEventClass&);
 
 #define EVT_DBGP_BREAK(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAK, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAK, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpBreakEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpEvalEventClassFunction)(t4p::DbgpEvalEventClass&);
 
 #define EVT_DBGP_EVAL(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_EVAL, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_EVAL, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpEvalEventClassFunction, & fn), (wxObject *) NULL),
 

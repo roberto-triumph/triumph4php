@@ -34,8 +34,8 @@ namespace t4p {
  * the user runs the program.
  */
 class NewUserFeatureClass : public t4p::FeatureClass {
-	public:
-	NewUserFeatureClass(t4p::AppClass& app);
+ public:
+    NewUserFeatureClass(t4p::AppClass& app);
 };
 }  // namespace t4p
 

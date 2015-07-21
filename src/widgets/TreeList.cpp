@@ -26,9 +26,9 @@
 #include <wx/wupdlock.h>
 
 void t4p::TreeListAutoSizeAllColumns(wxTreeListCtrl* ctrl) {
-	unsigned int cols = ctrl->GetColumnCount();
-	wxWindowUpdateLocker locker(ctrl);
-	for (unsigned int i = 0; i < cols; ++i) {
-		ctrl->SetColumnWidth(i, wxCOL_WIDTH_AUTOSIZE);
-	}
+    unsigned int cols = ctrl->GetColumnCount();
+    wxWindowUpdateLocker locker(ctrl);
+    for (unsigned int i = 0; i < cols; ++i) {
+        ctrl->SetColumnWidth(i, wxCOL_WIDTH_AUTOSIZE);
+    }
 }

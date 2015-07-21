@@ -28,20 +28,20 @@
 const int t4p::MAX_RECENT_FILES = 10;
 
 t4p::RecentFilesFeatureClass::RecentFilesFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app)
-	, FileHistory(MAX_RECENT_FILES, t4p::MENU_RECENT_FILES) {
+    : FeatureClass(app)
+    , FileHistory(MAX_RECENT_FILES, t4p::MENU_RECENT_FILES) {
 }
 
 void t4p::RecentFilesFeatureClass::LoadPreferences(wxConfigBase* config) {
-	FileHistory.Load(*config);
+    FileHistory.Load(*config);
 }
 
 void t4p::RecentFilesFeatureClass::SavePreferences() {
-	wxConfigBase* config = wxConfigBase::Get();
-	FileHistory.Save(*config);
-	config->Flush();
+    wxConfigBase* config = wxConfigBase::Get();
+    FileHistory.Save(*config);
+    config->Flush();
 
-	// signal that this app has modified the config file, that way the external
-	// modification check fails and the user will not be prompted to reload the config
-	App.UpdateConfigModifiedTime();
+    // signal that this app has modified the config file, that way the external
+    // modification check fails and the user will not be prompted to reload the config
+    App.UpdateConfigModifiedTime();
 }

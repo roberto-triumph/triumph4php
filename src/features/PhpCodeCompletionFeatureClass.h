@@ -38,8 +38,8 @@ namespace t4p {
  * <?php tags.
  */
 class PhpCodeCompletionFeatureClass : public t4p::FeatureClass {
-	public:
-	PhpCodeCompletionFeatureClass(t4p::AppClass& app);
+ public:
+    PhpCodeCompletionFeatureClass(t4p::AppClass& app);
 };
 }  // namespace t4p
 

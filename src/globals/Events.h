@@ -65,50 +65,50 @@ namespace t4p {
  * for communication among theads
  */
 class EventSinkClass {
-	public:
-	EventSinkClass();
+ public:
+    EventSinkClass();
 
-	/**
-	 * @param handler will get notified of every event that is published. This class
-	 * will not own the pointer.
-	 */
-	void PushHandler(wxEvtHandler* handler);
+    /**
+     * @param handler will get notified of every event that is published. This class
+     * will not own the pointer.
+     */
+    void PushHandler(wxEvtHandler* handler);
 
-	/**
-	 * forget all of the pushed handlers. After a call to this method, further calls
-	 * to Publish() will do nothing.
-	 */
-	void RemoveAllHandlers();
+    /**
+     * forget all of the pushed handlers. After a call to this method, further calls
+     * to Publish() will do nothing.
+     */
+    void RemoveAllHandlers();
 
-	/**
-	 * removes a single event handler from the sink. After a call to this method, the
-	 * given handler will no longer be notified of any events.  Note that the
-	 * handler is NOT deleted since this class does not own the pointer.
-	 */
-	void RemoveHandler(wxEvtHandler *handler);
+    /**
+     * removes a single event handler from the sink. After a call to this method, the
+     * given handler will no longer be notified of any events.  Note that the
+     * handler is NOT deleted since this class does not own the pointer.
+     */
+    void RemoveHandler(wxEvtHandler *handler);
 
-	/**
-	 * Note that the event is processed IMMEDIATELY ie. within the same
-	 * event loop. This method will not return control until all of the
-	 * handlers have processed the event.
-	 *
-	 * @param event send the event to all registered handlers
-	 */
-	void Publish(wxEvent& event);
+    /**
+     * Note that the event is processed IMMEDIATELY ie. within the same
+     * event loop. This method will not return control until all of the
+     * handlers have processed the event.
+     *
+     * @param event send the event to all registered handlers
+     */
+    void Publish(wxEvent& event);
 
-	/**
-	 * Note that the event is processed IN THE NEXT EVENT LOOP.
-	 *
-	 * @param event send the event to all registered handlers
-	 */
-	void Post(wxEvent& event);
+    /**
+     * Note that the event is processed IN THE NEXT EVENT LOOP.
+     *
+     * @param event send the event to all registered handlers
+     */
+    void Post(wxEvent& event);
 
-	private:
-	/**
-	 * the list of handlers to send events to. this class will NOT
-	 * own these pointers.
-	 */
-	std::vector<wxEvtHandler*> Handlers;
+ private:
+    /**
+     * the list of handlers to send events to. this class will NOT
+     * own these pointers.
+     */
+    std::vector<wxEvtHandler*> Handlers;
 };
 
 /**
@@ -119,45 +119,45 @@ class EventSinkClass {
  * The event sink is suitable for inter-thread communication.
  */
 class EventSinkLockerClass {
-	public:
-	EventSinkLockerClass();
+ public:
+    EventSinkLockerClass();
 
-	/**
-	 * @param handler will get notified of every event that is published. This class
-	 * will not own the pointer.
-	 */
-	void PushHandler(wxEvtHandler* handler);
+    /**
+     * @param handler will get notified of every event that is published. This class
+     * will not own the pointer.
+     */
+    void PushHandler(wxEvtHandler* handler);
 
-	/**
-	 * forget all of the pushed handlers. After a call to this method, further calls
-	 * to Publish() will do nothing.
-	 */
-	void RemoveAllHandlers();
+    /**
+     * forget all of the pushed handlers. After a call to this method, further calls
+     * to Publish() will do nothing.
+     */
+    void RemoveAllHandlers();
 
-	/**
-	 * removes a single event handler from the sink. After a call to this method, the
-	 * given handler will no longer be notified of any events.  Note that the
-	 * handler is NOT deleted since this class does not own the pointer.
-	 */
-	void RemoveHandler(wxEvtHandler *handler);
+    /**
+     * removes a single event handler from the sink. After a call to this method, the
+     * given handler will no longer be notified of any events.  Note that the
+     * handler is NOT deleted since this class does not own the pointer.
+     */
+    void RemoveHandler(wxEvtHandler *handler);
 
-	/**
-	 * Note that the event is processed IN THE NEXT EVENT LOOP.
-	 *
-	 * @param event send the event to all registered handlers
-	 */
-	void Post(wxEvent& event);
+    /**
+     * Note that the event is processed IN THE NEXT EVENT LOOP.
+     *
+     * @param event send the event to all registered handlers
+     */
+    void Post(wxEvent& event);
 
-	private:
-	/**
-	 * holds the list of event handlers
-	 */
-	t4p::EventSinkClass EventSink;
+ private:
+    /**
+     * holds the list of event handlers
+     */
+    t4p::EventSinkClass EventSink;
 
-	/**
-	 * to guard against simulatenous access of the event sink
-	 */
-	wxMutex Mutex;
+    /**
+     * to guard against simulatenous access of the event sink
+     */
+    wxMutex Mutex;
 };
 
 // forward declaration to prevent recompilation when CodeControlClass is updated
@@ -216,25 +216,25 @@ extern const wxEventType EVENT_APP_FILE_NOTEBOOK_CHANGED;
  * then it would result in an infine loop.
  */
 class CodeControlEventClass : public wxEvent {
-	public:
-	/**
-	 * @param codeControl caller will still own the pointer
-	 */
-	CodeControlEventClass(wxEventType type, CodeControlClass* codeControl);
+ public:
+    /**
+     * @param codeControl caller will still own the pointer
+     */
+    CodeControlEventClass(wxEventType type, CodeControlClass* codeControl);
 
-	/**
-	 * @return the code control that was saved; do NOT delete the returned
-	 * pointer.
-	 */
-	CodeControlClass* GetCodeControl() const;
+    /**
+     * @return the code control that was saved; do NOT delete the returned
+     * pointer.
+     */
+    CodeControlClass* GetCodeControl() const;
 
-	/**
-	 * required for sending with wxPostEvent()
-	 */
+    /**
+     * required for sending with wxPostEvent()
+     */
     wxEvent* Clone() const;
 
-	private:
-	CodeControlClass* CodeControl;
+ private:
+    CodeControlClass* CodeControl;
 };
 
 /**
@@ -243,14 +243,14 @@ class CodeControlEventClass : public wxEvent {
  * The event type determines whether paths are files or directories.
  */
 class RenameEventClass : public wxEvent {
-	public:
-	wxFileName OldPath;
+ public:
+    wxFileName OldPath;
 
-	wxFileName NewPath;
+    wxFileName NewPath;
 
-	RenameEventClass(wxEventType type, const wxString& oldPath, const wxString& newPath);
+    RenameEventClass(wxEventType type, const wxString& oldPath, const wxString& newPath);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -258,117 +258,117 @@ class RenameEventClass : public wxEvent {
  * open a file. A file can be opened to a specific line number.
  */
 class OpenFileCommandEventClass : public wxEvent {
-	public:
-	/**
-	 * the full path of the file to open
-	 */
-	wxString FullPath;
+ public:
+    /**
+     * the full path of the file to open
+     */
+    wxString FullPath;
 
-	/**
-	 * position to focus on and start highlighting, -1 to not highlight anything
-	 * * This number is 0-based
-	 */
-	int StartingPos;
+    /**
+     * position to focus on and start highlighting, -1 to not highlight anything
+     * * This number is 0-based
+     */
+    int StartingPos;
 
-	/**
-	 * number of characters to highlight, -1 to not highlight anything
-	 */
-	int Length;
+    /**
+     * number of characters to highlight, -1 to not highlight anything
+     */
+    int Length;
 
-	/**
-	 * line number to seek to after the file is opened, -1 to not jump to a file
-	 * This number is 1-based
-	 */
-	int LineNumber;
+    /**
+     * line number to seek to after the file is opened, -1 to not jump to a file
+     * This number is 1-based
+     */
+    int LineNumber;
 
 
-	OpenFileCommandEventClass(const wxString& fullPath, int startingPos = -1, int length = -1, int lineNumber = -1);
+    OpenFileCommandEventClass(const wxString& fullPath, int startingPos = -1, int length = -1, int lineNumber = -1);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 class OpenDbTableCommandEventClass : public wxEvent {
-	public:
-	/**
-	 * The name of the table to open
-	 */
-	wxString DbTableName;
+ public:
+    /**
+     * The name of the table to open
+     */
+    wxString DbTableName;
 
-	/**
-	 * The hash of the db connection to connect to
-	 */
-	wxString ConnectionHash;
+    /**
+     * The hash of the db connection to connect to
+     */
+    wxString ConnectionHash;
 
-	OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable, const wxString& connectionHash);
+    OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable, const wxString& connectionHash);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClass&);
 
 #define EVT_APP_FILE_NEW(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NEW, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NEW, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_OPEN(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_OPENED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_OPENED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_SAVED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_SAVED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_SAVED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_CLOSED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_PAGE_CHANGED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_PAGE_CHANGED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_PAGE_CHANGED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_NOTEBOOK_CHANGED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_REVERTED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_REVERTED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_REVERTED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*RenameEventClassFunction)(RenameEventClass&);
 
 #define EVT_APP_FILE_RENAMED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_RENAMED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_RENAMED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(RenameEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_DIR_RENAMED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_DIR_RENAMED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_DIR_RENAMED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(RenameEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*OpenFileCommandEventClassFunction)(OpenFileCommandEventClass&);
 
 #define EVT_CMD_FILE_OPEN(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_FILE_OPEN, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_FILE_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(OpenFileCommandEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*OpenDbTableCommandEventClassFunction)(OpenDbTableCommandEventClass&);
 
 #define EVT_APP_DB_TABLE_DATA_OPEN(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DATA_OPEN, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DATA_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(OpenDbTableCommandEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_DB_TABLE_DEFINITION_OPEN(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(OpenDbTableCommandEventClassFunction, & fn), (wxObject *) NULL),
 
@@ -399,7 +399,7 @@ extern const wxEventType EVENT_APP_FRAME_CLOSE;
 
 typedef void (wxEvtHandler::*NotifyEventFunction)(wxNotifyEvent&);
 #define EVT_APP_FRAME_CLOSE(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FRAME_CLOSE, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FRAME_CLOSE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(NotifyEventFunction, & fn), (wxObject *) NULL),
 
@@ -558,30 +558,30 @@ extern const wxEventType EVENT_APP_PROJECTS_UPDATED;
  * added, removed, or updated
  */
 class ProjectEventClass : public wxEvent {
-	public:
-	/**
-	 * the projects that were removed or updated. If this is a
-	 * remove event, the these are the projects that were removed
-	 * if this is a update event, then these projects were
-	 * actually updated. Note that a project update could just
-	 * have a label change and not have any new source directories.
-	 */
-	const std::vector<t4p::ProjectClass>& Projects;
+ public:
+    /**
+     * the projects that were removed or updated. If this is a
+     * remove event, the these are the projects that were removed
+     * if this is a update event, then these projects were
+     * actually updated. Note that a project update could just
+     * have a label change and not have any new source directories.
+     */
+    const std::vector<t4p::ProjectClass>& Projects;
 
-	ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects);
+    ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 typedef void (wxEvtHandler::*ProjectEventClassFunction)(ProjectEventClass&);
 
 #define EVT_APP_PROJECTS_REMOVED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_PROJECTS_REMOVED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_PROJECTS_REMOVED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(ProjectEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_PROJECTS_UPDATED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_PROJECTS_UPDATED, wxID_ANY, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_PROJECTS_UPDATED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(ProjectEventClassFunction, & fn), (wxObject *) NULL),
 

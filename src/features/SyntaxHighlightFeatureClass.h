@@ -38,10 +38,10 @@ namespace t4p {
  * also set colors for the code control margins
  */
 class SyntaxHighlightFeatureClass : public t4p::FeatureClass {
-	public:
-	SyntaxHighlightFeatureClass(t4p::AppClass& app);
+ public:
+    SyntaxHighlightFeatureClass(t4p::AppClass& app);
 
-	private:
+ private:
 };
 }  // namespace t4p
 

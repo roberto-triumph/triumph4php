@@ -35,21 +35,21 @@
 
 namespace t4p {
 class RunBrowserFeatureClass : public FeatureClass {
-	public:
-	/**
-	 * The most recent URLs that have been run. New URLs are added after the
-	 * user picks one from the "Search For URLs..." button, and they are deleted
-	 * only after the list has reached a certain size limit
-	 * These urls have a Project scope; when a project is opened any previous
-	 * URLs are cleared.
-	 */
-	std::vector<UrlTagClass> RecentUrls;
+ public:
+    /**
+     * The most recent URLs that have been run. New URLs are added after the
+     * user picks one from the "Search For URLs..." button, and they are deleted
+     * only after the list has reached a certain size limit
+     * These urls have a Project scope; when a project is opened any previous
+     * URLs are cleared.
+     */
+    std::vector<UrlTagClass> RecentUrls;
 
-	RunBrowserFeatureClass(t4p::AppClass& app);
+    RunBrowserFeatureClass(t4p::AppClass& app);
 
-	void ExternalBrowser(const wxString& browserName, const wxURI& url);
+    void ExternalBrowser(const wxString& browserName, const wxURI& url);
 
-	private:
+ private:
 };
 }  // namespace t4p
 

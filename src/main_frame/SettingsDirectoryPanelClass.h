@@ -29,15 +29,15 @@
 
 namespace t4p {
 class SettingsDirectoryPanelClass : public SettingsDirectoryGeneratedPanelClass {
-	public:
-	SettingsDirectoryPanelClass(wxWindow* parent, int id, wxFileName& settingsDir);
+ public:
+    SettingsDirectoryPanelClass(wxWindow* parent, int id, wxFileName& settingsDir);
 
-	bool TransferDataFromWindow();
+    bool TransferDataFromWindow();
 
-	private:
-	void OnUserDataDir(wxCommandEvent& event);
-	void OnAppDir(wxCommandEvent& event);
-	void OnCustomDir(wxCommandEvent& event);
+ private:
+    void OnUserDataDir(wxCommandEvent& event);
+    void OnAppDir(wxCommandEvent& event);
+    void OnCustomDir(wxCommandEvent& event);
 };
 }  // namespace t4p
 

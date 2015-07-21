@@ -33,13 +33,13 @@
  * @return exploded list of wildcards, split by semicolon
  */
 static std::vector<wxString> Explode(const wxString& extensionsString) {
-	std::vector<wxString> wildcards;
-	wxStringTokenizer tokenizer(extensionsString, wxT(";"));
-	while (tokenizer.HasMoreTokens()) {
-		wxString wildcard = tokenizer.NextToken();
-		wildcards.push_back(wildcard);
-	}
-	return wildcards;
+    std::vector<wxString> wildcards;
+    wxStringTokenizer tokenizer(extensionsString, wxT(";"));
+    while (tokenizer.HasMoreTokens()) {
+        wxString wildcard = tokenizer.NextToken();
+        wildcards.push_back(wildcard);
+    }
+    return wildcards;
 }
 
 /**
@@ -48,240 +48,240 @@ static std::vector<wxString> Explode(const wxString& extensionsString) {
  *          the wildcards.
  */
 static bool HasExtension(const wxString& fullPath, const wxString& extensionsString) {
-	std::vector<wxString> wildcards = Explode(extensionsString);
-	bool found = false;
-	wxFileName file(fullPath);
-	wxString nameOnly = file.IsOk() ? file.GetFullName() : fullPath;
-	for (size_t i = 0; i < wildcards.size(); ++i) {
-		wxString wildcard = wildcards[i];
-		if (wxMatchWild(wildcard, nameOnly, false)) {
-			found = true;
-			break;
-		}
-	}
-	return found;
+    std::vector<wxString> wildcards = Explode(extensionsString);
+    bool found = false;
+    wxFileName file(fullPath);
+    wxString nameOnly = file.IsOk() ? file.GetFullName() : fullPath;
+    for (size_t i = 0; i < wildcards.size(); ++i) {
+        wxString wildcard = wildcards[i];
+        if (wxMatchWild(wildcard, nameOnly, false)) {
+            found = true;
+            break;
+        }
+    }
+    return found;
 }
 
 t4p::FileTypeClass::FileTypeClass()
-: PhpFileExtensionsString(wxT("*.php;*.phtml;*.html;*.php3"))
-, CssFileExtensionsString(wxT("*.css"))
-, SqlFileExtensionsString(wxT("*.sql"))
-, JsFileExtensionsString(wxT("*.js"))
-, ConfigFileExtensionsString(wxT("*.conf;*.ini;.htaccess"))
-, CrontabFileExtensionsString(wxT("crontab"))
-, YamlFileExtensionsString(wxT("*.yml"))
-, XmlFileExtensionsString(wxT("*.xml"))
-, RubyFileExtensionsString(wxT("*.rb;Capfile"))
-, LuaFileExtensionsString(wxT("*.lua"))
-, MarkdownFileExtensionsString(wxT("*.md"))
-, BashFileExtensionsString(wxT("*.sh"))
-, DiffFileExtensionsString(wxT("*.diff;*.patch"))
-, MiscFileExtensionsString(wxT("*.json;*.twig;*.txt")) {
+    : PhpFileExtensionsString(wxT("*.php;*.phtml;*.html;*.php3"))
+    , CssFileExtensionsString(wxT("*.css"))
+    , SqlFileExtensionsString(wxT("*.sql"))
+    , JsFileExtensionsString(wxT("*.js"))
+    , ConfigFileExtensionsString(wxT("*.conf;*.ini;.htaccess"))
+    , CrontabFileExtensionsString(wxT("crontab"))
+    , YamlFileExtensionsString(wxT("*.yml"))
+    , XmlFileExtensionsString(wxT("*.xml"))
+    , RubyFileExtensionsString(wxT("*.rb;Capfile"))
+    , LuaFileExtensionsString(wxT("*.lua"))
+    , MarkdownFileExtensionsString(wxT("*.md"))
+    , BashFileExtensionsString(wxT("*.sh"))
+    , DiffFileExtensionsString(wxT("*.diff;*.patch"))
+    , MiscFileExtensionsString(wxT("*.json;*.twig;*.txt")) {
 }
 
 t4p::FileTypeClass::FileTypeClass(const t4p::FileTypeClass& src)
-: PhpFileExtensionsString(wxT("*.php;*.phtml;*.html;*.php3"))
-, CssFileExtensionsString(wxT("*.css"))
-, SqlFileExtensionsString(wxT("*.sql"))
-, JsFileExtensionsString(wxT("*.js"))
-, ConfigFileExtensionsString(wxT("*.conf;*.ini;.htaccess"))
-, CrontabFileExtensionsString(wxT("crontab"))
-, YamlFileExtensionsString(wxT("*.yml"))
-, XmlFileExtensionsString(wxT("*.xml"))
-, RubyFileExtensionsString(wxT("*.rb;Capfile"))
-, LuaFileExtensionsString(wxT("*.lua"))
-, MarkdownFileExtensionsString(wxT("*.md"))
-, BashFileExtensionsString(wxT("*.sh"))
-, DiffFileExtensionsString(wxT("*.diff;*.patch"))
-, MiscFileExtensionsString(wxT("*.json;*.twig;*.txt")) {
-	Copy(src);
+    : PhpFileExtensionsString(wxT("*.php;*.phtml;*.html;*.php3"))
+    , CssFileExtensionsString(wxT("*.css"))
+    , SqlFileExtensionsString(wxT("*.sql"))
+    , JsFileExtensionsString(wxT("*.js"))
+    , ConfigFileExtensionsString(wxT("*.conf;*.ini;.htaccess"))
+    , CrontabFileExtensionsString(wxT("crontab"))
+    , YamlFileExtensionsString(wxT("*.yml"))
+    , XmlFileExtensionsString(wxT("*.xml"))
+    , RubyFileExtensionsString(wxT("*.rb;Capfile"))
+    , LuaFileExtensionsString(wxT("*.lua"))
+    , MarkdownFileExtensionsString(wxT("*.md"))
+    , BashFileExtensionsString(wxT("*.sh"))
+    , DiffFileExtensionsString(wxT("*.diff;*.patch"))
+    , MiscFileExtensionsString(wxT("*.json;*.twig;*.txt")) {
+    Copy(src);
 }
 
 t4p::FileTypeClass& t4p::FileTypeClass::operator=(const t4p::FileTypeClass& src) {
-	Copy(src);
-	return *this;
+    Copy(src);
+    return *this;
 }
 
 void t4p::FileTypeClass::Copy(const t4p::FileTypeClass& src) {
-	// copy in a thread-safe way
-	CssFileExtensionsString        = CssFileExtensionsString.c_str();
-	PhpFileExtensionsString        = PhpFileExtensionsString.c_str();
-	SqlFileExtensionsString        = SqlFileExtensionsString.c_str();
-	JsFileExtensionsString         = JsFileExtensionsString.c_str();
-	ConfigFileExtensionsString     = ConfigFileExtensionsString.c_str();
-	CrontabFileExtensionsString    = CrontabFileExtensionsString.c_str();
-	YamlFileExtensionsString       = YamlFileExtensionsString.c_str();
-	XmlFileExtensionsString        = XmlFileExtensionsString.c_str();
-	RubyFileExtensionsString       = RubyFileExtensionsString.c_str();
-	LuaFileExtensionsString        = LuaFileExtensionsString.c_str();
-	MarkdownFileExtensionsString   = MarkdownFileExtensionsString.c_str();
-	BashFileExtensionsString       = BashFileExtensionsString.c_str();
-	DiffFileExtensionsString       = DiffFileExtensionsString.c_str();
+    // copy in a thread-safe way
+    CssFileExtensionsString        = CssFileExtensionsString.c_str();
+    PhpFileExtensionsString        = PhpFileExtensionsString.c_str();
+    SqlFileExtensionsString        = SqlFileExtensionsString.c_str();
+    JsFileExtensionsString         = JsFileExtensionsString.c_str();
+    ConfigFileExtensionsString     = ConfigFileExtensionsString.c_str();
+    CrontabFileExtensionsString    = CrontabFileExtensionsString.c_str();
+    YamlFileExtensionsString       = YamlFileExtensionsString.c_str();
+    XmlFileExtensionsString        = XmlFileExtensionsString.c_str();
+    RubyFileExtensionsString       = RubyFileExtensionsString.c_str();
+    LuaFileExtensionsString        = LuaFileExtensionsString.c_str();
+    MarkdownFileExtensionsString   = MarkdownFileExtensionsString.c_str();
+    BashFileExtensionsString       = BashFileExtensionsString.c_str();
+    DiffFileExtensionsString       = DiffFileExtensionsString.c_str();
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetPhpFileExtensions() const {
-	return Explode(PhpFileExtensionsString);
+    return Explode(PhpFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetCssFileExtensions() const {
-	return Explode(CssFileExtensionsString);
+    return Explode(CssFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetSqlFileExtensions() const {
-	return Explode(SqlFileExtensionsString);
+    return Explode(SqlFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetJsFileExtensions() const {
-	return Explode(JsFileExtensionsString);
+    return Explode(JsFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetConfigFileExtensions() const {
-	return Explode(ConfigFileExtensionsString);
+    return Explode(ConfigFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetCrontabFileExtensions() const {
-	return Explode(CrontabFileExtensionsString);
+    return Explode(CrontabFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetYamlFileExtensions() const {
-	return Explode(YamlFileExtensionsString);
+    return Explode(YamlFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetRubyFileExtensions() const {
-	return Explode(RubyFileExtensionsString);
+    return Explode(RubyFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetLuaFileExtensions() const {
-	return Explode(LuaFileExtensionsString);
+    return Explode(LuaFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetMarkdownFileExtensions() const {
-	return Explode(MarkdownFileExtensionsString);
+    return Explode(MarkdownFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetBashFileExtensions() const {
-	return Explode(BashFileExtensionsString);
+    return Explode(BashFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetDiffFileExtensions() const {
-	return Explode(DiffFileExtensionsString);
+    return Explode(DiffFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetMiscFileExtensions() const {
-	return Explode(MiscFileExtensionsString);
+    return Explode(MiscFileExtensionsString);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetNonPhpFileExtensions() const {
-	wxString allNotPhpWildcards;
-	allNotPhpWildcards += CssFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + SqlFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + JsFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + ConfigFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + CrontabFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + YamlFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + XmlFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + RubyFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + LuaFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + MarkdownFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + BashFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + DiffFileExtensionsString;
-	allNotPhpWildcards += wxT(";") + MiscFileExtensionsString;
-	return Explode(allNotPhpWildcards);
+    wxString allNotPhpWildcards;
+    allNotPhpWildcards += CssFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + SqlFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + JsFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + ConfigFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + CrontabFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + YamlFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + XmlFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + RubyFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + LuaFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + MarkdownFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + BashFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + DiffFileExtensionsString;
+    allNotPhpWildcards += wxT(";") + MiscFileExtensionsString;
+    return Explode(allNotPhpWildcards);
 }
 
 std::vector<wxString> t4p::FileTypeClass::GetAllSourceFileExtensions() const {
-	return Explode(GetAllSourceFileExtensionsString());
+    return Explode(GetAllSourceFileExtensionsString());
 }
 
 wxString t4p::FileTypeClass::GetAllSourceFileExtensionsString() const {
-	wxString allWildcards;
-	allWildcards += PhpFileExtensionsString;
-	allWildcards += wxT(";") + CssFileExtensionsString;
-	allWildcards += wxT(";") + SqlFileExtensionsString;
-	allWildcards += wxT(";") + JsFileExtensionsString;
-	allWildcards += wxT(";") + ConfigFileExtensionsString;
-	allWildcards += wxT(";") + CrontabFileExtensionsString;
-	allWildcards += wxT(";") + YamlFileExtensionsString;
-	allWildcards += wxT(";") + XmlFileExtensionsString;
-	allWildcards += wxT(";") + RubyFileExtensionsString;
-	allWildcards += wxT(";") + LuaFileExtensionsString;
-	allWildcards += wxT(";") + MarkdownFileExtensionsString;
-	allWildcards += wxT(";") + BashFileExtensionsString;
-	allWildcards += wxT(";") + DiffFileExtensionsString;
-	allWildcards += wxT(";") + MiscFileExtensionsString;
-	return allWildcards;
+    wxString allWildcards;
+    allWildcards += PhpFileExtensionsString;
+    allWildcards += wxT(";") + CssFileExtensionsString;
+    allWildcards += wxT(";") + SqlFileExtensionsString;
+    allWildcards += wxT(";") + JsFileExtensionsString;
+    allWildcards += wxT(";") + ConfigFileExtensionsString;
+    allWildcards += wxT(";") + CrontabFileExtensionsString;
+    allWildcards += wxT(";") + YamlFileExtensionsString;
+    allWildcards += wxT(";") + XmlFileExtensionsString;
+    allWildcards += wxT(";") + RubyFileExtensionsString;
+    allWildcards += wxT(";") + LuaFileExtensionsString;
+    allWildcards += wxT(";") + MarkdownFileExtensionsString;
+    allWildcards += wxT(";") + BashFileExtensionsString;
+    allWildcards += wxT(";") + DiffFileExtensionsString;
+    allWildcards += wxT(";") + MiscFileExtensionsString;
+    return allWildcards;
 }
 
 bool t4p::FileTypeClass::HasAPhpExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, PhpFileExtensionsString);
+    return HasExtension(fullPath, PhpFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasABashExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, BashFileExtensionsString);
+    return HasExtension(fullPath, BashFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasAConfigExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, ConfigFileExtensionsString);
+    return HasExtension(fullPath, ConfigFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasACrontabExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, CrontabFileExtensionsString);
+    return HasExtension(fullPath, CrontabFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasACssExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, CssFileExtensionsString);
+    return HasExtension(fullPath, CssFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasADiffExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, DiffFileExtensionsString);
+    return HasExtension(fullPath, DiffFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasAJsExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, JsFileExtensionsString);
+    return HasExtension(fullPath, JsFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasALuaExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, LuaFileExtensionsString);
+    return HasExtension(fullPath, LuaFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasAMarkdownExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, MarkdownFileExtensionsString);
+    return HasExtension(fullPath, MarkdownFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasAMiscExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, MiscFileExtensionsString);
+    return HasExtension(fullPath, MiscFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasARubyExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, RubyFileExtensionsString);
+    return HasExtension(fullPath, RubyFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasASqlExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, SqlFileExtensionsString);
+    return HasExtension(fullPath, SqlFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasAXmlExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, XmlFileExtensionsString);
+    return HasExtension(fullPath, XmlFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasAYamlExtension(const wxString& fullPath) const {
-	return HasExtension(fullPath, YamlFileExtensionsString);
+    return HasExtension(fullPath, YamlFileExtensionsString);
 }
 
 bool t4p::FileTypeClass::HasAnyExtension(const wxString& fullPath) const {
-	return HasAPhpExtension(fullPath)
-		|| HasASqlExtension(fullPath)
-		|| HasAJsExtension(fullPath)
-		|| HasACssExtension(fullPath)
-		|| HasAConfigExtension(fullPath)
-		|| HasACrontabExtension(fullPath)
-		|| HasAYamlExtension(fullPath)
-		|| HasAXmlExtension(fullPath)
-		|| HasARubyExtension(fullPath)
-		|| HasALuaExtension(fullPath)
-		|| HasAMarkdownExtension(fullPath)
-		|| HasABashExtension(fullPath)
-		|| HasADiffExtension(fullPath)
-		|| HasAMiscExtension(fullPath);
+    return HasAPhpExtension(fullPath)
+           || HasASqlExtension(fullPath)
+           || HasAJsExtension(fullPath)
+           || HasACssExtension(fullPath)
+           || HasAConfigExtension(fullPath)
+           || HasACrontabExtension(fullPath)
+           || HasAYamlExtension(fullPath)
+           || HasAXmlExtension(fullPath)
+           || HasARubyExtension(fullPath)
+           || HasALuaExtension(fullPath)
+           || HasAMarkdownExtension(fullPath)
+           || HasABashExtension(fullPath)
+           || HasADiffExtension(fullPath)
+           || HasAMiscExtension(fullPath);
 }
 

@@ -34,62 +34,62 @@ namespace t4p {
 class FileModifiedCheckFeatureClass;
 
 class FileModifiedCheckViewClass : public t4p::FeatureViewClass {
-	public:
-	FileModifiedCheckViewClass(t4p::FileModifiedCheckFeatureClass& feature);
+ public:
+    FileModifiedCheckViewClass(t4p::FileModifiedCheckFeatureClass& feature);
 
-	private:
-	/**
-	 * when the user puts this app in the foreground, check for
-	 * file modifications.  maybe the user went to another editor
-	 * and modified one of the files that is opened in triumph. Note that we
-	 * will check the file modified times in a background thread
-	 */
-	void OnActivateApp(wxCommandEvent& event);
+ private:
+    /**
+     * when the user puts this app in the foreground, check for
+     * file modifications.  maybe the user went to another editor
+     * and modified one of the files that is opened in triumph. Note that we
+     * will check the file modified times in a background thread
+     */
+    void OnActivateApp(wxCommandEvent& event);
 
-	/**
-	 * handle the files that are open (being modified by the user)
-	 * ie we will check the file modified times
-	 */
-	void OpenedCodeControlCheck();
+    /**
+     * handle the files that are open (being modified by the user)
+     * ie we will check the file modified times
+     */
+    void OpenedCodeControlCheck();
 
-	/**
-	 * special handling for files that are open. For open files that were externally modified
-	 * we will prompt the user to take action
-	 */
-	void HandleOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
+    /**
+     * special handling for files that are open. For open files that were externally modified
+     * we will prompt the user to take action
+     */
+    void HandleOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
 
-	/**
-	 * prompt the user to reload modified files
-	 */
-	void FilesModifiedPrompt(std::map<wxString, t4p::CodeControlClass*>& filesToPrompt);
+    /**
+     * prompt the user to reload modified files
+     */
+    void FilesModifiedPrompt(std::map<wxString, t4p::CodeControlClass*>& filesToPrompt);
 
-	/**
-	 * prompt the user to save the deleted files
-	 */
-	void FilesDeletedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, int>& deletedFiles);
+    /**
+     * prompt the user to save the deleted files
+     */
+    void FilesDeletedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, int>& deletedFiles);
 
-	/**
-	 * prompt the user to open or close the renamed files
-	 */
-	void FilesRenamedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
+    /**
+     * prompt the user to open or close the renamed files
+     */
+    void FilesRenamedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
 
-	/**
-	 * After we check the file modified times in a background thread this
-	 * method gets called. here we will prompt the user to reload/close the
-	 * files that were modified outside of triumph
-	 */
-	void OnFileModifiedPollComplete(t4p::FilesModifiedEventClass& event);
+    /**
+     * After we check the file modified times in a background thread this
+     * method gets called. here we will prompt the user to reload/close the
+     * files that were modified outside of triumph
+     */
+    void OnFileModifiedPollComplete(t4p::FilesModifiedEventClass& event);
 
-	t4p::FileModifiedCheckFeatureClass& Feature;
+    t4p::FileModifiedCheckFeatureClass& Feature;
 
-	/**
-	 * flag to prevent multiple modified dialogs during activate app event.
-	 * needed for linux
-	 */
-	bool JustReactivated;
+    /**
+     * flag to prevent multiple modified dialogs during activate app event.
+     * needed for linux
+     */
+    bool JustReactivated;
 
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

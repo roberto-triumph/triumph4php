@@ -39,19 +39,19 @@ namespace t4p {
  * into the search box does not feel laggy.
  */
 class TotalSearchViewClass : public t4p::FeatureViewClass {
-	public:
-	TotalSearchViewClass(t4p::TotalSearchFeatureClass& feature);
+ public:
+    TotalSearchViewClass(t4p::TotalSearchFeatureClass& feature);
 
-	void AddSearchMenuItems(wxMenu* searchMenu);
+    void AddSearchMenuItems(wxMenu* searchMenu);
 
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+    void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
-	private:
-	void OnTotalSearch(wxCommandEvent& event);
+ private:
+    void OnTotalSearch(wxCommandEvent& event);
 
-	t4p::TotalSearchFeatureClass& Feature;
+    t4p::TotalSearchFeatureClass& Feature;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 
@@ -61,81 +61,81 @@ class TotalSearchViewClass : public t4p::FeatureViewClass {
  * instant feedback
  */
 class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
-	public:
-	TotalSearchDialogClass(wxWindow* parent, t4p::TotalSearchFeatureClass& feature,
-		std::vector<t4p::TotalTagResultClass>& selectedTags, int& lineNumber);
+ public:
+    TotalSearchDialogClass(wxWindow* parent, t4p::TotalSearchFeatureClass& feature,
+                           std::vector<t4p::TotalTagResultClass>& selectedTags, int& lineNumber);
 
-	private:
-	void OnCancelButton(wxCommandEvent& event);
-	void OnHelpButton(wxCommandEvent& event);
-	void OnMatchesListKeyDown(wxKeyEvent& event);
-	void OnMatchesListDoubleClick(wxCommandEvent& event);
-	void OnOkButton(wxCommandEvent& event);
-	void OnSearchEnter(wxCommandEvent& event);
-	void OnSearchKeyDown(wxKeyEvent& event);
-	void OnSearchComplete(t4p::TotalTagSearchCompleteEventClass& event);
+ private:
+    void OnCancelButton(wxCommandEvent& event);
+    void OnHelpButton(wxCommandEvent& event);
+    void OnMatchesListKeyDown(wxKeyEvent& event);
+    void OnMatchesListDoubleClick(wxCommandEvent& event);
+    void OnOkButton(wxCommandEvent& event);
+    void OnSearchEnter(wxCommandEvent& event);
+    void OnSearchKeyDown(wxKeyEvent& event);
+    void OnSearchComplete(t4p::TotalTagSearchCompleteEventClass& event);
 
-	/**
-	 * update the cache status label and internal flags
-	 */
-	void UpdateCacheStatus();
+    /**
+     * update the cache status label and internal flags
+     */
+    void UpdateCacheStatus();
 
-	void OnTimer(wxTimerEvent& event);
+    void OnTimer(wxTimerEvent& event);
 
-	void ChooseSelectedAndEnd(size_t selected);
+    void ChooseSelectedAndEnd(size_t selected);
 
-	t4p::TotalSearchFeatureClass& Feature;
+    t4p::TotalSearchFeatureClass& Feature;
 
-	/**
-	 * The item last searched; we wont attempt to search
-	 * the same thing twice consecutively since it will produce
-	 * the same result
-	 */
-	wxString LastSearch;
+    /**
+     * The item last searched; we wont attempt to search
+     * the same thing twice consecutively since it will produce
+     * the same result
+     */
+    wxString LastSearch;
 
-	/**
-	 * we will perform  a search every time the timer goes
-	 * off.
-	 */
-	wxTimer Timer;
+    /**
+     * we will perform  a search every time the timer goes
+     * off.
+     */
+    wxTimer Timer;
 
-	/**
-	 * we will perform the search in a background thread
-	 * that way the user does not feel a slowdown while
-	 * typing in thq query
-	 */
-	t4p::RunningThreadsClass RunningThreads;
+    /**
+     * we will perform the search in a background thread
+     * that way the user does not feel a slowdown while
+     * typing in thq query
+     */
+    t4p::RunningThreadsClass RunningThreads;
 
-	/**
-	 * results from the last compeleted search
-	 */
-	std::vector<t4p::TotalTagResultClass> Results;
+    /**
+     * results from the last compeleted search
+     */
+    std::vector<t4p::TotalTagResultClass> Results;
 
-	/**
-	 * The tags that were selected by the user
-	 */
-	std::vector<t4p::TotalTagResultClass>& SelectedTags;
+    /**
+     * The tags that were selected by the user
+     */
+    std::vector<t4p::TotalTagResultClass>& SelectedTags;
 
-	/**
-	 * the line number to jump to (given by the user)
-	 */
-	int& LineNumber;
+    /**
+     * the line number to jump to (given by the user)
+     */
+    int& LineNumber;
 
-	/**
-	 * if TRUE, the cache is being built (background tag cache
-	 * action is running.  We don't want to query the tag
-	 * cache in this case, since ti results in GUI lockups
-	 * since our read query will be locked by the writes
-	 */
-	bool IsCacheBeingBuilt;
+    /**
+     * if TRUE, the cache is being built (background tag cache
+     * action is running.  We don't want to query the tag
+     * cache in this case, since ti results in GUI lockups
+     * since our read query will be locked by the writes
+     */
+    bool IsCacheBeingBuilt;
 
-	/**
-	 * if TRUE, the cache is empty. informational message is
-	 * shown
-	 */
-	bool IsCacheEmpty;
+    /**
+     * if TRUE, the cache is empty. informational message is
+     * shown
+     */
+    bool IsCacheEmpty;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

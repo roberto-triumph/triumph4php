@@ -25,56 +25,56 @@
 #include "widgets/ComboBoxHistoryClass.h"
 
 t4p::ComboBoxHistoryClass::ComboBoxHistoryClass(wxComboBox* combo)
-	: wxEvtHandler()
-	, Items()
-	, Combo(combo) {
-	if (NULL != Combo) {
-		Combo->Connect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
-		Combo->Connect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
-	}
+    : wxEvtHandler()
+    , Items()
+    , Combo(combo) {
+    if (NULL != Combo) {
+        Combo->Connect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
+        Combo->Connect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
+    }
 }
 
 t4p::ComboBoxHistoryClass::~ComboBoxHistoryClass() {
-	if (NULL != Combo) {
-		Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
-		Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
-	}
+    if (NULL != Combo) {
+        Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
+        Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
+    }
 }
 
 void t4p::ComboBoxHistoryClass::Attach(wxComboBox* combo) {
-	Combo = combo;
-	Combo->Connect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
-	Combo->Connect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
+    Combo = combo;
+    Combo->Connect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
+    Combo->Connect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
 
-	// prepopulate fromm previous instance
-	Combo->Append(Items);
+    // prepopulate fromm previous instance
+    Combo->Append(Items);
 }
 
 void t4p::ComboBoxHistoryClass::Detach() {
-	Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
-	Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
+    Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
+    Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
 
-	// save for next time
-	Items = Combo->GetStrings();
-	Combo = NULL;
+    // save for next time
+    Items = Combo->GetStrings();
+    Combo = NULL;
 }
 
 void t4p::ComboBoxHistoryClass::Save() {
-	int MAX_ITEMS = 18;
-	wxString newValue = Combo->GetValue();
-	int index = Combo->FindString(newValue);
-	if (wxNOT_FOUND == index && !newValue.IsEmpty()) {
-		Combo->Insert(newValue, 0);
-	}
-	int count = Combo->GetCount();
-	if (count > MAX_ITEMS) {
-		Combo->Delete(count - 1);
-	}
+    int MAX_ITEMS = 18;
+    wxString newValue = Combo->GetValue();
+    int index = Combo->FindString(newValue);
+    if (wxNOT_FOUND == index && !newValue.IsEmpty()) {
+        Combo->Insert(newValue, 0);
+    }
+    int count = Combo->GetCount();
+    if (count > MAX_ITEMS) {
+        Combo->Delete(count - 1);
+    }
 }
 
 void t4p::ComboBoxHistoryClass::OnComboSelected(wxCommandEvent& event) {
-	if (NULL != Combo) {
-		Save();
-	}
-	event.Skip();
+    if (NULL != Combo) {
+        Save();
+    }
+    event.Skip();
 }

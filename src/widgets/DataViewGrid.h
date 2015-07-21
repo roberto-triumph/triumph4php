@@ -28,15 +28,15 @@
 #include <wx/dataview.h>
 
 namespace t4p {
-	/**
-	 * Resizes all of the columns of the given data view control so that
-	 * all columns are visible and take up only the space that they need.
-	 * This is a relatively expensive operation when the control has many
-	 * items.
-	 *
-	 * @param ctrl
-	 */
-	void DataViewGridAutoSizeAllColumns(wxDataViewCtrl* ctrl);
+/**
+ * Resizes all of the columns of the given data view control so that
+ * all columns are visible and take up only the space that they need.
+ * This is a relatively expensive operation when the control has many
+ * items.
+ *
+ * @param ctrl
+ */
+void DataViewGridAutoSizeAllColumns(wxDataViewCtrl* ctrl);
 }  // namespace t4p
 
 #endif  // SRC_WIDGETS_DATAVIEWGRID_H_

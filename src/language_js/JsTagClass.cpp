@@ -25,49 +25,49 @@
 #include "language_js/JsTagClass.h"
 
 t4p::JsTagClass::JsTagClass()
-: Id(0)
-, FileTagId(0)
-, SourceId(0)
-, Key()
-, Identifier()
-, Signature()
-, Comment()
-, FullPath()
-, FileIsNew(false)
-, LineNumber(0)
-, ColumnPosition(0) {
+    : Id(0)
+    , FileTagId(0)
+    , SourceId(0)
+    , Key()
+    , Identifier()
+    , Signature()
+    , Comment()
+    , FullPath()
+    , FileIsNew(false)
+    , LineNumber(0)
+    , ColumnPosition(0) {
 }
 
 t4p::JsTagClass::JsTagClass(const t4p::JsTagClass& src)
-: Id(0)
-, FileTagId(0)
-, SourceId(0)
-, Key()
-, Identifier()
-, Signature()
-, Comment()
-, FullPath()
-, FileIsNew(false)
-, LineNumber(0)
-, ColumnPosition(0) {
-	Copy(src);
+    : Id(0)
+    , FileTagId(0)
+    , SourceId(0)
+    , Key()
+    , Identifier()
+    , Signature()
+    , Comment()
+    , FullPath()
+    , FileIsNew(false)
+    , LineNumber(0)
+    , ColumnPosition(0) {
+    Copy(src);
 }
 
 t4p::JsTagClass& t4p::JsTagClass::operator=(const t4p::JsTagClass& src) {
-	Copy(src);
-	return *this;
+    Copy(src);
+    return *this;
 }
 
 void t4p::JsTagClass::Copy(const t4p::JsTagClass& src) {
-	Id = src.Id;
-	FileTagId = src.FileTagId;
-	SourceId = src.SourceId;
-	Key = src.Key;
-	Identifier = src.Identifier;
-	Signature = src.Signature;
-	Comment = src.Comment;
-	FullPath = src.FullPath;
-	FileIsNew = src.FileIsNew;
-	LineNumber = src.LineNumber;
-	ColumnPosition = src.ColumnPosition;
+    Id = src.Id;
+    FileTagId = src.FileTagId;
+    SourceId = src.SourceId;
+    Key = src.Key;
+    Identifier = src.Identifier;
+    Signature = src.Signature;
+    Comment = src.Comment;
+    FullPath = src.FullPath;
+    FileIsNew = src.FileIsNew;
+    LineNumber = src.LineNumber;
+    ColumnPosition = src.ColumnPosition;
 }

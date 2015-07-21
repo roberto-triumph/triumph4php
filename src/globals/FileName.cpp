@@ -26,15 +26,15 @@
 #include <vector>
 
 wxFileName t4p::FileNameCopy(const wxFileName& fileName) {
-	wxFileName cpy(fileName.GetFullPath());
-	return cpy;
+    wxFileName cpy(fileName.GetFullPath());
+    return cpy;
 }
 
 std::vector<wxFileName> t4p::DeepCopyFileNames(const std::vector<wxFileName>& fileNames) {
-	std::vector<wxFileName> cpy;
-	std::vector<wxFileName>::const_iterator filename;
-	for (filename = fileNames.begin(); filename != fileNames.end(); ++filename) {
-		cpy.push_back(wxFileName(filename->GetFullPath()));
-	}
-	return cpy;
+    std::vector<wxFileName> cpy;
+    std::vector<wxFileName>::const_iterator filename;
+    for (filename = fileNames.begin(); filename != fileNames.end(); ++filename) {
+        cpy.push_back(wxFileName(filename->GetFullPath()));
+    }
+    return cpy;
 }

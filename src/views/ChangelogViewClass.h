@@ -36,17 +36,17 @@ class ChangelogFeatureClass;
  * triumph's release change log
  */
 class ChangelogViewClass : public t4p::FeatureViewClass {
-	public:
-	ChangelogViewClass(t4p::ChangelogFeatureClass& feature);
+ public:
+    ChangelogViewClass(t4p::ChangelogFeatureClass& feature);
 
-	void AddHelpMenuItems(wxMenu* helpMenu);
+    void AddHelpMenuItems(wxMenu* helpMenu);
 
-	private:
-	void OnHelpChangelog(wxCommandEvent& event);
+ private:
+    void OnHelpChangelog(wxCommandEvent& event);
 
-	t4p::ChangelogFeatureClass& Feature;
+    t4p::ChangelogFeatureClass& Feature;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

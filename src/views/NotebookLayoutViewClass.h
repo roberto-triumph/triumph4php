@@ -40,45 +40,45 @@ namespace t4p {
  *
  */
 class NotebookLayoutViewClass : public t4p::FeatureViewClass {
-	public:
-	NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature);
+ public:
+    NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature);
 
-	void AddViewMenuItems(wxMenu* viewMenu);
+    void AddViewMenuItems(wxMenu* viewMenu);
 
-	void AddToolBarItems(wxAuiToolBar* toolBar);
+    void AddToolBarItems(wxAuiToolBar* toolBar);
 
-	private:
-	/**
-	 * handler for the notebook menu event
-	 */
-	void OnNotebookMenu(wxCommandEvent& event);
+ private:
+    /**
+     * handler for the notebook menu event
+     */
+    void OnNotebookMenu(wxCommandEvent& event);
 
-	/**
-	 * Create notebooks as 2, or 3 columns
-	 */
-	void OnNotebookCreateColumns(wxCommandEvent& event);
+    /**
+     * Create notebooks as 2, or 3 columns
+     */
+    void OnNotebookCreateColumns(wxCommandEvent& event);
 
-	/**
-	 * Create notebooks as 2 or 3 rows
-	 */
-	void OnNotebookCreateRows(wxCommandEvent& event);
+    /**
+     * Create notebooks as 2 or 3 rows
+     */
+    void OnNotebookCreateRows(wxCommandEvent& event);
 
-	/**
-	 * Create notebooks as 2x2, or 3x2, or 2x3 grid
-	 */
-	void OnNotebookCreateGrid(wxCommandEvent& event);
+    /**
+     * Create notebooks as 2x2, or 3x2, or 2x3 grid
+     */
+    void OnNotebookCreateGrid(wxCommandEvent& event);
 
-	/**
-	 * Create a single notebook
-	 */
-	void OnNotebookReset(wxCommandEvent& event);
+    /**
+     * Create a single notebook
+     */
+    void OnNotebookReset(wxCommandEvent& event);
 
-	/**
-	 * To get access to the globals; needed by the notebook.
-	 */
-	// t4p::NotebookLayoutFeatureClass& Feature;
+    /**
+     * To get access to the globals; needed by the notebook.
+     */
+    // t4p::NotebookLayoutFeatureClass& Feature;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

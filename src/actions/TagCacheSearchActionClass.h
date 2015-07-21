@@ -38,19 +38,19 @@ namespace t4p {
  * contains the results of the search.
  */
 class TagCacheSearchCompleteEventClass : public wxEvent {
-	public:
-	/**
-	 * The string that was searched for.
-	 */
-	UnicodeString SearchString;
+ public:
+    /**
+     * The string that was searched for.
+     */
+    UnicodeString SearchString;
 
     /**
      * Will contain all of the resulting tags.
      */
-	std::vector<t4p::PhpTagClass> Tags;
+    std::vector<t4p::PhpTagClass> Tags;
 
     TagCacheSearchCompleteEventClass(int eventId, const UnicodeString& searchString,
-		const std::vector<t4p::PhpTagClass>& tags);
+                                     const std::vector<t4p::PhpTagClass>& tags);
 
     wxEvent* Clone() const;
 };
@@ -70,45 +70,45 @@ typedef void (wxEvtHandler::*TagCacheSearchCompleteEventClassFunction)(TagCacheS
  * the results will be posted in an event of type EVENT_TAG_CACHE_SEARCH_COMPLETE.
  */
 class TagCacheSearchActionClass : public t4p::ActionClass {
-	public:
-	TagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    TagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * set the search parameters.  this should be called before the action is
-	 * added to the run queue
-	 * This won't be a straight equals search; it will be a "near match"
-	 * as defined by ParsedTagFinderClass::CollectNearMathResources()
-	 * when the given search string is more than 2 characters long, and will
-	 * be an exact search as defined by CollectFullyQualifiedResources when the
-	 * search string is 2 characters long
-	 * This method assumes that index is up-to-date, if not matches may be stale.
-	 *
-	 * @parm globals to get the locations of the tag dbs
-	 * @param search the search string, can be either file name, full path, or class names, function names
-	 * @param dirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
-	 */
-	void SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs);
+    /**
+     * set the search parameters.  this should be called before the action is
+     * added to the run queue
+     * This won't be a straight equals search; it will be a "near match"
+     * as defined by ParsedTagFinderClass::CollectNearMathResources()
+     * when the given search string is more than 2 characters long, and will
+     * be an exact search as defined by CollectFullyQualifiedResources when the
+     * search string is 2 characters long
+     * This method assumes that index is up-to-date, if not matches may be stale.
+     *
+     * @parm globals to get the locations of the tag dbs
+     * @param search the search string, can be either file name, full path, or class names, function names
+     * @param dirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
+     */
+    void SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs);
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	protected:
-	void BackgroundWork();
+ protected:
+    void BackgroundWork();
 
-	private:
-	/**
-	 * the thing to search in
-	 */
-	t4p::TagCacheClass TagCache;
+ private:
+    /**
+     * the thing to search in
+     */
+    t4p::TagCacheClass TagCache;
 
-	/**
-	 * the string to look for. could be a partial class name, file name, function name
-	 */
-	UnicodeString SearchString;
+    /**
+     * the string to look for. could be a partial class name, file name, function name
+     */
+    UnicodeString SearchString;
 
-	/**
-	 * directories to search in. If empty, then the entire cache will be searched.
-	 */
-	std::vector<wxFileName> SearchDirs;
+    /**
+     * directories to search in. If empty, then the entire cache will be searched.
+     */
+    std::vector<wxFileName> SearchDirs;
 };
 }  // namespace t4p
 

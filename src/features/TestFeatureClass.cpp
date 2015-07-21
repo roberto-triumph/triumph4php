@@ -25,7 +25,7 @@
 #include "features/TestFeatureClass.h"
 
 t4p::TestFeatureClass::TestFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+    : FeatureClass(app) {
 }
 
 void t4p::TestFeatureClass::Go() {

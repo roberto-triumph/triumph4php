@@ -44,21 +44,21 @@ namespace t4p {
  * for the URL that the user has selected.
  */
 class TemplateFilesFeatureClass : public t4p::FeatureClass {
-	public:
-	TemplateFilesFeatureClass(t4p::AppClass& app);
+ public:
+    TemplateFilesFeatureClass(t4p::AppClass& app);
 
-	void SetCurrentUrl(t4p::UrlTagClass url);
+    void SetCurrentUrl(t4p::UrlTagClass url);
 
-	UrlTagFinderClass& Urls();
+    UrlTagFinderClass& Urls();
 
-	/**
-	 * starts the view file detection process. This is an asynchronous operation.
-	 * When view files are detected, the feature will update the
-	 * panel appropriately.
-	 */
-	void StartDetection();
+    /**
+     * starts the view file detection process. This is an asynchronous operation.
+     * When view files are detected, the feature will update the
+     * panel appropriately.
+     */
+    void StartDetection();
 
-	private:
+ private:
 };
 }  // namespace t4p
 

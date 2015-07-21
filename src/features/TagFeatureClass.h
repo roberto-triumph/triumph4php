@@ -54,84 +54,84 @@ namespace t4p {
  * acutally re-parse the new directory.
  */
 class TagFeatureClass : public FeatureClass {
-	public:
-	/**
-	 * when a 'jump to tag' is done and we need to index a project, we
-	 * need to keep the search string so that after indexing we can
-	 * search the index.
-	 */
-	wxString JumpToText;
+ public:
+    /**
+     * when a 'jump to tag' is done and we need to index a project, we
+     * need to keep the search string so that after indexing we can
+     * search the index.
+     */
+    wxString JumpToText;
 
-	TagFeatureClass(t4p::AppClass& app);
+    TagFeatureClass(t4p::AppClass& app);
 
-	/**
-	 * returns a short string describing the status of the cache.
-	 */
-	wxString CacheStatus();
+    /**
+     * returns a short string describing the status of the cache.
+     */
+    wxString CacheStatus();
 
-	private:
-	void OnAppStartSequenceComplete(wxCommandEvent& event);
+ private:
+    void OnAppStartSequenceComplete(wxCommandEvent& event);
 
-	/**
-	 * when a file is deleted remove it from the tag cache
-	 */
-	void OnAppFileDeleted(wxCommandEvent& event);
+    /**
+     * when a file is deleted remove it from the tag cache
+     */
+    void OnAppFileDeleted(wxCommandEvent& event);
 
-	/**
-	 * when a file is renamed then update the tag cache
-	 */
-	void OnAppFileRenamed(t4p::RenameEventClass& event);
+    /**
+     * when a file is renamed then update the tag cache
+     */
+    void OnAppFileRenamed(t4p::RenameEventClass& event);
 
-	/**
-	 * when a directory has been created tag the directory
-	 */
-	void OnAppDirCreated(wxCommandEvent& event);
+    /**
+     * when a directory has been created tag the directory
+     */
+    void OnAppDirCreated(wxCommandEvent& event);
 
-	/**
-	 * when a directory has been delete clear the tags from that directory
-	 */
-	void OnAppDirDeleted(wxCommandEvent& event);
+    /**
+     * when a directory has been delete clear the tags from that directory
+     */
+    void OnAppDirDeleted(wxCommandEvent& event);
 
-	/**
-	 * when a dir is renamed then update the tag cache
-	 */
-	void OnAppDirRenamed(t4p::RenameEventClass& event);
+    /**
+     * when a dir is renamed then update the tag cache
+     */
+    void OnAppDirRenamed(t4p::RenameEventClass& event);
 
-	/**
-	 * if a file is modified externally re-tag it
-	 */
-	void OnAppFileExternallyModified(wxCommandEvent& event);
+    /**
+     * if a file is modified externally re-tag it
+     */
+    void OnAppFileExternallyModified(wxCommandEvent& event);
 
-	void OnProjectsUpdated(wxCommandEvent& event);
+    void OnProjectsUpdated(wxCommandEvent& event);
 
-	void OnAppFileClosed(t4p::CodeControlEventClass& event);
-
-
-	void OnAppExit(wxCommandEvent& event);
+    void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 
-	/**
-	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
-	 * This method can be used to update the resources once a file has been modified on disk.
-	 *
-	 * @param project the project that holds the file
-	 * @param fullPath file to be scanned (full path, including name).
-	 * @param version the version of PHP to check against
-	 * @return bool false file does not exist
-	 */
-	bool InitForFile(const t4p::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
+    void OnAppExit(wxCommandEvent& event);
 
-	/**
-	 * cache will be considered stale at app start. once all projects have
-	 * been indexed then it will be considered as good; though this is a real
-	 * naive status as it does not take file system changes from external processes
-	 */
-	enum CacheStatus {
-		CACHE_STALE,
-		CACHE_OK
-	} CacheState;
 
-	DECLARE_EVENT_TABLE()
+    /**
+     * prepare to iterate through the given file. The name part of the given file must match the wildcard.
+     * This method can be used to update the resources once a file has been modified on disk.
+     *
+     * @param project the project that holds the file
+     * @param fullPath file to be scanned (full path, including name).
+     * @param version the version of PHP to check against
+     * @return bool false file does not exist
+     */
+    bool InitForFile(const t4p::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
+
+    /**
+     * cache will be considered stale at app start. once all projects have
+     * been indexed then it will be considered as good; though this is a real
+     * naive status as it does not take file system changes from external processes
+     */
+    enum CacheStatus {
+        CACHE_STALE,
+        CACHE_OK
+    } CacheState;
+
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

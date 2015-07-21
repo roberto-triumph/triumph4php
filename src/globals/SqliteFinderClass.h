@@ -41,48 +41,48 @@ namespace t4p {
  * class for more info.
  */
 class SqliteFinderClass {
-	public:
-	/**
-	 * use an existing connection for this finder.
-	 * This method can used to have the the finder query either  a file-backed db or a memory db.
-	 * By using an in-memory database, lookups are faster.
-	 * The session does not necessarily have to be initialized at this point,
-	 * but it should definitely be initialized before calling Prepare() or
-	 * Exec()
-	 *
-	 * @param session the soci connection to use.
-	 */
-	SqliteFinderClass(soci::session& session);
+ public:
+    /**
+     * use an existing connection for this finder.
+     * This method can used to have the the finder query either  a file-backed db or a memory db.
+     * By using an in-memory database, lookups are faster.
+     * The session does not necessarily have to be initialized at this point,
+     * but it should definitely be initialized before calling Prepare() or
+     * Exec()
+     *
+     * @param session the soci connection to use.
+     */
+    SqliteFinderClass(soci::session& session);
 
-	virtual ~SqliteFinderClass();
+    virtual ~SqliteFinderClass();
 
-	/**
-	 * prepares  a query against this sqlite db. There is no need to
-	 * call this call this for one-time queries; as Exec() will prepare
-	 * the query if its not prepared.  The advantage of calling Prepare()
-	 * is that it can be called once, then SqliteResultClass::ReExec
-	 * can be called as many times as needed in order to make queries
-	 * performant.
-	 *
-	 * @param result contains the query to run and the parameters to bind
-	 * @param doLimit if true then a limit will be added to the query
-	 * @return bool TRUE if the query was successfully prepared
-	 */
-	bool Prepare(t4p::SqliteResultClass* result, bool doLimit);
+    /**
+     * prepares  a query against this sqlite db. There is no need to
+     * call this call this for one-time queries; as Exec() will prepare
+     * the query if its not prepared.  The advantage of calling Prepare()
+     * is that it can be called once, then SqliteResultClass::ReExec
+     * can be called as many times as needed in order to make queries
+     * performant.
+     *
+     * @param result contains the query to run and the parameters to bind
+     * @param doLimit if true then a limit will be added to the query
+     * @return bool TRUE if the query was successfully prepared
+     */
+    bool Prepare(t4p::SqliteResultClass* result, bool doLimit);
 
-	/**
-	 * executes a query against this sqlite db.
-	 *
-	 * @param result contains the query to run and the parameters to bind
-	 * @return bool TRUE if the query was successfully run
-	 */
-	bool Exec(t4p::SqliteResultClass* result);
+    /**
+     * executes a query against this sqlite db.
+     *
+     * @param result contains the query to run and the parameters to bind
+     * @return bool TRUE if the query was successfully run
+     */
+    bool Exec(t4p::SqliteResultClass* result);
 
-	protected:
-	/**
-	 * the opened connection to the detector databases.
-	 */
-	soci::session& Session;
+ protected:
+    /**
+     * the opened connection to the detector databases.
+     */
+    soci::session& Session;
 };
 }  // namespace t4p
 

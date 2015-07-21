@@ -39,13 +39,13 @@ class CodeControlClass;
  * mouse pointer or at the current cursor position.
  */
 class DocCommentFeatureClass : public t4p::FeatureClass {
-	public:
-	DocCommentFeatureClass(t4p::AppClass& app);
+ public:
+    DocCommentFeatureClass(t4p::AppClass& app);
 
-	/**
-	 * @return TRUE if this feature is enabled
-	 */
-	bool IsEnabled() const;
+    /**
+     * @return TRUE if this feature is enabled
+     */
+    bool IsEnabled() const;
 };
 }  // namespace t4p
 

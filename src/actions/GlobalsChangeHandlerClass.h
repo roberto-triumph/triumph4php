@@ -38,21 +38,21 @@ namespace t4p {
  * to this handler.
  */
 class GlobalsChangeHandlerClass : public wxEvtHandler {
-	public:
-	GlobalsChangeHandlerClass(t4p::GlobalsClass& globals);
+ public:
+    GlobalsChangeHandlerClass(t4p::GlobalsClass& globals);
 
-	private:
-	t4p::GlobalsClass& Globals;
+ private:
+    t4p::GlobalsClass& Globals;
 
-	void OnSqlMetaDataComplete(t4p::SqlMetaDataEventClass& event);
+    void OnSqlMetaDataComplete(t4p::SqlMetaDataEventClass& event);
 
-	/**
-	 * when the php database detectors have completed, put all of the detected database
-	 * tags in the globals list.
-	 */
-	void OnDatabaseTagsComplete(t4p::ActionEventClass& event);
+    /**
+     * when the php database detectors have completed, put all of the detected database
+     * tags in the globals list.
+     */
+    void OnDatabaseTagsComplete(t4p::ActionEventClass& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

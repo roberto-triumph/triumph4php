@@ -38,62 +38,62 @@ namespace t4p {
  * OutputDbFileName.
  */
 class UrlTagDetectorParamsClass {
-	public:
-	/**
-	 * location to the php executable (php.exe / php)
-	 * this is usually retrieved from t4p::EnvironmentClass
-	 */
-	wxString PhpExecutablePath;
+ public:
+    /**
+     * location to the php executable (php.exe / php)
+     * this is usually retrieved from t4p::EnvironmentClass
+     */
+    wxString PhpExecutablePath;
 
-	/**
-	 * the base location of the php detector scripts. this is used as the
-	 * include path so that both local detectors and global detectors
-	 * can access the php detector sources (since local detectors and global
-	 * detectors are located in separate directories, we need to use
-	 * include_path)
-	 */
-	wxFileName PhpIncludePath;
+    /**
+     * the base location of the php detector scripts. this is used as the
+     * include path so that both local detectors and global detectors
+     * can access the php detector sources (since local detectors and global
+     * detectors are located in separate directories, we need to use
+     * include_path)
+     */
+    wxFileName PhpIncludePath;
 
-	/**
-	 * The actual PHP script to run.
-	 */
-	wxFileName ScriptName;
+    /**
+     * The actual PHP script to run.
+     */
+    wxFileName ScriptName;
 
-	/**
-	 * Argument to the URL detector script; the base directory of the project to scan
-	 */
-	wxFileName SourceDir;
+    /**
+     * Argument to the URL detector script; the base directory of the project to scan
+     */
+    wxFileName SourceDir;
 
-	/**
-	 * Argument to the URL detector script; the location of the resource cache SQLite db.
-	 * this db is created when the project is indexed and can be accessed via the
-	 * GlobalsClass::Projects list
-	 */
-	wxFileName ResourceDbFileName;
+    /**
+     * Argument to the URL detector script; the location of the resource cache SQLite db.
+     * this db is created when the project is indexed and can be accessed via the
+     * GlobalsClass::Projects list
+     */
+    wxFileName ResourceDbFileName;
 
-	/**
-	 * Argument to the URL detector script; the base URL of the project in question. This is
-	 * usually calculated with the help of ApacheClass.
-	 * Examples: "http://localhost" ; "http://dev.localhost"
-	 */
-	wxString RootUrl;
+    /**
+     * Argument to the URL detector script; the base URL of the project in question. This is
+     * usually calculated with the help of ApacheClass.
+     * Examples: "http://localhost" ; "http://dev.localhost"
+     */
+    wxString RootUrl;
 
-	/**
-	 * Argument to the URL detector script; the location of th detectors cache SQLite db.
-	 * this db is created when the project is indexed and can be accessed via the
-	 * GlobalsClass::Projects list. This argument is optional; it can be empty in which
-	 * case the script outputs to STDOUT; leaving this argument empty is useful
-	 * for testing url detectors; so that the results are visible in the console wthout
-	 * needing to query the SQLite db.
-	 */
-	wxString OutputDbFileName;
+    /**
+     * Argument to the URL detector script; the location of th detectors cache SQLite db.
+     * this db is created when the project is indexed and can be accessed via the
+     * GlobalsClass::Projects list. This argument is optional; it can be empty in which
+     * case the script outputs to STDOUT; leaving this argument empty is useful
+     * for testing url detectors; so that the results are visible in the console wthout
+     * needing to query the SQLite db.
+     */
+    wxString OutputDbFileName;
 
-	UrlTagDetectorParamsClass();
+    UrlTagDetectorParamsClass();
 
-	/**
-	 * build the command line to be executed for each url detector
-	 */
-	wxString BuildCmdLine() const;
+    /**
+     * build the command line to be executed for each url detector
+     */
+    wxString BuildCmdLine() const;
 };
 
 /**
@@ -101,50 +101,50 @@ class UrlTagDetectorParamsClass {
  * one external process execution for each project source directory / url detector combination
  */
 class UrlTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
-	public:
-	UrlTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    UrlTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * @return boolean false if php is not installed in the system
-	 */
-	bool Init(t4p::GlobalsClass& globals);
+    /**
+     * @return boolean false if php is not installed in the system
+     */
+    bool Init(t4p::GlobalsClass& globals);
 
-	bool DoAsync();
+    bool DoAsync();
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	void BackgroundWork();
+    void BackgroundWork();
 
-	private:
-	/**
-	 * used to run the external url detector PHP script
-	 */
-	t4p::ProcessWithHeartbeatClass Process;
+ private:
+    /**
+     * used to run the external url detector PHP script
+     */
+    t4p::ProcessWithHeartbeatClass Process;
 
-	/**
-	 * we will perform one external call for each item in this
-	 * queue
-	 */
-	std::queue<t4p::UrlTagDetectorParamsClass> ParamsQueue;
+    /**
+     * we will perform one external call for each item in this
+     * queue
+     */
+    std::queue<t4p::UrlTagDetectorParamsClass> ParamsQueue;
 
-	/**
-	 * pop the next set of params from the queue and call the php url
-	 * detector.
-	 * @return bool TRUE if the detection was started succesfully
-	 */
-	bool NextDetection();
+    /**
+     * pop the next set of params from the queue and call the php url
+     * detector.
+     * @return bool TRUE if the detection was started succesfully
+     */
+    bool NextDetection();
 
-	/**
-	 * @return all of the PHP URL detector scripts. These can be either ones
-	 * provided by default or ones created by the user.
-	 */
-	std::vector<wxString> DetectorScripts();
+    /**
+     * @return all of the PHP URL detector scripts. These can be either ones
+     * provided by default or ones created by the user.
+     */
+    std::vector<wxString> DetectorScripts();
 
-	void OnProcessComplete(wxCommandEvent& event);
+    void OnProcessComplete(wxCommandEvent& event);
 
-	void OnProcessFailed(wxCommandEvent& event);
+    void OnProcessFailed(wxCommandEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

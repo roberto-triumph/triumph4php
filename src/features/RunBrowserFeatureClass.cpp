@@ -33,35 +33,35 @@
 #include "widgets/ChooseUrlDialogClass.h"
 
 t4p::RunBrowserFeatureClass::RunBrowserFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app)
-	, RecentUrls() {
+    : FeatureClass(app)
+    , RecentUrls() {
 }
 
 void  t4p::RunBrowserFeatureClass::ExternalBrowser(const wxString& browserName, const wxURI& url) {
-	wxFileName webBrowserPath;
-	bool found = App.Globals.Environment.FindBrowserByName(browserName, webBrowserPath);
-	if (!found || !webBrowserPath.IsOk()) {
-		t4p::EditorLogWarning(t4p::ERR_BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
-		return;
-	}
-	wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\"");
+    wxFileName webBrowserPath;
+    bool found = App.Globals.Environment.FindBrowserByName(browserName, webBrowserPath);
+    if (!found || !webBrowserPath.IsOk()) {
+        t4p::EditorLogWarning(t4p::ERR_BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
+        return;
+    }
+    wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\"");
 
-	wxPlatformInfo info;
-	if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN && browserName.CmpNoCase(wxT("Safari")) == 0) {
-		// safari on Mac does not handle command line URL arguments
-		// need to use the "open" program
-		// see http://superuser.com/questions/459268/run-safari-from-command-line-with-url-parameter
-		cmd = wxT("open -a safari ");
-	}
-	cmd += wxT(" \"");
-	cmd += url.BuildURI();
-	cmd += wxT("\"");
+    wxPlatformInfo info;
+    if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN && browserName.CmpNoCase(wxT("Safari")) == 0) {
+        // safari on Mac does not handle command line URL arguments
+        // need to use the "open" program
+        // see http://superuser.com/questions/459268/run-safari-from-command-line-with-url-parameter
+        cmd = wxT("open -a safari ");
+    }
+    cmd += wxT(" \"");
+    cmd += url.BuildURI();
+    cmd += wxT("\"");
 
-	// dont track this PID, let the browser stay open if the editor is closed.
-	// if we dont do pass the make group leader flag the browser thinks it crashed and will tell the user
-	// that the browser crashed.
-	long pid = wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER);
-	if (pid <= 0) {
-		t4p::EditorLogWarning(t4p::ERR_BAD_WEB_BROWSER_EXECUTABLE, cmd);
-	}
+    // dont track this PID, let the browser stay open if the editor is closed.
+    // if we dont do pass the make group leader flag the browser thinks it crashed and will tell the user
+    // that the browser crashed.
+    long pid = wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER);
+    if (pid <= 0) {
+        t4p::EditorLogWarning(t4p::ERR_BAD_WEB_BROWSER_EXECUTABLE, cmd);
+    }
 }

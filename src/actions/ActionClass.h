@@ -65,155 +65,155 @@ class RunningThreadsClass;
  *
  */
 class ActionClass {
-	public:
-	/**
-	 * ProgressMode can be one of two modes: determinate or indeterminate.
-	 * Determinate mode means that an action is able to give an accurate estimate of
-	 * how much it has completed at any given time.
-	 * Indeterminate mode is means that an action cannot accurately estimate how
-	 * much it has completed at any given time.
-	 */
-	enum ProgressMode {
-		DETERMINATE,
-		INDETERMINATE
-	};
+ public:
+    /**
+     * ProgressMode can be one of two modes: determinate or indeterminate.
+     * Determinate mode means that an action is able to give an accurate estimate of
+     * how much it has completed at any given time.
+     * Indeterminate mode is means that an action cannot accurately estimate how
+     * much it has completed at any given time.
+     */
+    enum ProgressMode {
+        DETERMINATE,
+        INDETERMINATE
+    };
 
-	/**
-	 * @param runningThreads used to post events. This reference must be
-	 *        alive for as long as this class is alive.
-	 * @param eventId the posted events will have this ID as the EventID
-	 */
-	ActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+    /**
+     * @param runningThreads used to post events. This reference must be
+     *        alive for as long as this class is alive.
+     * @param eventId the posted events will have this ID as the EventID
+     */
+    ActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	virtual ~ActionClass();
+    virtual ~ActionClass();
 
-	/**
-	 * This is the method to override; this method is executed in the background thread.
-	 */
-	virtual void BackgroundWork() = 0;
+    /**
+     * This is the method to override; this method is executed in the background thread.
+     */
+    virtual void BackgroundWork() = 0;
 
-	/**
-	 * @return wxString a short description of this action.
-	 */
-	virtual wxString GetLabel() const = 0;
+    /**
+     * @return wxString a short description of this action.
+     */
+    virtual wxString GetLabel() const = 0;
 
-	/**
-	 * if the thread allocates any dynamic memory (using NEW) but this thread is
-	 * Delete()'d before the thread gets a chance to wxPostEvent() to the main
-	 * thread, then it should delete the memory in this method. This method will
-	 * get called in the main thread.
-	 */
-	virtual void DoCancel();
+    /**
+     * if the thread allocates any dynamic memory (using NEW) but this thread is
+     * Delete()'d before the thread gets a chance to wxPostEvent() to the main
+     * thread, then it should delete the memory in this method. This method will
+     * get called in the main thread.
+     */
+    virtual void DoCancel();
 
-	/**
-	 * ask the action to stop.  the action will then stop as soon as possible but will
-	 * do so while retaining a clean state.
-	 *
-	 * this method can be called from a different thread
-	 */
-	void Cancel();
+    /**
+     * ask the action to stop.  the action will then stop as soon as possible but will
+     * do so while retaining a clean state.
+     *
+     * this method can be called from a different thread
+     */
+    void Cancel();
 
-	/**
-	 * Will generate a EVENT_ACTION_COMPLETE event and stop the EVENT_ACTION_IN_PROGRESS events.
-	 * Does not actually stop the thread.
-	 */
-	void SignalEnd();
+    /**
+     * Will generate a EVENT_ACTION_COMPLETE event and stop the EVENT_ACTION_IN_PROGRESS events.
+     * Does not actually stop the thread.
+     */
+    void SignalEnd();
 
-	/**
-	 * @return int the event ID for this action
-	 */
-	int GetEventId() const;
+    /**
+     * @return int the event ID for this action
+     */
+    int GetEventId() const;
 
-	/**
-	 * a number used to identify this action; will be used to cancel the action.
-	 * usually, this action ID is used in conjunction with RunningThreads class.
-	 */
-	void SetActionId(int actionId);
+    /**
+     * a number used to identify this action; will be used to cancel the action.
+     * usually, this action ID is used in conjunction with RunningThreads class.
+     */
+    void SetActionId(int actionId);
 
-	/**
-	 * get the ID of this action.
-	 * usually, the action ID is used in conjunction with RunningThreads class.
-	 */
-	int GetActionId();
+    /**
+     * get the ID of this action.
+     * usually, the action ID is used in conjunction with RunningThreads class.
+     */
+    int GetActionId();
 
-	/**
-	 * @return ProgressMode the way that the action tracks its progress
-	 */
-	t4p::ActionClass::ProgressMode GetProgressMode();
+    /**
+     * @return ProgressMode the way that the action tracks its progress
+     */
+    t4p::ActionClass::ProgressMode GetProgressMode();
 
-	/**
-	 * get the percentage complete of this action. only non-zero when the action
-	 * supports determinate mode.
-	 */
-	int GetPercentComplete();
+    /**
+     * get the percentage complete of this action. only non-zero when the action
+     * supports determinate mode.
+     */
+    int GetPercentComplete();
 
-	/**
-	 * send an event to all of the handlers that have registered via RunningThreads::AddHandler
-	 * method.
-	 */
-	void PostEvent(wxEvent& event);
+    /**
+     * send an event to all of the handlers that have registered via RunningThreads::AddHandler
+     * method.
+     */
+    void PostEvent(wxEvent& event);
 
-	protected:
-	/**
-	 * Generates a EVENT_ACTION_STATUS event with the given string
-	 * as the wxCommandEvent.GetString
-	 */
-	void SetStatus(const wxString& status);
+ protected:
+    /**
+     * Generates a EVENT_ACTION_STATUS event with the given string
+     * as the wxCommandEvent.GetString
+     */
+    void SetStatus(const wxString& status);
 
-	/**
-	 * subclasses should call this method often in the BackgroundWork() method; subclasses
-	 * should exit the BackgroundWork() method after IsCancelled() returns TRUE
-	 */
-	bool IsCancelled();
+    /**
+     * subclasses should call this method often in the BackgroundWork() method; subclasses
+     * should exit the BackgroundWork() method after IsCancelled() returns TRUE
+     */
+    bool IsCancelled();
 
-	/**
-	 * @paramrProgressMode set the way that the action tracks its progress
-	 */
-	void SetProgressMode(t4p::ActionClass::ProgressMode mode);
+    /**
+     * @paramrProgressMode set the way that the action tracks its progress
+     */
+    void SetProgressMode(t4p::ActionClass::ProgressMode mode);
 
-	/**
-	 * @param int percentComplete a number between 0 and 100
-	 */
-	void SetPercentComplete(int percentComplete);
+    /**
+     * @param int percentComplete a number between 0 and 100
+     */
+    void SetPercentComplete(int percentComplete);
 
-	private:
-	/**
-	 * Keeps a reference to this object's running thread; that way
-	 * we can send events to other threads.
-	 */
-	t4p::RunningThreadsClass& RunningThreads;
+ private:
+    /**
+     * Keeps a reference to this object's running thread; that way
+     * we can send events to other threads.
+     */
+    t4p::RunningThreadsClass& RunningThreads;
 
-	/**
-	 * All events generated by this action will have this ID as their EventId
-	 */
-	int EventId;
+    /**
+     * All events generated by this action will have this ID as their EventId
+     */
+    int EventId;
 
-	/**
-	 * a number used to identify this action; will be used to cancel the action.
-	 * usually, this action ID is used in conjunction with RunningThreads class.
-	 */
-	int ActionId;
+    /**
+     * a number used to identify this action; will be used to cancel the action.
+     * usually, this action ID is used in conjunction with RunningThreads class.
+     */
+    int ActionId;
 
-	/**
-	 * the mutext controls access to Cancelled boolean
-	 */
-	wxMutex Mutex;
+    /**
+     * the mutext controls access to Cancelled boolean
+     */
+    wxMutex Mutex;
 
-	/**
-	 * flag to signal that the action should return immediately even if it has
-	 * not completed its work.
-	 */
-	bool Cancelled;
+    /**
+     * flag to signal that the action should return immediately even if it has
+     * not completed its work.
+     */
+    bool Cancelled;
 
-	/**
-	 * The way that the action tracks its progress
-	 */
-	t4p::ActionClass::ProgressMode Mode;
+    /**
+     * The way that the action tracks its progress
+     */
+    t4p::ActionClass::ProgressMode Mode;
 
-	/**
-	 * The progress in the current action. This is only valid if the action is in determinate progress mode
-	 */
-	int PercentComplete;
+    /**
+     * The progress in the current action. This is only valid if the action is in determinate progress mode
+     */
+    int PercentComplete;
 };
 
 /**
@@ -227,23 +227,23 @@ class ActionClass {
  * context of the background thread.
  */
 class ThreadCleanupClass {
-	public:
-	ThreadCleanupClass();
+ public:
+    ThreadCleanupClass();
 
-	virtual ~ThreadCleanupClass();
+    virtual ~ThreadCleanupClass();
 
-	/**
-	 * override this method to put in logic to be executed just as the thread
-	 * ends.
-	 */
-	virtual void ThreadEnd() = 0;
+    /**
+     * override this method to put in logic to be executed just as the thread
+     * ends.
+     */
+    virtual void ThreadEnd() = 0;
 
-	/**
-	 * override this method to return a cloned instance of itself.
-	 * since we use more than 1 background thread, we need to
-	 * create new instances of this object for each thread.
-	 */
-	virtual t4p::ThreadCleanupClass* Clone() = 0;
+    /**
+     * override this method to return a cloned instance of itself.
+     * since we use more than 1 background thread, we need to
+     * create new instances of this object for each thread.
+     */
+    virtual t4p::ThreadCleanupClass* Clone() = 0;
 };
 
 /**
@@ -255,100 +255,100 @@ class ThreadCleanupClass {
  * BackgroundWork() has finished.
  */
 class ThreadActionClass : public wxThread {
-	public:
-	/**
-	 *
-	 * @param actions to be run; First In First Out
-	 *        this class will continually poll the queue, pop actions off the
-	 *        queue, call BackgroundWork() on them, and delete them once
-	 *        BackgroundWork() has finished.
-	 * @param actionsMutex to prevent simultaneous access to Actions
-	 * @param finishSemaphore to signal when all actions have been cleaned up
-	 * @param threadCleanup code to be run once the thread ends. this class will own the pointer
-	 */
-	ThreadActionClass(std::queue<t4p::ActionClass*>& actions, wxMutex& actionsMutex,
-		wxSemaphore& finishSemaphore, t4p::ThreadCleanupClass* threadCleanup);
+ public:
+    /**
+     *
+     * @param actions to be run; First In First Out
+     *        this class will continually poll the queue, pop actions off the
+     *        queue, call BackgroundWork() on them, and delete them once
+     *        BackgroundWork() has finished.
+     * @param actionsMutex to prevent simultaneous access to Actions
+     * @param finishSemaphore to signal when all actions have been cleaned up
+     * @param threadCleanup code to be run once the thread ends. this class will own the pointer
+     */
+    ThreadActionClass(std::queue<t4p::ActionClass*>& actions, wxMutex& actionsMutex,
+                      wxSemaphore& finishSemaphore, t4p::ThreadCleanupClass* threadCleanup);
 
-	void* Entry();
+    void* Entry();
 
-	/**
-	 * cancel the current action that is running, but only if the action ID matches
-	 * the given ID.  this method is used when a single action is to be termnated
-	 * early.
-	 *
-	 * Do not confuse this from wxThread::Delete, this is the cancel mechanism for
-	 * the action class; so that actions themselves can terminate early when signaled
-	 * to do so.  When an action is cancelled, this thread will pop the next action
-	 * off the queue and start woking on it.
-	 *
-	 * @param actionId the ID returned by t4p::RunningThreadsClass::Add method
-	 */
-	void CancelRunningActionIf(int actionId);
+    /**
+     * cancel the current action that is running, but only if the action ID matches
+     * the given ID.  this method is used when a single action is to be termnated
+     * early.
+     *
+     * Do not confuse this from wxThread::Delete, this is the cancel mechanism for
+     * the action class; so that actions themselves can terminate early when signaled
+     * to do so.  When an action is cancelled, this thread will pop the next action
+     * off the queue and start woking on it.
+     *
+     * @param actionId the ID returned by t4p::RunningThreadsClass::Add method
+     */
+    void CancelRunningActionIf(int actionId);
 
-	/**
-	 * cancel the current action that is running.  this method is used when
-	 * this thread needs to exit; we need the running action to return out of its
-	 * BackgroundWork() method so that the thread can gracefully end.
-	 *
-	 * Do not confuse this from wxThread::Delete, this is the cancel mechanism for
-	 * the action class; so that actions themselves can terminate early when signaled
-	 * to do so.
-	 */
-	void CancelRunningAction();
+    /**
+     * cancel the current action that is running.  this method is used when
+     * this thread needs to exit; we need the running action to return out of its
+     * BackgroundWork() method so that the thread can gracefully end.
+     *
+     * Do not confuse this from wxThread::Delete, this is the cancel mechanism for
+     * the action class; so that actions themselves can terminate early when signaled
+     * to do so.
+     */
+    void CancelRunningAction();
 
-	/**
-	 * posts the progress event for the action that is currently running
-	 */
-	void PostProgressEvent();
+    /**
+     * posts the progress event for the action that is currently running
+     */
+    void PostProgressEvent();
 
-	private:
-	/**
-	 * actions to be run; First In First Out
-	 */
-	std::queue<t4p::ActionClass*>& Actions;
+ private:
+    /**
+     * actions to be run; First In First Out
+     */
+    std::queue<t4p::ActionClass*>& Actions;
 
-	/**
-	 * Prevent simultaneous access to Actions
-	 */
-	wxMutex& ActionsMutex;
+    /**
+     * Prevent simultaneous access to Actions
+     */
+    wxMutex& ActionsMutex;
 
-	/**
-	 * this is to signal when the background task has finished cleanup
-	 */
-	wxSemaphore& FinishSemaphore;
+    /**
+     * this is to signal when the background task has finished cleanup
+     */
+    wxSemaphore& FinishSemaphore;
 
-	/**
-	 * prevent simultaneous access to the running action
-	 */
-	wxMutex RunningActionMutex;
+    /**
+     * prevent simultaneous access to the running action
+     */
+    wxMutex RunningActionMutex;
 
-	/**
-	 * handle to the action that is actually running; we need to hold
-	 * a pointer to it since we remove the pointer from the queue
-	 * while it is working
-	 */
-	t4p::ActionClass* RunningAction;
+    /**
+     * handle to the action that is actually running; we need to hold
+     * a pointer to it since we remove the pointer from the queue
+     * while it is working
+     */
+    t4p::ActionClass* RunningAction;
 
-	/**
-	 * logic to be called when a thread ends
-	 */
-	t4p::ThreadCleanupClass* ThreadCleanup;
+    /**
+     * logic to be called when a thread ends
+     */
+    t4p::ThreadCleanupClass* ThreadCleanup;
 
-	/**
-	 * @return action  next action from the queue, or NULL if queue is empty
-	 */
-	t4p::ActionClass* NextAction();
+    /**
+     * @return action  next action from the queue, or NULL if queue is empty
+     */
+    t4p::ActionClass* NextAction();
 
-	/**
-	 * cleanup the action
-	 * @param action to finalize
-	 */
-	void ActionComplete(t4p::ActionClass* action);
+    /**
+     * cleanup the action
+     * @param action to finalize
+     */
+    void ActionComplete(t4p::ActionClass* action);
 
-	/**
-	 * cleanup alls action that are still in the queue
-	 */
-	void CleanupAllActions();
+    /**
+     * cleanup alls action that are still in the queue
+     */
+    void CleanupAllActions();
 };
 
 /**
@@ -367,170 +367,170 @@ class ThreadActionClass : public wxThread {
  * This class will own all given actions, and will delete them need.
  */
 class RunningThreadsClass : public wxEvtHandler {
-	public:
-	RunningThreadsClass(bool doPostEvents = true);
+ public:
+    RunningThreadsClass(bool doPostEvents = true);
 
-	~RunningThreadsClass();
+    ~RunningThreadsClass();
 
-	/**
-	 * Only call this method BEFORE any items are queued up
-	 * @param int maxThreads number threads to start. This can be zero, if so
-	 *        then we will start as many threads as there are CPUs in the system
-	 */
-	void SetMaxThreads(int maxThreads);
+    /**
+     * Only call this method BEFORE any items are queued up
+     * @param int maxThreads number threads to start. This can be zero, if so
+     *        then we will start as many threads as there are CPUs in the system
+     */
+    void SetMaxThreads(int maxThreads);
 
-	/**
-	 * Queues the given action to be run at some point in the near future.
-	 * This method will return an identifier that can be used to stop the
-	 * action if needed.
-	 *
-	 * It is very important to note that once an action is queued, it may
-	 * deleted at any time after that so the action pointer should not be accessed
-	 * at all.
-	 *
-	 * @param action this class will own the pointer and delete it
-	 * @return an action ID, which can be used to cancel the action at at
-	 * later time.
-	 */
-	int Queue(t4p::ActionClass* action);
+    /**
+     * Queues the given action to be run at some point in the near future.
+     * This method will return an identifier that can be used to stop the
+     * action if needed.
+     *
+     * It is very important to note that once an action is queued, it may
+     * deleted at any time after that so the action pointer should not be accessed
+     * at all.
+     *
+     * @param action this class will own the pointer and delete it
+     * @return an action ID, which can be used to cancel the action at at
+     * later time.
+     */
+    int Queue(t4p::ActionClass* action);
 
-	/**
-	 * gracefully stops the given action, allowing the other added actions
-	 * to keep going. If the action is running it is cancelled. if it is not
-	 * running, it will be removed from the queue and deleted.
-	 *
-	 * @param int actionID as given by the Add() method
-	 */
-	void CancelAction(int actionId);
+    /**
+     * gracefully stops the given action, allowing the other added actions
+     * to keep going. If the action is running it is cancelled. if it is not
+     * running, it will be removed from the queue and deleted.
+     *
+     * @param int actionID as given by the Add() method
+     */
+    void CancelAction(int actionId);
 
-	/**
-	 * stop all of the running threads. This method is guaranteed to block
-	 * until all threads have terminated. If this method is hanging
-	 * indefinitely, it means that one of the running threads has not
-	 * been calling Cancel() correctly.
-	 */
-	void StopAll();
+    /**
+     * stop all of the running threads. This method is guaranteed to block
+     * until all threads have terminated. If this method is hanging
+     * indefinitely, it means that one of the running threads has not
+     * been calling Cancel() correctly.
+     */
+    void StopAll();
 
-	/**
-	 * stops all running threads, and additionally will no longer queue up any
-	 * actions given to be queued.  This method is usually called before this item
-	 * goes out of scope.
-	 */
-	void Shutdown();
+    /**
+     * stops all running threads, and additionally will no longer queue up any
+     * actions given to be queued.  This method is usually called before this item
+     * goes out of scope.
+     */
+    void Shutdown();
 
-	/**
-	 * This method should called before any actions are added.
-	 *
-	 * @param threadCleanup object to be called when a thread ends.
-	 *        this class will own the pointer
-	 *        this class will clone the object.
-	 */
-	void SetThreadCleanup(t4p::ThreadCleanupClass* threadCleanup);
+    /**
+     * This method should called before any actions are added.
+     *
+     * @param threadCleanup object to be called when a thread ends.
+     *        this class will own the pointer
+     *        this class will clone the object.
+     */
+    void SetThreadCleanup(t4p::ThreadCleanupClass* threadCleanup);
 
-	/**
-	 * adds an event handler to this instance.  Running threads will
-	 * post events to all registered handlers.  The handlers pointer
-	 * is NOT owned by this object; the caller must ensure to call
-	 * RemoveEventHandler before the event handler goes out of scope.
-	 */
-	void AddEventHandler(wxEvtHandler* handler);
+    /**
+     * adds an event handler to this instance.  Running threads will
+     * post events to all registered handlers.  The handlers pointer
+     * is NOT owned by this object; the caller must ensure to call
+     * RemoveEventHandler before the event handler goes out of scope.
+     */
+    void AddEventHandler(wxEvtHandler* handler);
 
-	/**
-	 * removes event handler to this instance, if handler has
-	 * not been registered then this method does nothing.
-	 */
-	void RemoveEventHandler(wxEvtHandler* handler);
+    /**
+     * removes event handler to this instance, if handler has
+     * not been registered then this method does nothing.
+     */
+    void RemoveEventHandler(wxEvtHandler* handler);
 
-	/**
-	 * post an event (using wxPostEvent) to all registered handlers.
-	 * this means that the event will be received in the next event loop.
-	 */
-	void PostEvent(wxEvent& event);
+    /**
+     * post an event (using wxPostEvent) to all registered handlers.
+     * this means that the event will be received in the next event loop.
+     */
+    void PostEvent(wxEvent& event);
 
-	private:
-	/**
-	 * holds all actions that need to be run. This class will add
-	 * actions to the queue. An action will be removed as soon as it
-	 * is actually worked on. The background threads will check to
-	 * see if this queue is non-empty and then pop items from it and
-	 * "work" on them (call BackgroundWork() method)
-	 */
-	std::queue<t4p::ActionClass*> Actions;
+ private:
+    /**
+     * holds all actions that need to be run. This class will add
+     * actions to the queue. An action will be removed as soon as it
+     * is actually worked on. The background threads will check to
+     * see if this queue is non-empty and then pop items from it and
+     * "work" on them (call BackgroundWork() method)
+     */
+    std::queue<t4p::ActionClass*> Actions;
 
-	/**
-	 * Prevent simultaneous access to Actions
-	 */
-	wxMutex ActionMutex;
+    /**
+     * Prevent simultaneous access to Actions
+     */
+    wxMutex ActionMutex;
 
-	/**
-	 * this is the background thread that pops items from the action queue
-	 * and actually runs the actions
-	 */
-	std::vector<t4p::ThreadActionClass*> ThreadActions;
+    /**
+     * this is the background thread that pops items from the action queue
+     * and actually runs the actions
+     */
+    std::vector<t4p::ThreadActionClass*> ThreadActions;
 
-	/**
-	 * holds all event handlers to post events to. This object
-	 * will not own these pointers.
-	 */
-	std::vector<wxEvtHandler*> Handlers;
+    /**
+     * holds all event handlers to post events to. This object
+     * will not own these pointers.
+     */
+    std::vector<wxEvtHandler*> Handlers;
 
-	/**
-	 * prevent concurrent access to the handlers
-	 */
-	wxMutex HandlerMutex;
+    /**
+     * prevent concurrent access to the handlers
+     */
+    wxMutex HandlerMutex;
 
-	/**
-	 * to implement blocking wait when stopping the background
-	 * threads
-	 */
-	wxSemaphore* Semaphore;
+    /**
+     * to implement blocking wait when stopping the background
+     * threads
+     */
+    wxSemaphore* Semaphore;
 
-	/**
-	 *  To generate the heartbeats (EVENT_WORK_IN_PROGRESS)
-	 */
-	wxTimer Timer;
+    /**
+     *  To generate the heartbeats (EVENT_WORK_IN_PROGRESS)
+     */
+    wxTimer Timer;
 
-	/**
-	 * logic to be called when a thread ends
-	 */
-	t4p::ThreadCleanupClass* ThreadCleanup;
+    /**
+     * logic to be called when a thread ends
+     */
+    t4p::ThreadCleanupClass* ThreadCleanup;
 
-	/**
-	 * wheter to send events in the current event loop or the next event
-	 * loop (wxPostEvent vs. ProcessEvent() ) .  this flag is used for
-	 * unit tests since we don't have an event loop in the unit tests.
-	 */
-	bool DoPostEvents;
+    /**
+     * wheter to send events in the current event loop or the next event
+     * loop (wxPostEvent vs. ProcessEvent() ) .  this flag is used for
+     * unit tests since we don't have an event loop in the unit tests.
+     */
+    bool DoPostEvents;
 
-	/**
-	 * a number that uniquely identifies an action. no two queued actions will have
-	 * the same ID.
-	 */
-	int NextActionId;
+    /**
+     * a number that uniquely identifies an action. no two queued actions will have
+     * the same ID.
+     */
+    int NextActionId;
 
-	/**
-	 * the max number of threads to create
-	 */
-	int MaxThreads;
+    /**
+     * the max number of threads to create
+     */
+    int MaxThreads;
 
-	/**
-	 * if TRUE no items will be queued.
-	 */
-	bool IsShutdown;
+    /**
+     * if TRUE no items will be queued.
+     */
+    bool IsShutdown;
 
-	/**
-	 * Will generate a EVENT_ACTION_IN_PROGRESS event
-	 */
-	void OnTimer(wxTimerEvent& event);
+    /**
+     * Will generate a EVENT_ACTION_IN_PROGRESS event
+     */
+    void OnTimer(wxTimerEvent& event);
 
-	/**
-	 * Will prepare to send events at regular intervals. After a call to this method, a
-	 * EVENT_WORK_IN_PROGRESS will be generated at regular intervals until SignalEnd()
-	 * is called.
-	 */
-	void SignalStart();
+    /**
+     * Will prepare to send events at regular intervals. After a call to this method, a
+     * EVENT_WORK_IN_PROGRESS will be generated at regular intervals until SignalEnd()
+     * is called.
+     */
+    void SignalStart();
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /**
@@ -541,21 +541,21 @@ class RunningThreadsClass : public wxEvtHandler {
  * ID_MENU_*
  */
 enum {
-	ID_EVENT_ACTION_TAG_FINDER_LIST_INIT = wxID_HIGHEST + 20000,
-	ID_EVENT_ACTION_TAG_FINDER_LIST,
-	ID_EVENT_ACTION_SQL_METADATA_INIT,
-	ID_EVENT_ACTION_SQL_METADATA,
-	ID_EVENT_ACTION_URL_TAG_DETECTOR,
-	ID_EVENT_ACTION_CALL_STACK,
-	ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR,
-	ID_EVENT_ACTION_TAG_DETECTOR_INIT,
-	ID_EVENT_ACTION_TAG_DETECTOR,
-	ID_EVENT_ACTION_DATABASE_TAG_DETECTOR,
-	ID_EVENT_ACTION_CONFIG_TAG_DETECTOR,
-	ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE,
-	ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK,
-	ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK,
-	ID_EVENT_ACTION_DETECTOR_DB_INIT
+    ID_EVENT_ACTION_TAG_FINDER_LIST_INIT = wxID_HIGHEST + 20000,
+    ID_EVENT_ACTION_TAG_FINDER_LIST,
+    ID_EVENT_ACTION_SQL_METADATA_INIT,
+    ID_EVENT_ACTION_SQL_METADATA,
+    ID_EVENT_ACTION_URL_TAG_DETECTOR,
+    ID_EVENT_ACTION_CALL_STACK,
+    ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR,
+    ID_EVENT_ACTION_TAG_DETECTOR_INIT,
+    ID_EVENT_ACTION_TAG_DETECTOR,
+    ID_EVENT_ACTION_DATABASE_TAG_DETECTOR,
+    ID_EVENT_ACTION_CONFIG_TAG_DETECTOR,
+    ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE,
+    ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK,
+    ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK,
+    ID_EVENT_ACTION_DETECTOR_DB_INIT
 };
 
 
@@ -588,19 +588,19 @@ extern const wxEventType EVENT_ACTION_PROGRESS;
  * the task and 100 being the end of the task.
  */
 class ActionProgressEventClass : public wxEvent {
-	public:
-	/** on of  either determinate or indeterminate */
-	t4p::ActionClass::ProgressMode Mode;
+ public:
+    /** on of  either determinate or indeterminate */
+    t4p::ActionClass::ProgressMode Mode;
 
-	/** a number between 0 and 100 */
-	int PercentComplete;
+    /** a number between 0 and 100 */
+    int PercentComplete;
 
-	/** a message to be displayed */
-	wxString Message;
+    /** a message to be displayed */
+    wxString Message;
 
-	ActionProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
+    ActionProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -610,15 +610,15 @@ class ActionProgressEventClass : public wxEvent {
  * copy any strings that we pass from one thread to another.
  */
 class ActionEventClass : public wxEvent {
-	public:
-	/**
-	 * a string, copied between threads in a safe way
-	 */
-	wxString Message;
+ public:
+    /**
+     * a string, copied between threads in a safe way
+     */
+    wxString Message;
 
-	ActionEventClass(int id, wxEventType type, const wxString& msg);
+    ActionEventClass(int id, wxEventType type, const wxString& msg);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 typedef void (wxEvtHandler::*ActionEventClassFunction)(t4p::ActionEventClass&);

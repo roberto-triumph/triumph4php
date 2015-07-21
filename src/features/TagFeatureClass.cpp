@@ -37,96 +37,96 @@
 #include "Triumph.h"
 
 t4p::TagFeatureClass::TagFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app)
-	, JumpToText()
-	, CacheState(CACHE_STALE) {
+    : FeatureClass(app)
+    , JumpToText()
+    , CacheState(CACHE_STALE) {
 }
 
 void t4p::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& event) {
-	CacheState = CACHE_OK;
+    CacheState = CACHE_OK;
 }
 
 wxString t4p::TagFeatureClass::CacheStatus() {
-	if (CACHE_OK == CacheState) {
-		return _("OK");
-	}
-	return _("Stale");
+    if (CACHE_OK == CacheState) {
+        return _("OK");
+    }
+    return _("Stale");
 }
 
 void t4p::TagFeatureClass::OnAppFileDeleted(wxCommandEvent& event) {
-	// clean up the cache in a background thread
-	std::vector<wxFileName> filesToDelete;
-	filesToDelete.push_back(wxFileName(event.GetString()));
-	t4p::TagDeleteFileActionClass* action =  new t4p::TagDeleteFileActionClass(App.SqliteRunningThreads, wxID_ANY,
-		filesToDelete);
-	action->Init(App.Globals);
-	App.SqliteRunningThreads.Queue(action);
+    // clean up the cache in a background thread
+    std::vector<wxFileName> filesToDelete;
+    filesToDelete.push_back(wxFileName(event.GetString()));
+    t4p::TagDeleteFileActionClass* action =  new t4p::TagDeleteFileActionClass(App.SqliteRunningThreads, wxID_ANY,
+            filesToDelete);
+    action->Init(App.Globals);
+    App.SqliteRunningThreads.Queue(action);
 }
 
 void t4p::TagFeatureClass::OnAppFileRenamed(t4p::RenameEventClass& event) {
-	t4p::ProjectTagSingleFileRenameActionClass* action = new t4p::ProjectTagSingleFileRenameActionClass(App.SqliteRunningThreads, wxID_ANY);
-	action->SetPaths(event.OldPath.GetFullPath(), event.NewPath.GetFullPath());
-	action->Init(App.Globals);
-	App.SqliteRunningThreads.Queue(action);
+    t4p::ProjectTagSingleFileRenameActionClass* action = new t4p::ProjectTagSingleFileRenameActionClass(App.SqliteRunningThreads, wxID_ANY);
+    action->SetPaths(event.OldPath.GetFullPath(), event.NewPath.GetFullPath());
+    action->Init(App.Globals);
+    App.SqliteRunningThreads.Queue(action);
 }
 
 void t4p::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
-	// the file is assumed not be opened, we don't need to build the symbol table
-	// just retag it
-	// see the comment for EVENT_APP_FILE_EXTERNALLY_MODIFIED in Events.h
-	// if the file is from an active project, then re-tag it
-	// otherwise do nothing
-	wxString fileName = event.GetString();
-	t4p::ProjectTagSingleFileActionClass* tagAction = new t4p::ProjectTagSingleFileActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST);
-	tagAction->SetFileToParse(fileName);
-	if (tagAction->Init(App.Globals)) {
-		App.SqliteRunningThreads.Queue(tagAction);
-	} else {
-		delete tagAction;
-	}
+    // the file is assumed not be opened, we don't need to build the symbol table
+    // just retag it
+    // see the comment for EVENT_APP_FILE_EXTERNALLY_MODIFIED in Events.h
+    // if the file is from an active project, then re-tag it
+    // otherwise do nothing
+    wxString fileName = event.GetString();
+    t4p::ProjectTagSingleFileActionClass* tagAction = new t4p::ProjectTagSingleFileActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST);
+    tagAction->SetFileToParse(fileName);
+    if (tagAction->Init(App.Globals)) {
+        App.SqliteRunningThreads.Queue(tagAction);
+    } else {
+        delete tagAction;
+    }
 }
 
 void t4p::TagFeatureClass::OnAppDirCreated(wxCommandEvent& event) {
-	t4p::ProjectTagDirectoryActionClass* tagAction =  new t4p::ProjectTagDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY);
-	tagAction->SetDirToParse(event.GetString());
-	if (tagAction->Init(App.Globals)) {
-		App.SqliteRunningThreads.Queue(tagAction);
-	} else {
-		delete tagAction;
-	}
+    t4p::ProjectTagDirectoryActionClass* tagAction =  new t4p::ProjectTagDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY);
+    tagAction->SetDirToParse(event.GetString());
+    if (tagAction->Init(App.Globals)) {
+        App.SqliteRunningThreads.Queue(tagAction);
+    } else {
+        delete tagAction;
+    }
 }
 
 void t4p::TagFeatureClass::OnAppDirDeleted(wxCommandEvent& event) {
-	std::vector<wxFileName> dirsToDelete;
-	wxFileName dir;
-	dir.AssignDir(event.GetString());
-	dirsToDelete.push_back(dir);
-	t4p::TagDeleteDirectoryActionClass* tagAction =  new t4p::TagDeleteDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY, dirsToDelete);
-	if (tagAction->Init(App.Globals)) {
-		App.SqliteRunningThreads.Queue(tagAction);
-	} else {
-		delete tagAction;
-	}
+    std::vector<wxFileName> dirsToDelete;
+    wxFileName dir;
+    dir.AssignDir(event.GetString());
+    dirsToDelete.push_back(dir);
+    t4p::TagDeleteDirectoryActionClass* tagAction =  new t4p::TagDeleteDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY, dirsToDelete);
+    if (tagAction->Init(App.Globals)) {
+        App.SqliteRunningThreads.Queue(tagAction);
+    } else {
+        delete tagAction;
+    }
 }
 
 void t4p::TagFeatureClass::OnAppDirRenamed(t4p::RenameEventClass& event) {
-t4p::ProjectTagDirectoryRenameActionClass* action = new t4p::ProjectTagDirectoryRenameActionClass(App.SqliteRunningThreads, wxID_ANY);
-	action->SetPaths(event.OldPath.GetPath(), event.NewPath.GetPath());
-	action->Init(App.Globals);
-	App.SqliteRunningThreads.Queue(action);
+    t4p::ProjectTagDirectoryRenameActionClass* action = new t4p::ProjectTagDirectoryRenameActionClass(App.SqliteRunningThreads, wxID_ANY);
+    action->SetPaths(event.OldPath.GetPath(), event.NewPath.GetPath());
+    action->Init(App.Globals);
+    App.SqliteRunningThreads.Queue(action);
 }
 
 BEGIN_EVENT_TABLE(t4p::TagFeatureClass, wxEvtHandler)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_DELETED, t4p::TagFeatureClass::OnAppFileDeleted)
-	EVT_APP_FILE_RENAMED(t4p::TagFeatureClass::OnAppFileRenamed)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_CREATED,  t4p::TagFeatureClass::OnAppDirCreated)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_DELETED,  t4p::TagFeatureClass::OnAppDirDeleted)
-	EVT_APP_DIR_RENAMED(t4p::TagFeatureClass::OnAppDirRenamed)
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_DELETED, t4p::TagFeatureClass::OnAppFileDeleted)
+    EVT_APP_FILE_RENAMED(t4p::TagFeatureClass::OnAppFileRenamed)
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_CREATED,  t4p::TagFeatureClass::OnAppDirCreated)
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_DELETED,  t4p::TagFeatureClass::OnAppDirDeleted)
+    EVT_APP_DIR_RENAMED(t4p::TagFeatureClass::OnAppDirRenamed)
 
-	// we will treat new exernal file and file external modified the same
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_EXTERNALLY_CREATED, t4p::TagFeatureClass::OnAppFileExternallyModified)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_EXTERNALLY_MODIFIED, t4p::TagFeatureClass::OnAppFileExternallyModified)
+    // we will treat new exernal file and file external modified the same
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_EXTERNALLY_CREATED, t4p::TagFeatureClass::OnAppFileExternallyModified)
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_EXTERNALLY_MODIFIED, t4p::TagFeatureClass::OnAppFileExternallyModified)
 
 
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, t4p::TagFeatureClass::OnAppStartSequenceComplete)
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, t4p::TagFeatureClass::OnAppStartSequenceComplete)
 END_EVENT_TABLE()

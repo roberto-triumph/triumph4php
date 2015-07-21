@@ -34,28 +34,28 @@ namespace t4p {
  * updates that triump4hp has released
  */
 class ChangelogFeatureClass : public t4p::FeatureClass {
-	public:
-	ChangelogFeatureClass(t4p::AppClass& app);
+ public:
+    ChangelogFeatureClass(t4p::AppClass& app);
 
-	void LoadPreferences(wxConfigBase* config);
+    void LoadPreferences(wxConfigBase* config);
 
-	void ShowChangeLog();
+    void ShowChangeLog();
 
-	private:
-	void OnAppReady(wxCommandEvent& event);
+ private:
+    void OnAppReady(wxCommandEvent& event);
 
-	void OnSavePreferences(wxCommandEvent& event);
+    void OnSavePreferences(wxCommandEvent& event);
 
-	/**
-	 * the last version of the app that was opened.
-	 * This is value is stored in the config. When we read
-	 * it in and it is different than the running version,
-	 * it means that the user upgraded (or downgraded)
-	 * versions.
-	 */
-	wxString LastVersion;
+    /**
+     * the last version of the app that was opened.
+     * This is value is stored in the config. When we read
+     * it in and it is different than the running version,
+     * it means that the user upgraded (or downgraded)
+     * versions.
+     */
+    wxString LastVersion;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

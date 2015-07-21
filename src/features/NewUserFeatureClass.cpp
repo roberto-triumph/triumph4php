@@ -26,5 +26,5 @@
 #include "Triumph.h"
 
 t4p::NewUserFeatureClass::NewUserFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+    : FeatureClass(app) {
 }

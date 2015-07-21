@@ -35,10 +35,10 @@ namespace t4p {
  * tree item
  */
 class TreeItemDataStringClass : public wxTreeItemData {
-	public:
-	wxString Str;
+ public:
+    wxString Str;
 
-	TreeItemDataStringClass(const wxString& str);
+    TreeItemDataStringClass(const wxString& str);
 };
 }  // namespace t4p
 

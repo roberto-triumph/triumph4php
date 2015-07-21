@@ -30,47 +30,47 @@
 #include "language_sql/DatabaseTagClass.h"
 
 t4p::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(t4p::GlobalsClass& globals)
-	: wxEvtHandler()
-	, Globals(globals) {
+    : wxEvtHandler()
+    , Globals(globals) {
 }
 
 void t4p::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(t4p::SqlMetaDataEventClass& event) {
-	std::vector<UnicodeString> errors = event.Errors;
-	for (size_t i = 0; i < errors.size(); ++i) {
-		wxString wxError = t4p::IcuToWx(errors[i]);
-		t4p::EditorLogError(t4p::ERR_BAD_SQL_CONNECTION, wxError);
-	}
+    std::vector<UnicodeString> errors = event.Errors;
+    for (size_t i = 0; i < errors.size(); ++i) {
+        wxString wxError = t4p::IcuToWx(errors[i]);
+        t4p::EditorLogError(t4p::ERR_BAD_SQL_CONNECTION, wxError);
+    }
 }
 
 void t4p::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(t4p::ActionEventClass& event) {
-	// first remove all detected connections that were previously detected
-	std::vector<t4p::DatabaseTagClass>::iterator info;
-	info = Globals.DatabaseTags.begin();
-	while(info != Globals.DatabaseTags.end()) {
-		if (info->IsDetected) {
-			info = Globals.DatabaseTags.erase(info);
-		} else {
-			info++;
-		}
-	}
+    // first remove all detected connections that were previously detected
+    std::vector<t4p::DatabaseTagClass>::iterator info;
+    info = Globals.DatabaseTags.begin();
+    while (info != Globals.DatabaseTags.end()) {
+        if (info->IsDetected) {
+            info = Globals.DatabaseTags.erase(info);
+        } else {
+            info++;
+        }
+    }
 
 
-	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	t4p::DatabaseTagFinderClass finder(session);
-	std::vector<wxFileName> sourceDirectories = Globals.AllEnabledSourceDirectories();
+    soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+    t4p::DatabaseTagFinderClass finder(session);
+    std::vector<wxFileName> sourceDirectories = Globals.AllEnabledSourceDirectories();
 
-	std::vector<t4p::DatabaseTagClass> detected = finder.All(sourceDirectories);
-	std::vector<t4p::DatabaseTagClass>::const_iterator tag;
-	for (tag = detected.begin(); tag != detected.end(); ++tag) {
-		if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {
-			Globals.DatabaseTags.push_back(*tag);
-		}
-	}
+    std::vector<t4p::DatabaseTagClass> detected = finder.All(sourceDirectories);
+    std::vector<t4p::DatabaseTagClass>::const_iterator tag;
+    for (tag = detected.begin(); tag != detected.end(); ++tag) {
+        if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {
+            Globals.DatabaseTags.push_back(*tag);
+        }
+    }
 }
 
 BEGIN_EVENT_TABLE(t4p::GlobalsChangeHandlerClass, wxEvtHandler)
-	EVT_SQL_META_DATA_COMPLETE(t4p::ID_EVENT_ACTION_SQL_METADATA, t4p::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
-	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, t4p::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
+    EVT_SQL_META_DATA_COMPLETE(t4p::ID_EVENT_ACTION_SQL_METADATA, t4p::GlobalsChangeHandlerClass::OnSqlMetaDataComplete)
+    EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, t4p::GlobalsChangeHandlerClass::OnDatabaseTagsComplete)
 END_EVENT_TABLE()
 
 

@@ -37,16 +37,16 @@ namespace t4p {
  * is saved in a variable so that we can tell when it changes.
  */
 class FileModifiedTimeClass {
-	public:
-	wxFileName FileName;
+ public:
+    wxFileName FileName;
 
-	wxDateTime ModifiedTime;
+    wxDateTime ModifiedTime;
 
-	FileModifiedTimeClass();
+    FileModifiedTimeClass();
 
-	FileModifiedTimeClass(const t4p::FileModifiedTimeClass& src);
+    FileModifiedTimeClass(const t4p::FileModifiedTimeClass& src);
 
-	void Copy(const t4p::FileModifiedTimeClass& src);
+    void Copy(const t4p::FileModifiedTimeClass& src);
 };
 
 /**
@@ -54,29 +54,29 @@ class FileModifiedTimeClass {
  * have been modified or deleted externally
  */
 class FilesModifiedEventClass : public wxEvent {
-	public:
-	/**
-	 * files that have been modified externally (outside the editor)
-	 */
-	std::vector<wxFileName> Modified;
+ public:
+    /**
+     * files that have been modified externally (outside the editor)
+     */
+    std::vector<wxFileName> Modified;
 
-	/**
-	 * the new modification times for the files. this is parallel to
-	 * Modified vector (index 0 of ModifiedTimes is the modified time for
-	 * file at index 0 of Modified)
-	 */
-	std::vector<wxDateTime> ModifiedTimes;
+    /**
+     * the new modification times for the files. this is parallel to
+     * Modified vector (index 0 of ModifiedTimes is the modified time for
+     * file at index 0 of Modified)
+     */
+    std::vector<wxDateTime> ModifiedTimes;
 
-	/**
-	 * files that have been deleted externally (outside the editor)
-	 */
-	std::vector<wxFileName> Deleted;
+    /**
+     * files that have been deleted externally (outside the editor)
+     */
+    std::vector<wxFileName> Deleted;
 
-	FilesModifiedEventClass(int eventId, const std::vector<wxFileName>& modified,
-		const std::vector<wxDateTime>& modifiedTimes,
-		const std::vector<wxFileName>& deleted);
+    FilesModifiedEventClass(int eventId, const std::vector<wxFileName>& modified,
+                            const std::vector<wxDateTime>& modifiedTimes,
+                            const std::vector<wxFileName>& deleted);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 extern const wxEventType EVENT_FILES_EXTERNALLY_MODIFIED;
@@ -95,27 +95,27 @@ extern const wxEventType EVENT_FILES_EXTERNALLY_MODIFIED;
  * as having changed.
  */
 class FileModifiedCheckActionClass : public t4p::ActionClass {
-	public:
-	FileModifiedCheckActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    FileModifiedCheckActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * set the files to be checked, along with the times that we know
-	 * the files were last modified.
-	 */
-	void SetFiles(const std::vector<t4p::FileModifiedTimeClass>& files);
+    /**
+     * set the files to be checked, along with the times that we know
+     * the files were last modified.
+     */
+    void SetFiles(const std::vector<t4p::FileModifiedTimeClass>& files);
 
-	/**
-	 * performs the file checks in a background thread and POSTs the results
-	 */
-	void BackgroundWork();
+    /**
+     * performs the file checks in a background thread and POSTs the results
+     */
+    void BackgroundWork();
 
-	/**
-	 * @return wxString a short description of this action.
-	 */
-	wxString GetLabel() const;
+    /**
+     * @return wxString a short description of this action.
+     */
+    wxString GetLabel() const;
 
-	private:
-	std::vector<t4p::FileModifiedTimeClass> FilesToCheck;
+ private:
+    std::vector<t4p::FileModifiedTimeClass> FilesToCheck;
 };
 
 }  // namespace t4p
@@ -123,7 +123,7 @@ class FileModifiedCheckActionClass : public t4p::ActionClass {
 typedef void (wxEvtHandler::*FilesModifiedEventClassFunction)(t4p::FilesModifiedEventClass&);
 
 #define EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FILES_EXTERNALLY_MODIFIED, id, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FILES_EXTERNALLY_MODIFIED, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(FilesModifiedEventClassFunction, & fn), (wxObject *) NULL),
 

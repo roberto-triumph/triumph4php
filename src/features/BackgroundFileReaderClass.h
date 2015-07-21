@@ -67,97 +67,97 @@ extern const wxEventType EVENT_FILE_READ;
  * multiple workers than multiple workers attempting to open/close the same file multiple times.
  */
 class BackgroundFileReaderClass : public t4p::ActionClass {
-	public:
-	/**
-	 * flags to determine whether to iterate through all files
-	 * or only files that were matched in the previous find
-	 * operation
-	 */
-	enum Mode {
-		WALK,
-		MATCHED
-	};
+ public:
+    /**
+     * flags to determine whether to iterate through all files
+     * or only files that were matched in the previous find
+     * operation
+     */
+    enum Mode {
+        WALK,
+        MATCHED
+    };
 
-	/**
-	 * @param wxEvtHandler& handler this event handler will receive
-	 *        a EVENT_FILE_READ_COMPLETE event when the
-	 *        background thread has completed. Will also receive
-	 * 		  t4p::WORK_* events
-	 * @see t4p::ThreadWithHeartbeatClass
-	 */
-	BackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+    /**
+     * @param wxEvtHandler& handler this event handler will receive
+     *        a EVENT_FILE_READ_COMPLETE event when the
+     *        background thread has completed. Will also receive
+     * 		  t4p::WORK_* events
+     * @see t4p::ThreadWithHeartbeatClass
+     */
+    BackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * Prepare the background thread to iterate through all
-	 * files in the given directory.
-	 *
-	 * @param const wxString& path the path to recurse
-	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the
-	 *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
-	 *        is useful when the caller needs to know how many total files will be walked over, but it is also more
-	 *        memory intensive.  Note that both modes will result in walking of all files.
-	 * @return bool doHidden if TRUE then hidden files will be walked as well.
-	 * @return bool true of the given path exists
-	 */
-	bool Init(const wxString& path, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
+    /**
+     * Prepare the background thread to iterate through all
+     * files in the given directory.
+     *
+     * @param const wxString& path the path to recurse
+     * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the
+     *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
+     *        is useful when the caller needs to know how many total files will be walked over, but it is also more
+     *        memory intensive.  Note that both modes will result in walking of all files.
+     * @return bool doHidden if TRUE then hidden files will be walked as well.
+     * @return bool true of the given path exists
+     */
+    bool Init(const wxString& path, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
 
-	/**
-	 * Prepare the background thread to iterate through the given sources.
-	 *
-	 * @param sources the list of directories to recurse
-	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the
-	 *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
-	 *        is useful when the caller needs to know how many total files will be walked over, but it is also more
-	 *        memory intensive.  Note that both modes will result in walking of all files.
-	 * @return bool doHidden if TRUE then hidden files will be walked as well.
-	 * @return bool true of the given path exists
-	 */
-	bool Init(std::vector<t4p::SourceClass> sources, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
+    /**
+     * Prepare the background thread to iterate through the given sources.
+     *
+     * @param sources the list of directories to recurse
+     * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the
+     *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
+     *        is useful when the caller needs to know how many total files will be walked over, but it is also more
+     *        memory intensive.  Note that both modes will result in walking of all files.
+     * @return bool doHidden if TRUE then hidden files will be walked as well.
+     * @return bool true of the given path exists
+     */
+    bool Init(std::vector<t4p::SourceClass> sources, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
 
-	/**
-	 * prepares the thread to iterate over the given set of files
-	 * In this case the FileMatch() method will be called.
-	 * @param matchedFiles vector of full paths. Each full path will be given the to the BackgroundFileMatch() method.
-	 * @return bool true if there are matching files from the previous find
-	 * operation.
-	 */
-	bool InitMatched(const std::vector<wxString>& matchedFiles);
+    /**
+     * prepares the thread to iterate over the given set of files
+     * In this case the FileMatch() method will be called.
+     * @param matchedFiles vector of full paths. Each full path will be given the to the BackgroundFileMatch() method.
+     * @return bool true if there are matching files from the previous find
+     * operation.
+     */
+    bool InitMatched(const std::vector<wxString>& matchedFiles);
 
-	protected:
-	/**
-	 * This method will be executed in it's own thread. Most of the time
-	 * this method would be implemented by calling search.Walk() method.
-	 * The return value of this method will be set as the event.GetClientData()
-	 * of the correspoding FILE_READ event; subclasses can use it in the
-	 * event handler if they want / need to.
-	 */
-	virtual bool BackgroundFileRead(DirectorySearchClass& search) = 0;
+ protected:
+    /**
+     * This method will be executed in it's own thread. Most of the time
+     * this method would be implemented by calling search.Walk() method.
+     * The return value of this method will be set as the event.GetClientData()
+     * of the correspoding FILE_READ event; subclasses can use it in the
+     * event handler if they want / need to.
+     */
+    virtual bool BackgroundFileRead(DirectorySearchClass& search) = 0;
 
-	/**
-	 * This method will be executed in it's own thread. The method
-	 * will be given a file that had a match (the files that
-	 * has DirectoryWalker.Walk() method return TRUE).
-	 */
-	virtual bool BackgroundFileMatch(const wxString& file) = 0;
+    /**
+     * This method will be executed in it's own thread. The method
+     * will be given a file that had a match (the files that
+     * has DirectoryWalker.Walk() method return TRUE).
+     */
+    virtual bool BackgroundFileMatch(const wxString& file) = 0;
 
-	void BackgroundWork();
+    void BackgroundWork();
 
-	private:
-	/**
-	 * The object that will be used to traverse the file system.
-	 */
-	DirectorySearchClass DirectorySearch;
+ private:
+    /**
+     * The object that will be used to traverse the file system.
+     */
+    DirectorySearchClass DirectorySearch;
 
-	/**
-	 * The files to traverse through if the caller gave us a set of files
-	 */
-	std::vector<wxString> MatchedFiles;
+    /**
+     * The files to traverse through if the caller gave us a set of files
+     */
+    std::vector<wxString> MatchedFiles;
 
-	/**
-	 * The mode that this instance of the background thread
-	 * will run.
-	 */
-	Mode Mode;
+    /**
+     * The mode that this instance of the background thread
+     * will run.
+     */
+    Mode Mode;
 };
 }  // namespace t4p
 #endif  // SRC_FEATURES_BACKGROUNDFILEREADERCLASS_H_

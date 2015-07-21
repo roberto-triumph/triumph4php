@@ -29,79 +29,79 @@
 #include "globals/String.h"
 
 t4p::ConfigTagClass::ConfigTagClass()
-	: Label()
-	, ConfigFileName() {
+    : Label()
+    , ConfigFileName() {
 }
 
 t4p::ConfigTagClass::ConfigTagClass(const t4p::ConfigTagClass& src)
-	: Label()
-	, ConfigFileName() {
-	Copy(src);
+    : Label()
+    , ConfigFileName() {
+    Copy(src);
 }
 
 void t4p::ConfigTagClass::Copy(const t4p::ConfigTagClass& src) {
-	// make sure wxString copy in thread-safe manner
-	Label = src.Label.c_str();
-	ConfigFileName.Assign(src.ConfigFileName.GetFullPath().c_str());
+    // make sure wxString copy in thread-safe manner
+    Label = src.Label.c_str();
+    ConfigFileName.Assign(src.ConfigFileName.GetFullPath().c_str());
 }
 
 t4p::ConfigTagClass& t4p::ConfigTagClass::operator=(const t4p::ConfigTagClass& src) {
-	Copy(src);
-	return *this;
+    Copy(src);
+    return *this;
 }
 
 wxString t4p::ConfigTagClass::MenuLabel() const {
-	wxString label(Label);
-	label.Replace(wxT("&"), wxT("&&"));
-	return label;
+    wxString label(Label);
+    label.Replace(wxT("&"), wxT("&&"));
+    return label;
 }
 
 t4p::ConfigTagFinderClass::ConfigTagFinderClass(soci::session& session)
-: SqliteFinderClass(session) {
+    : SqliteFinderClass(session) {
 }
 
 std::vector<t4p::ConfigTagClass> t4p::ConfigTagFinderClass::All(const std::vector<wxFileName>& sourceDirectories) {
-	std::vector<t4p::ConfigTagClass> allConfigTags;
-	if (sourceDirectories.empty()) {
-		return allConfigTags;
-	}
+    std::vector<t4p::ConfigTagClass> allConfigTags;
+    if (sourceDirectories.empty()) {
+        return allConfigTags;
+    }
 
-	std::vector<std::string> stdSourceDirectories;
+    std::vector<std::string> stdSourceDirectories;
 
-	std::string label,
-		fullPath;
-	std::string sql = "SELECT label, full_path FROM config_tags JOIN sources ON(sources.source_id = config_tags.source_id) ";
-	sql += "WHERE directory IN(";
-	for (size_t i = 0; i < sourceDirectories.size(); ++i) {
-		stdSourceDirectories.push_back(t4p::WxToChar(sourceDirectories[i].GetPathWithSep()));
-		if (0 == i) {
-			sql += "?";
-		} else {
-			sql += ",?";
-		}
-	}
-	sql += ")";
+    std::string label,
+        fullPath;
+    std::string sql = "SELECT label, full_path FROM config_tags JOIN sources ON(sources.source_id = config_tags.source_id) ";
+    sql += "WHERE directory IN(";
+    for (size_t i = 0; i < sourceDirectories.size(); ++i) {
+        stdSourceDirectories.push_back(t4p::WxToChar(sourceDirectories[i].GetPathWithSep()));
+        if (0 == i) {
+            sql += "?";
+        } else {
+            sql += ",?";
+        }
+    }
+    sql += ")";
 
-	try {
-		soci::statement stmt = Session.prepare << sql;
-		stmt.exchange(soci::into(label));
-		stmt.exchange(soci::into(fullPath));
-		for (size_t i = 0; i < stdSourceDirectories.size(); ++i) {
-			stmt.exchange(soci::use(stdSourceDirectories[i]));
-		}
-		stmt.define_and_bind();
-		if (stmt.execute(true)) {
-			do {
-				t4p::ConfigTagClass configTag;
-				configTag.Label = t4p::CharToWx(label.c_str());
-				configTag.ConfigFileName.Assign(t4p::CharToWx(fullPath.c_str()));
-				allConfigTags.push_back(configTag);
-			} while (stmt.fetch());
-		}
-	} catch (std::exception& e) {
-		wxString msg = t4p::CharToWx(e.what());
-		wxUnusedVar(msg);
-		t4p::EditorLogError(t4p::ERR_TAG_READ, msg);
-	}
-	return allConfigTags;
+    try {
+        soci::statement stmt = Session.prepare << sql;
+        stmt.exchange(soci::into(label));
+        stmt.exchange(soci::into(fullPath));
+        for (size_t i = 0; i < stdSourceDirectories.size(); ++i) {
+            stmt.exchange(soci::use(stdSourceDirectories[i]));
+        }
+        stmt.define_and_bind();
+        if (stmt.execute(true)) {
+            do {
+                t4p::ConfigTagClass configTag;
+                configTag.Label = t4p::CharToWx(label.c_str());
+                configTag.ConfigFileName.Assign(t4p::CharToWx(fullPath.c_str()));
+                allConfigTags.push_back(configTag);
+            } while (stmt.fetch());
+        }
+    } catch (std::exception& e) {
+        wxString msg = t4p::CharToWx(e.what());
+        wxUnusedVar(msg);
+        t4p::EditorLogError(t4p::ERR_TAG_READ, msg);
+    }
+    return allConfigTags;
 }

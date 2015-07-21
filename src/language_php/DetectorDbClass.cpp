@@ -28,53 +28,53 @@
 #include "globals/String.h"
 
 t4p::DetectorDbClass::DetectorDbClass()
-: Session(NULL) {
+    : Session(NULL) {
 }
 
 void t4p::DetectorDbClass::Init(soci::session* session) {
-	Session = session;
+    Session = session;
 }
 
 void t4p::DetectorDbClass::DeleteSource(const wxFileName& sourceDir) {
-	wxASSERT_MSG(Session, wxT("session must be initialized"));
-	if (!Session) {
-		return;
-	}
-	try {
-		int sourceId = 0;
-		std::string stdSourceDir = t4p::WxToChar(sourceDir.GetPathWithSep());
-		soci::statement stmt = (Session->prepare << "SELECT source_id FROM sources WHERE directory = ?",
-			soci::into(sourceId), soci::use(stdSourceDir));
-		stmt.execute(true);
+    wxASSERT_MSG(Session, wxT("session must be initialized"));
+    if (!Session) {
+        return;
+    }
+    try {
+        int sourceId = 0;
+        std::string stdSourceDir = t4p::WxToChar(sourceDir.GetPathWithSep());
+        soci::statement stmt = (Session->prepare << "SELECT source_id FROM sources WHERE directory = ?",
+                                soci::into(sourceId), soci::use(stdSourceDir));
+        stmt.execute(true);
 
-		// delete from all tables
-		Session->once << "DELETE FROM call_stacks WHERE source_id = ? ", soci::use(sourceId);
-		Session->once << "DELETE FROM database_tags WHERE source_id = ? ", soci::use(sourceId);
-		Session->once << "DELETE FROM template_file_tags WHERE source_id = ? ", soci::use(sourceId);
-		Session->once << "DELETE FROM config_tags WHERE source_id = ? ", soci::use(sourceId);
-		Session->once << "DELETE FROM detected_tags WHERE source_id = ? ", soci::use(sourceId);
-		Session->once << "DELETE FROM url_tags WHERE source_id = ? ", soci::use(sourceId);
-		Session->once << "DELETE FROM sources WHERE source_id = ? ", soci::use(sourceId);
-	} catch (std::exception& e) {
-		t4p::EditorLogWarning(t4p::ERR_TAG_READ, wxString::FromAscii(e.what()));
-	}
+        // delete from all tables
+        Session->once << "DELETE FROM call_stacks WHERE source_id = ? ", soci::use(sourceId);
+        Session->once << "DELETE FROM database_tags WHERE source_id = ? ", soci::use(sourceId);
+        Session->once << "DELETE FROM template_file_tags WHERE source_id = ? ", soci::use(sourceId);
+        Session->once << "DELETE FROM config_tags WHERE source_id = ? ", soci::use(sourceId);
+        Session->once << "DELETE FROM detected_tags WHERE source_id = ? ", soci::use(sourceId);
+        Session->once << "DELETE FROM url_tags WHERE source_id = ? ", soci::use(sourceId);
+        Session->once << "DELETE FROM sources WHERE source_id = ? ", soci::use(sourceId);
+    } catch (std::exception& e) {
+        t4p::EditorLogWarning(t4p::ERR_TAG_READ, wxString::FromAscii(e.what()));
+    }
 }
 
 void t4p::DetectorDbClass::Wipe() {
-	wxASSERT_MSG(Session, wxT("session must be initialized"));
-	if (!Session) {
-		return;
-	}
-	try {
-		Session->once << "DELETE FROM call_stacks";
-		Session->once << "DELETE FROM database_tags";
-		Session->once << "DELETE FROM template_file_tags";
-		Session->once << "DELETE FROM config_tags";
-		Session->once << "DELETE FROM detected_tags";
-		Session->once << "DELETE FROM url_tags";
-		Session->once << "DELETE FROM sources";
-	} catch (std::exception& e) {
-		t4p::EditorLogWarning(t4p::ERR_TAG_READ, wxString::FromAscii(e.what()));
-	}
+    wxASSERT_MSG(Session, wxT("session must be initialized"));
+    if (!Session) {
+        return;
+    }
+    try {
+        Session->once << "DELETE FROM call_stacks";
+        Session->once << "DELETE FROM database_tags";
+        Session->once << "DELETE FROM template_file_tags";
+        Session->once << "DELETE FROM config_tags";
+        Session->once << "DELETE FROM detected_tags";
+        Session->once << "DELETE FROM url_tags";
+        Session->once << "DELETE FROM sources";
+    } catch (std::exception& e) {
+        t4p::EditorLogWarning(t4p::ERR_TAG_READ, wxString::FromAscii(e.what()));
+    }
 }
 

@@ -38,107 +38,107 @@ class RunConsoleFeatureClass;
  * 'console' (CLI).
  */
 class CliCommandClass {
-	public:
-	/**
-	 * Binary to be run. This may be a full path, or just the
-	 * binary name if the binary is already in the PATH.
-	 */
-	wxString Executable;
+ public:
+    /**
+     * Binary to be run. This may be a full path, or just the
+     * binary name if the binary is already in the PATH.
+     */
+    wxString Executable;
 
-	/**
-	 * The full path to the directory where the command will
-	 * run from.
-	 */
-	wxFileName WorkingDirectory;
+    /**
+     * The full path to the directory where the command will
+     * run from.
+     */
+    wxFileName WorkingDirectory;
 
-	/**
-	 * all of the arguments to give to the executable
-	 */
-	wxString Arguments;
+    /**
+     * all of the arguments to give to the executable
+     */
+    wxString Arguments;
 
-	/**
-	 * A short human-friendly description of the command. This is
-	 * given by the user; it is not guaranteed to be unique.
-	 */
-	wxString Description;
+    /**
+     * A short human-friendly description of the command. This is
+     * given by the user; it is not guaranteed to be unique.
+     */
+    wxString Description;
 
-	/**
-	 * if TRUE, then when the console window is created for this command
-	 * the command will NOT be run. This gives the user a chance to
-	 * add runtime arguments.
-	 */
-	bool WaitForArguments;
+    /**
+     * if TRUE, then when the console window is created for this command
+     * the command will NOT be run. This gives the user a chance to
+     * add runtime arguments.
+     */
+    bool WaitForArguments;
 
-	/**
-	 * if TRUE, this item will show up in the toolbar. Note that the order
-	 * is determined by the position in the list of commands.
-	 */
-	bool ShowInToolbar;
+    /**
+     * if TRUE, this item will show up in the toolbar. Note that the order
+     * is determined by the position in the list of commands.
+     */
+    bool ShowInToolbar;
 
-	CliCommandClass();
+    CliCommandClass();
 
-	void Copy(const CliCommandClass& src);
+    void Copy(const CliCommandClass& src);
 
-	/**
-	 * @return the command to be executed
-	 */
-	wxString CmdLine() const;
+    /**
+     * @return the command to be executed
+     */
+    wxString CmdLine() const;
 };
 
 /**
  * Keeps track of the position of a file name in the output.
  */
 class FileNameHitClass {
-	public:
-	/**
-	 * The 0-based index into output string. This is the start of the file name
-	 */
-	int32_t StartIndex;
+ public:
+    /**
+     * The 0-based index into output string. This is the start of the file name
+     */
+    int32_t StartIndex;
 
-	/**
-	 * The number of characters in the file name
-	 */
-	int32_t Length;
+    /**
+     * The number of characters in the file name
+     */
+    int32_t Length;
 
-	FileNameHitClass();
+    FileNameHitClass();
 };
 
 class RunConsoleFeatureClass : public FeatureClass {
-	public:
-	/**
-	 * The list of commands to be persisted.
-	 */
-	std::vector<t4p::CliCommandClass> CliCommands;
+ public:
+    /**
+     * The list of commands to be persisted.
+     */
+    std::vector<t4p::CliCommandClass> CliCommands;
 
 
-	/**
-	 * Constructor
- 	 */
-	RunConsoleFeatureClass(t4p::AppClass& app);
+    /**
+     * Constructor
+     */
+    RunConsoleFeatureClass(t4p::AppClass& app);
 
-	void LoadPreferences(wxConfigBase* config);
+    void LoadPreferences(wxConfigBase* config);
 
-	/**
-	 * Add a new command to the list (but does not persist
-	 * the list to disk)
-	 */
-	void AddCommand(const t4p::CliCommandClass& command);
+    /**
+     * Add a new command to the list (but does not persist
+     * the list to disk)
+     */
+    void AddCommand(const t4p::CliCommandClass& command);
 
-	/**
-	 * Saves the CLI commands to the [global] config
-	 */
-	void PersistCommands();
+    /**
+     * Saves the CLI commands to the [global] config
+     */
+    void PersistCommands();
 
-	/**
-	 * Open a file.
-	 */
-	void LoadPage(const wxString& fileName);
+    /**
+     * Open a file.
+     */
+    void LoadPage(const wxString& fileName);
 
-	private:
-	/**
-	 * Handles the click of the saved command buttons
-	 */
-	void OnCommandButtonClick(wxCommandEvent& evt);
+ private:
+    /**
+     * Handles the click of the saved command buttons
+     */
+    void OnCommandButtonClick(wxCommandEvent& evt);
 };
 }  // namespace t4p
 

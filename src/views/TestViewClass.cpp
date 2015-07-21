@@ -36,23 +36,23 @@ void t4p::TestViewClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 
 void t4p::TestViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	toolBar->AddTool(ID_GO_BUTTON, wxT("GO"), wxArtProvider::GetBitmap(
-	                     wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("GO"), wxITEM_NORMAL);
+    toolBar->AddTool(ID_GO_BUTTON, wxT("GO"), wxArtProvider::GetBitmap(
+                         wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("GO"), wxITEM_NORMAL);
 }
 
 void t4p::TestViewClass::AddWindows() {
 }
 
 void t4p::TestViewClass::Go(wxCommandEvent& event) {
-	wxMessageBox(wxT("Clicked the GO! button"));
-	Feature.Go();
+    wxMessageBox(wxT("Clicked the GO! button"));
+    Feature.Go();
 }
 
 t4p::TestViewClass::TestViewClass(t4p::TestFeatureClass& feature)
-	: FeatureViewClass()
-	, Feature(feature) {
+    : FeatureViewClass()
+    , Feature(feature) {
 }
 
 BEGIN_EVENT_TABLE(t4p::TestViewClass, t4p::FeatureViewClass)
-	EVT_MENU(ID_GO_BUTTON, TestViewClass::Go)
+    EVT_MENU(ID_GO_BUTTON, TestViewClass::Go)
 END_EVENT_TABLE()

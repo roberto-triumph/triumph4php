@@ -35,66 +35,66 @@ namespace t4p {
  * Holds the PHP binary location
  */
 class PhpEnvironmentClass {
-	public:
-	/**
-	 * Full path to the PHP executable
-	 */
-	wxString PhpExecutablePath;
+ public:
+    /**
+     * Full path to the PHP executable
+     */
+    wxString PhpExecutablePath;
 
-	/**
-	 * The version to use in Source code parsing.
-	 */
-	pelet::Versions Version;
+    /**
+     * The version to use in Source code parsing.
+     */
+    pelet::Versions Version;
 
-	/**
-	 * If TRUE, we will get the version of use from the PHP executable
-	 * itself by reading the output of "php -v"
-	 */
-	bool IsAuto;
+    /**
+     * If TRUE, we will get the version of use from the PHP executable
+     * itself by reading the output of "php -v"
+     */
+    bool IsAuto;
 
-	/**
-	 * if TRUE, PHP is installed in the system. If false, Triumph will not
-	 * attempt to run any scripts and should not show the user any "PHP not found"
-	 * errors.
-	 */
-	bool Installed;
+    /**
+     * if TRUE, PHP is installed in the system. If false, Triumph will not
+     * attempt to run any scripts and should not show the user any "PHP not found"
+     * errors.
+     */
+    bool Installed;
 
-	PhpEnvironmentClass();
+    PhpEnvironmentClass();
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	PhpEnvironmentClass(const t4p::PhpEnvironmentClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    PhpEnvironmentClass(const t4p::PhpEnvironmentClass& src);
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	t4p::PhpEnvironmentClass& operator=(const t4p::PhpEnvironmentClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    t4p::PhpEnvironmentClass& operator=(const t4p::PhpEnvironmentClass& src);
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	void Copy(const t4p::PhpEnvironmentClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    void Copy(const t4p::PhpEnvironmentClass& src);
 
-	/**
-	 * assign defaults based on the current operating system
-	 */
-	void Init();
+    /**
+     * assign defaults based on the current operating system
+     */
+    void Init();
 
-	/**
-	 * Use the PHP executable to determine the PHP verion and
-	 * then fills in the  Version property
-	 */
-	void AutoDetermine();
+    /**
+     * Use the PHP executable to determine the PHP verion and
+     * then fills in the  Version property
+     */
+    void AutoDetermine();
 
-	/**
-	 * @return bool TRUE is php is not installed or binary location
-	 *         is invalid
-	 */
-	bool NotInstalled() const;
+    /**
+     * @return bool TRUE is php is not installed or binary location
+     *         is invalid
+     */
+    bool NotInstalled() const;
 };
 
 /**
@@ -102,35 +102,35 @@ class PhpEnvironmentClass {
  * and a 'friendly' name that the user can change.
  */
 class WebBrowserClass {
-	public:
-	/**
-	 * should be unique, but that is not enforced here
-	 */
-	wxString Name;
+ public:
+    /**
+     * should be unique, but that is not enforced here
+     */
+    wxString Name;
 
-	wxFileName FullPath;
+    wxFileName FullPath;
 
-	WebBrowserClass();
+    WebBrowserClass();
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	WebBrowserClass(const t4p::WebBrowserClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    WebBrowserClass(const t4p::WebBrowserClass& src);
 
-	WebBrowserClass(wxString name, wxFileName fullPath);
+    WebBrowserClass(wxString name, wxFileName fullPath);
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	t4p::WebBrowserClass& operator=(const t4p::WebBrowserClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    t4p::WebBrowserClass& operator=(const t4p::WebBrowserClass& src);
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	void Copy(const t4p::WebBrowserClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    void Copy(const t4p::WebBrowserClass& src);
 };
 
 /**
@@ -139,66 +139,66 @@ class WebBrowserClass {
  *
  */
 class EnvironmentClass {
-	public:
-	EnvironmentClass();
-	~EnvironmentClass();
+ public:
+    EnvironmentClass();
+    ~EnvironmentClass();
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	EnvironmentClass(const t4p::EnvironmentClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    EnvironmentClass(const t4p::EnvironmentClass& src);
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	t4p::EnvironmentClass& operator=(const t4p::EnvironmentClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    t4p::EnvironmentClass& operator=(const t4p::EnvironmentClass& src);
 
-	/**
-	 *  assigns default values based on the current operating system
-	 */
-	void Init();
+    /**
+     *  assigns default values based on the current operating system
+     */
+    void Init();
 
-	/**
-	 * completely copy an instance
-	 * @param src item to copy from
-	 */
-	void Copy(const t4p::EnvironmentClass& src);
+    /**
+     * completely copy an instance
+     * @param src item to copy from
+     */
+    void Copy(const t4p::EnvironmentClass& src);
 
-	ApacheClass Apache;
+    ApacheClass Apache;
 
-	PhpEnvironmentClass Php;
+    PhpEnvironmentClass Php;
 
-	/**
-	 * The list of web browsers used to launch when the user click Run On Web Browser
-	 */
-	std::vector<WebBrowserClass> WebBrowsers;
+    /**
+     * The list of web browsers used to launch when the user click Run On Web Browser
+     */
+    std::vector<WebBrowserClass> WebBrowsers;
 
-	/**
-	 * Save the environment settings to the given config
-	 */
-	void SaveToConfig(wxConfigBase* config) const;
+    /**
+     * Save the environment settings to the given config
+     */
+    void SaveToConfig(wxConfigBase* config) const;
 
-	/**
-	 * Get the environment settings from the given config
-	 */
-	void LoadFromConfig(wxConfigBase* config);
+    /**
+     * Get the environment settings from the given config
+     */
+    void LoadFromConfig(wxConfigBase* config);
 
-	/**
-	 * @return vector of all WebBrowsers' names
-	 */
-	std::vector<wxString> BrowserNames() const;
+    /**
+     * @return vector of all WebBrowsers' names
+     */
+    std::vector<wxString> BrowserNames() const;
 
-	/**
-	 * @param name the browser name to look up. lookup is case sensitive.
-	 * @param fullPath will get filled with the full path of the corresponding browser
-	 * @return TRUE if name was found.
-	 */
-	bool FindBrowserByName(const wxString& name, wxFileName& fileName) const;
+    /**
+     * @param name the browser name to look up. lookup is case sensitive.
+     * @param fullPath will get filled with the full path of the corresponding browser
+     * @return TRUE if name was found.
+     */
+    bool FindBrowserByName(const wxString& name, wxFileName& fileName) const;
 
-	private:
-	void AddDefaults();
+ private:
+    void AddDefaults();
 };
 }  // namespace t4p
 

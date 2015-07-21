@@ -33,194 +33,194 @@
 
 namespace t4p {
 class ProjectViewClass : public FeatureViewClass {
-	public:
-	/**
-	 * Create a new instance of ProjectViewClass.
-	 */
-	ProjectViewClass(t4p::ProjectFeatureClass& feature);
+ public:
+    /**
+     * Create a new instance of ProjectViewClass.
+     */
+    ProjectViewClass(t4p::ProjectFeatureClass& feature);
 
-	/**
-	 * Add menu items to the file menu
-	 */
-	void AddFileMenuItems(wxMenu* fileMenu);
+    /**
+     * Add menu items to the file menu
+     */
+    void AddFileMenuItems(wxMenu* fileMenu);
 
-	/**
-	 * Add a preference sheet for the user to enter the explorer executable.
-	 */
-	void AddPreferenceWindow(wxBookCtrlBase* parent);
+    /**
+     * Add a preference sheet for the user to enter the explorer executable.
+     */
+    void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-	private:
-	/**
-	 * close all projects and all resources that depend on it
-	 */
-	void CleanupProjects();
+ private:
+    /**
+     * close all projects and all resources that depend on it
+     */
+    void CleanupProjects();
 
-	/**
-	 * Open up a dialog so that the user can add more source directories
-	 */
-	void OnProjectDefine(wxCommandEvent& event);
+    /**
+     * Open up a dialog so that the user can add more source directories
+     */
+    void OnProjectDefine(wxCommandEvent& event);
 
-	/**
-	 * Open up a "simple" dialog so that the user create a new project
-	 */
-	void OnCreateNewProject(wxCommandEvent& event);
+    /**
+     * Open up a "simple" dialog so that the user create a new project
+     */
+    void OnCreateNewProject(wxCommandEvent& event);
 
-	t4p::ProjectFeatureClass& Feature;
+    t4p::ProjectFeatureClass& Feature;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 class ProjectPreferencesPanelClass : public ProjectPreferencesGeneratedPanelClass {
-	public:
-	/**
-	 * Construct a new instance
-	 */
-	ProjectPreferencesPanelClass(wxWindow* parent, ProjectFeatureClass& projectFeature);
+ public:
+    /**
+     * Construct a new instance
+     */
+    ProjectPreferencesPanelClass(wxWindow* parent, ProjectFeatureClass& projectFeature);
 };
 
 /**
  * Dialog to edit a single project (add multiple sources to a project)
  */
 class ProjectDefinitionDialogClass : public ProjectDefinitionDialogGeneratedClass {
-	protected:
-	void OnAddSource(wxCommandEvent& event);
-	void OnEditSource(wxCommandEvent& event);
-	void OnRemoveSource(wxCommandEvent& event);
-	void OnOkButton(wxCommandEvent& event);
-	void OnCancelButton(wxCommandEvent& event);
-	void OnSourcesListDoubleClick(wxCommandEvent& event);
+ protected:
+    void OnAddSource(wxCommandEvent& event);
+    void OnEditSource(wxCommandEvent& event);
+    void OnRemoveSource(wxCommandEvent& event);
+    void OnOkButton(wxCommandEvent& event);
+    void OnCancelButton(wxCommandEvent& event);
+    void OnSourcesListDoubleClick(wxCommandEvent& event);
 
-	public:
-	ProjectDefinitionDialogClass(wxWindow* parent, t4p::ProjectClass& project);
+ public:
+    ProjectDefinitionDialogClass(wxWindow* parent, t4p::ProjectClass& project);
 
-	private:
-	/**
-	 * Reference that gets updated only when the user clicks OK
-	 */
-	t4p::ProjectClass& Project;
+ private:
+    /**
+     * Reference that gets updated only when the user clicks OK
+     */
+    t4p::ProjectClass& Project;
 
-	/**
-	 * The project that the user edits
-	 */
-	t4p::ProjectClass EditedProject;
+    /**
+     * The project that the user edits
+     */
+    t4p::ProjectClass EditedProject;
 
-	/**
-	 * add the project sources to the list box.
-	 */
-	void Populate();
+    /**
+     * add the project sources to the list box.
+     */
+    void Populate();
 };
 
 /**
  * Dialog to add a source directory to a project
  */
 class ProjectSourceDialogClass : public ProjectSourceDialogGeneratedClass {
-	protected:
-	void OnOkButton(wxCommandEvent& event);
-	void OnCancelButton(wxCommandEvent& event);
+ protected:
+    void OnOkButton(wxCommandEvent& event);
+    void OnCancelButton(wxCommandEvent& event);
 
-	public:
-	ProjectSourceDialogClass(wxWindow* parent, t4p::SourceClass& source);
+ public:
+    ProjectSourceDialogClass(wxWindow* parent, t4p::SourceClass& source);
 
-	private:
-	/**
-	 * The source that will get updated when the user clicks OK
-	 */
-	t4p::SourceClass& Source;
+ private:
+    /**
+     * The source that will get updated when the user clicks OK
+     */
+    t4p::SourceClass& Source;
 
-	/**
-	 * The source being edited by the user
-	 */
-	t4p::SourceClass EditedSource;
+    /**
+     * The source being edited by the user
+     */
+    t4p::SourceClass EditedSource;
 };
 
 /**
  * Dialog to add, remove, edit, or enable/disable projects.
  */
 class ProjectListDialogClass : public ProjectListDialogGeneratedClass {
-	protected:
-	void OnSelectAllButton(wxCommandEvent& event);
-	void OnProjectsListDoubleClick(wxCommandEvent& event);
-	void OnProjectsListCheckbox(wxCommandEvent& event);
-	void OnAddButton(wxCommandEvent& event);
-	void OnRemoveButton(wxCommandEvent& event);
-	void OnEditButton(wxCommandEvent& event);
-	void OnOkButton(wxCommandEvent& event);
-	void OnCancelButton(wxCommandEvent& event);
-	void OnAddFromDirectoryButton(wxCommandEvent& event);
-	void OnHelpButton(wxCommandEvent& event);
+ protected:
+    void OnSelectAllButton(wxCommandEvent& event);
+    void OnProjectsListDoubleClick(wxCommandEvent& event);
+    void OnProjectsListCheckbox(wxCommandEvent& event);
+    void OnAddButton(wxCommandEvent& event);
+    void OnRemoveButton(wxCommandEvent& event);
+    void OnEditButton(wxCommandEvent& event);
+    void OnOkButton(wxCommandEvent& event);
+    void OnCancelButton(wxCommandEvent& event);
+    void OnAddFromDirectoryButton(wxCommandEvent& event);
+    void OnHelpButton(wxCommandEvent& event);
 
-	public:
-	/**
-	 * @param project the list of projects the user will edit / remove / add to
-	 * @param removedProjects the list of projects that the user has removed. This list will
-	 *        get populated only when the user clicks OK (and has removed a project)
-	 * @param touchedProjects the list of projects that have been . This list will
-	 *        get populated only when the user clicks OK (and has touched a project). "Touched"
-	 *        means that at the project's source directories list has been changed in any way;
-	 *        if a project has a new source, a project has one fewer source, a source's
-	 *        include/exclude wildcards have been changed. This list also includes any completely
-	 *        new projects as well.
-	 */
-	ProjectListDialogClass(wxWindow* parent, std::vector<t4p::ProjectClass>& projects,
-		std::vector<t4p::ProjectClass>& removedProjects,
-		std::vector<t4p::ProjectClass>& touchedProjects);
+ public:
+    /**
+     * @param project the list of projects the user will edit / remove / add to
+     * @param removedProjects the list of projects that the user has removed. This list will
+     *        get populated only when the user clicks OK (and has removed a project)
+     * @param touchedProjects the list of projects that have been . This list will
+     *        get populated only when the user clicks OK (and has touched a project). "Touched"
+     *        means that at the project's source directories list has been changed in any way;
+     *        if a project has a new source, a project has one fewer source, a source's
+     *        include/exclude wildcards have been changed. This list also includes any completely
+     *        new projects as well.
+     */
+    ProjectListDialogClass(wxWindow* parent, std::vector<t4p::ProjectClass>& projects,
+                           std::vector<t4p::ProjectClass>& removedProjects,
+                           std::vector<t4p::ProjectClass>& touchedProjects);
 
-	private:
-	/**
-	 * The list that will get updated once the user clicks OK
-	 */
-	std::vector<t4p::ProjectClass>& Projects;
+ private:
+    /**
+     * The list that will get updated once the user clicks OK
+     */
+    std::vector<t4p::ProjectClass>& Projects;
 
-	/**
-	 * The projects being edited by the user.
-	 */
-	std::vector<t4p::ProjectClass> EditedProjects;
+    /**
+     * The projects being edited by the user.
+     */
+    std::vector<t4p::ProjectClass> EditedProjects;
 
-	/**
-	 * The list of projects that the user has decided to remove. This list will
-	 * get populated only when the user clicks OK (and has removed a project)
-	 */
-	std::vector<t4p::ProjectClass>& RemovedProjects;
+    /**
+     * The list of projects that the user has decided to remove. This list will
+     * get populated only when the user clicks OK (and has removed a project)
+     */
+    std::vector<t4p::ProjectClass>& RemovedProjects;
 
-	/**
-	 * The list of projects that the user has added/modified/removed source directories. This list will
-	 * get populated only when the user clicks OK (and has touched a project)
-	 */
-	std::vector<t4p::ProjectClass>& TouchedProjects;
+    /**
+     * The list of projects that the user has added/modified/removed source directories. This list will
+     * get populated only when the user clicks OK (and has touched a project)
+     */
+    std::vector<t4p::ProjectClass>& TouchedProjects;
 
-	/**
-	 * add the project labels to the check list box
-	 */
-	void Populate();
+    /**
+     * add the project labels to the check list box
+     */
+    void Populate();
 
-	private:
-	/**
-	 * @param project to add to both the edited data structure and the GUI list
-	 */
-	void AddProject(const t4p::ProjectClass& project);
+ private:
+    /**
+     * @param project to add to both the edited data structure and the GUI list
+     */
+    void AddProject(const t4p::ProjectClass& project);
 };
 
 /**
  * class to show a checklist of choices and allow to user to select one or more.
  */
 class MultipleSelectDialogClass : public MultipleSelectDialogGeneratedClass {
-	public:
-	/**
-	 * @param parent the parent window
-	 * @param title the title of the dialog
-	 * @Param caption text shown in the dialog
-	 * @param choices the items to display
-	 * @param selections the indices of the chosen items will be pushed into this vector
-	 */
-	MultipleSelectDialogClass(wxWindow* parent, const wxString& title, const wxString& caption, std::vector<wxString>& choices, std::vector<int>& selections);
+ public:
+    /**
+     * @param parent the parent window
+     * @param title the title of the dialog
+     * @Param caption text shown in the dialog
+     * @param choices the items to display
+     * @param selections the indices of the chosen items will be pushed into this vector
+     */
+    MultipleSelectDialogClass(wxWindow* parent, const wxString& title, const wxString& caption, std::vector<wxString>& choices, std::vector<int>& selections);
 
-	protected:
-	void OnOkButton(wxCommandEvent& event);
+ protected:
+    void OnOkButton(wxCommandEvent& event);
 
-	void OnCancelButton(wxCommandEvent& event);
+    void OnCancelButton(wxCommandEvent& event);
 
-	private:
-	std::vector<int>& Selections;
+ private:
+    std::vector<int>& Selections;
 };
 }  // namespace t4p
 

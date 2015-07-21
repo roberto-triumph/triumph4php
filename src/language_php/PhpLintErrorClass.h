@@ -30,10 +30,10 @@ namespace t4p {
  * The PhpLintErrorClass
  */
 class PhpLintErrorClass {
-	public:
-	PhpLintErrorClass();
+ public:
+    PhpLintErrorClass();
 
-	private:
+ private:
 };
 }  // namespace t4p
 

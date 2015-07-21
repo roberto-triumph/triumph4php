@@ -37,15 +37,15 @@ namespace t4p {
 extern const wxEventType EVENT_SQL_META_DATA_COMPLETE;
 
 class SqlMetaDataEventClass : public wxEvent {
-	public:
-	/**
-	 * Get any connection errors that occurred in the background thread.
-	 */
-	std::vector<UnicodeString> Errors;
+ public:
+    /**
+     * Get any connection errors that occurred in the background thread.
+     */
+    std::vector<UnicodeString> Errors;
 
-	SqlMetaDataEventClass(int eventId, const std::vector<UnicodeString>& errors);
+    SqlMetaDataEventClass(int eventId, const std::vector<UnicodeString>& errors);
 
-	wxEvent* Clone() const;
+    wxEvent* Clone() const;
 };
 
 /**
@@ -55,47 +55,47 @@ class SqlMetaDataEventClass : public wxEvent {
  * with the new resources
  */
 class SqlMetaDataActionClass : public GlobalActionClass {
-	public:
-	/**
-	 * @param runningThreads will get notified with EVENT_WORK_* events
-	 *        and the EVENT_SQL_META_DATA_COMPLETE event
-	 */
-	SqlMetaDataActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    /**
+     * @param runningThreads will get notified with EVENT_WORK_* events
+     *        and the EVENT_SQL_META_DATA_COMPLETE event
+     */
+    SqlMetaDataActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	/**
-	 * Initialize the connections to be scanned.  This needs to be done before
-	 * the thread is started (CreateSingleInstance).
-	 *
-	 * @see t4p::ThreadWithHearbeatClass
-	 * @param infos the connections to fetch info for.
-	 * @return bool TRUE if infos is non-empty
-	 */
-	bool Init(t4p::GlobalsClass& globals);
+    /**
+     * Initialize the connections to be scanned.  This needs to be done before
+     * the thread is started (CreateSingleInstance).
+     *
+     * @see t4p::ThreadWithHearbeatClass
+     * @param infos the connections to fetch info for.
+     * @return bool TRUE if infos is non-empty
+     */
+    bool Init(t4p::GlobalsClass& globals);
 
-	void BackgroundWork();
+    void BackgroundWork();
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	private:
-	/**
-	 * The connections to query; where the tables / columns will be fetched from
-	 */
-	std::vector<DatabaseTagClass> DatabaseTags;
+ private:
+    /**
+     * The connections to query; where the tables / columns will be fetched from
+     */
+    std::vector<DatabaseTagClass> DatabaseTags;
 
-	/**
-	 * location where sql table names will be stored
-	 */
-	wxFileName CacheDbFileName;
+    /**
+     * location where sql table names will be stored
+     */
+    wxFileName CacheDbFileName;
 };
 
 class SqlMetaDataInitActionClass : public t4p::InitializerGlobalActionClass {
-	public:
-	SqlMetaDataInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    SqlMetaDataInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	void Work(t4p::GlobalsClass& globals);
+    void Work(t4p::GlobalsClass& globals);
 
-	protected:
-	wxString GetLabel() const;
+ protected:
+    wxString GetLabel() const;
 };
 }  // namespace t4p
 
@@ -103,7 +103,7 @@ typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(t4p::SqlMetaDataEven
 
 
 #define EVT_SQL_META_DATA_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_SQL_META_DATA_COMPLETE, id, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_SQL_META_DATA_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(SqlMetaDataEventClassFunction, & fn), (wxObject *) NULL),
 

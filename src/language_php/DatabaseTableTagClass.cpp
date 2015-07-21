@@ -26,20 +26,20 @@
 #include "language_php/DatabaseTableTagClass.h"
 
 t4p::DatabaseTableTagClass::DatabaseTableTagClass()
-: TableName()
-, ConnectionHash() {
+    : TableName()
+    , ConnectionHash() {
 }
 
 t4p::DatabaseTableTagClass::DatabaseTableTagClass(const t4p::DatabaseTableTagClass& src)
-: TableName()
-, ConnectionHash() {
-	Copy(src);
+    : TableName()
+    , ConnectionHash() {
+    Copy(src);
 }
 
 void t4p::DatabaseTableTagClass::Copy(const t4p::DatabaseTableTagClass& src) {
-	// want copies to be thread safe
-	TableName = src.TableName.c_str();
-	ConnectionHash = src.ConnectionHash.c_str();
+    // want copies to be thread safe
+    TableName = src.TableName.c_str();
+    ConnectionHash = src.ConnectionHash.c_str();
 }
 
 

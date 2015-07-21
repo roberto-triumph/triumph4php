@@ -38,37 +38,37 @@ namespace t4p {
  * can handle either wxTextCtrl of wxComboBox only.
  */
 class RegularExpressionValidatorClass : public wxValidator {
-	public:
-	/**
-	 * @param The string to validate / transfer. This class will not own this pointer.
-	 * @param the mode radio button. this needs to be
-	 *        checked so that we skip reg ex validation
-	 *        when the expression is not a reg ex
-	 */
-	RegularExpressionValidatorClass(UnicodeString* data, wxRadioBox* modeRadio);
+ public:
+    /**
+     * @param The string to validate / transfer. This class will not own this pointer.
+     * @param the mode radio button. this needs to be
+     *        checked so that we skip reg ex validation
+     *        when the expression is not a reg ex
+     */
+    RegularExpressionValidatorClass(UnicodeString* data, wxRadioBox* modeRadio);
 
-	virtual bool TransferToWindow();
+    virtual bool TransferToWindow();
 
-	virtual bool TransferFromWindow();
+    virtual bool TransferFromWindow();
 
-	virtual bool Validate(wxWindow* parent);
+    virtual bool Validate(wxWindow* parent);
 
-	virtual wxObject* Clone() const;
+    virtual wxObject* Clone() const;
 
-	private:
-	RegularExpressionValidatorClass();
+ private:
+    RegularExpressionValidatorClass();
 
-	/**
-	 * The mode radio button; this needs to be
-	 * checked so that we skip reg ex validation
-	 * when the expression is not a reg ex
-	 */
-	wxRadioBox* ModeRadio;
+    /**
+     * The mode radio button; this needs to be
+     * checked so that we skip reg ex validation
+     * when the expression is not a reg ex
+     */
+    wxRadioBox* ModeRadio;
 
-	/**
-	 * The object to validate. This class will not own this pointer.
-	 */
-	UnicodeString* Data;
+    /**
+     * The object to validate. This class will not own this pointer.
+     */
+    UnicodeString* Data;
 };
 
 /**
@@ -114,35 +114,35 @@ void AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int currentIn
  * When connecting to events, use these IDs.
  */
 enum RegExMenus {
-	ID_MENU_REG_EX_SEQUENCE_ZERO = 1,
-	ID_MENU_REG_EX_SEQUENCE_ONE,
-	ID_MENU_REG_EX_ZERO_OR_ONE,
-	ID_MENU_REG_EX_SEQUENCE_EXACT,
-	ID_MENU_REG_EX_SEQUENCE_AT_LEAST,
-	ID_MENU_REG_EX_SEQUENCE_BETWEEN,
-	ID_MENU_REG_EX_BEGIN_OF_LINE,
-	ID_MENU_REG_EX_END_OF_LINE,
-	ID_MENU_REG_EX_DIGIT,
-	ID_MENU_REG_EX_WHITE_SPACE,
-	ID_MENU_REG_EX_ALPHANUMERIC,
-	ID_MENU_REG_EX_NOT_DECIMAL,
-	ID_MENU_REG_EX_NOT_WHITE_SPACE,
-	ID_MENU_REG_EX_NOT_ALPHANUMERIC,
-	ID_MENU_REG_EX_CASE_SENSITIVE,
-	ID_MENU_REG_EX_COMMENT,
-	ID_MENU_REG_EX_DOT_ALL,
-	ID_MENU_REG_EX_MULTI_LINE,
-	ID_MENU_REG_EX_UWORD,
-	ID_MENU_REG_EX_PHP_STRING,
-	ID_MENU_REG_EX_PHP_VARIABLE,
-	ID_MENU_REG_EX_PHP_NUMBER,
-	ID_MENU_REG_EX_PHP_WHITESPACE,
+    ID_MENU_REG_EX_SEQUENCE_ZERO = 1,
+    ID_MENU_REG_EX_SEQUENCE_ONE,
+    ID_MENU_REG_EX_ZERO_OR_ONE,
+    ID_MENU_REG_EX_SEQUENCE_EXACT,
+    ID_MENU_REG_EX_SEQUENCE_AT_LEAST,
+    ID_MENU_REG_EX_SEQUENCE_BETWEEN,
+    ID_MENU_REG_EX_BEGIN_OF_LINE,
+    ID_MENU_REG_EX_END_OF_LINE,
+    ID_MENU_REG_EX_DIGIT,
+    ID_MENU_REG_EX_WHITE_SPACE,
+    ID_MENU_REG_EX_ALPHANUMERIC,
+    ID_MENU_REG_EX_NOT_DECIMAL,
+    ID_MENU_REG_EX_NOT_WHITE_SPACE,
+    ID_MENU_REG_EX_NOT_ALPHANUMERIC,
+    ID_MENU_REG_EX_CASE_SENSITIVE,
+    ID_MENU_REG_EX_COMMENT,
+    ID_MENU_REG_EX_DOT_ALL,
+    ID_MENU_REG_EX_MULTI_LINE,
+    ID_MENU_REG_EX_UWORD,
+    ID_MENU_REG_EX_PHP_STRING,
+    ID_MENU_REG_EX_PHP_VARIABLE,
+    ID_MENU_REG_EX_PHP_NUMBER,
+    ID_MENU_REG_EX_PHP_WHITESPACE,
 
-	ID_MENU_REG_EX_REPLACE_MATCH_ONE,
-	ID_MENU_REG_EX_REPLACE_MATCH_TWO,
-	ID_MENU_REG_EX_REPLACE_MATCH_THREE,
-	ID_MENU_REG_EX_REPLACE_MATCH_FOUR,
-	ID_MENU_REG_EX_REPLACE_MATCH_FIVE
+    ID_MENU_REG_EX_REPLACE_MATCH_ONE,
+    ID_MENU_REG_EX_REPLACE_MATCH_TWO,
+    ID_MENU_REG_EX_REPLACE_MATCH_THREE,
+    ID_MENU_REG_EX_REPLACE_MATCH_FOUR,
+    ID_MENU_REG_EX_REPLACE_MATCH_FIVE
 };
 }  // namespace t4p
 

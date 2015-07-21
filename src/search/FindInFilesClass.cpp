@@ -33,273 +33,273 @@
 #include "globals/String.h"
 
 static const char* CharsetFromSignature(const char* buffer, int bufferLength) {
-	int signatureLength = 0;
-	UErrorCode err = U_ZERO_ERROR;
-	const char* encoding = ucnv_detectUnicodeSignature(buffer, bufferLength, &signatureLength, &err);
-	if (encoding != NULL && U_SUCCESS(err)) {
-		return encoding;
-	}
-	return NULL;
+    int signatureLength = 0;
+    UErrorCode err = U_ZERO_ERROR;
+    const char* encoding = ucnv_detectUnicodeSignature(buffer, bufferLength, &signatureLength, &err);
+    if (encoding != NULL && U_SUCCESS(err)) {
+        return encoding;
+    }
+    return NULL;
 }
 
 static const char* CharsetDetection(const char* buffer, int bufferLength) {
-	const char* name = NULL;
-	UErrorCode status = U_ZERO_ERROR;
-	UCharsetDetector* csd = ucsdet_open(&status);
-	ucsdet_setText(csd, buffer, bufferLength, &status);
-	if (U_SUCCESS(status)) {
-		const UCharsetMatch *ucm = ucsdet_detect(csd, &status);
-		if (U_SUCCESS(status) && ucm) {
-			name = ucsdet_getName(ucm, &status);
-		}
-	}
-	ucsdet_close(csd);
-	return name;
+    const char* name = NULL;
+    UErrorCode status = U_ZERO_ERROR;
+    UCharsetDetector* csd = ucsdet_open(&status);
+    ucsdet_setText(csd, buffer, bufferLength, &status);
+    if (U_SUCCESS(status)) {
+        const UCharsetMatch *ucm = ucsdet_detect(csd, &status);
+        if (U_SUCCESS(status) && ucm) {
+            name = ucsdet_getName(ucm, &status);
+        }
+    }
+    ucsdet_close(csd);
+    return name;
 }
 
 t4p::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, t4p::FinderClass::Modes mode)
-	: Expression(expression)
-	, ReplaceExpression()
-	, Source()
-	, Mode(mode)
-	, Finder(expression, mode)
-	, FFile()
-	, File(NULL)
-	, CurrentLine()
-	, LineNumber(0)
-	, LineOffset(0)
-	, FileOffset(0)
-	, LineStartOffset(0)
-	, MatchLength(0) {
+    : Expression(expression)
+    , ReplaceExpression()
+    , Source()
+    , Mode(mode)
+    , Finder(expression, mode)
+    , FFile()
+    , File(NULL)
+    , CurrentLine()
+    , LineNumber(0)
+    , LineOffset(0)
+    , FileOffset(0)
+    , LineStartOffset(0)
+    , MatchLength(0) {
 }
 
 t4p::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFiles)
-	: Expression()
-	, ReplaceExpression()
-	, Source()
-	, Mode()
-	, Finder()
-	, FFile()
-	, File(NULL)
-	, CurrentLine()
-	, LineNumber(0)
-	, LineOffset(0)
-	, FileOffset(0)
-	, LineStartOffset(0)
-	, MatchLength(0) {
-	Copy(findInFiles);
+    : Expression()
+    , ReplaceExpression()
+    , Source()
+    , Mode()
+    , Finder()
+    , FFile()
+    , File(NULL)
+    , CurrentLine()
+    , LineNumber(0)
+    , LineOffset(0)
+    , FileOffset(0)
+    , LineStartOffset(0)
+    , MatchLength(0) {
+    Copy(findInFiles);
 }
 
 t4p::FindInFilesClass::~FindInFilesClass() {
-	CleanupStreams();
+    CleanupStreams();
 }
 
 bool t4p::FindInFilesClass::Prepare() {
-	Finder.Expression = Expression;
-	Finder.Mode = Mode;
-	Finder.ReplaceExpression = ReplaceExpression;
-	return Finder.Prepare();
+    Finder.Expression = Expression;
+    Finder.Mode = Mode;
+    Finder.ReplaceExpression = ReplaceExpression;
+    return Finder.Prepare();
 }
 
 bool t4p::FindInFilesClass::Walk(const wxString& fileName) {
-	bool found = false;
-	LineNumber = 0;
-	LineOffset = 0;
-	FileOffset = 0;
-	LineStartOffset = 0;
-	MatchLength = 0;
-	CurrentLine.remove();
-	CleanupStreams();
-	if (!fileName.empty()) {
-		// use wxWidgets file class as it allows us to properly open
-		// unicode filenames
-		if (FFile.Open(fileName, wxT("r"))) {
-			File = u_finit(FFile.fp(), NULL, NULL);
-			return FindNext();
-		}
-	}
-	return found;
+    bool found = false;
+    LineNumber = 0;
+    LineOffset = 0;
+    FileOffset = 0;
+    LineStartOffset = 0;
+    MatchLength = 0;
+    CurrentLine.remove();
+    CleanupStreams();
+    if (!fileName.empty()) {
+        // use wxWidgets file class as it allows us to properly open
+        // unicode filenames
+        if (FFile.Open(fileName, wxT("r"))) {
+            File = u_finit(FFile.fp(), NULL, NULL);
+            return FindNext();
+        }
+    }
+    return found;
 }
 
 bool t4p::FindInFilesClass::FindNext() {
-	LineOffset = 0;
-	MatchLength = 0;
-	bool found = false;
-	if (File) {
-		while (!u_feof(File)) {
-			++LineNumber;
+    LineOffset = 0;
+    MatchLength = 0;
+    bool found = false;
+    if (File) {
+        while (!u_feof(File)) {
+            ++LineNumber;
 
-			// ATTN: docs lie,... giving it a -1 for arg 2 does not work
-			UChar* buf = CurrentLine.getBuffer(2048);
-			u_fgets(buf, 2047, File);
-			CurrentLine.releaseBuffer(-1);
-			found = Finder.FindNext(CurrentLine, 0) && Finder.GetLastMatch(LineOffset, MatchLength);
-			if (found) {
-				FileOffset = LineStartOffset + LineOffset;
-				LineStartOffset += CurrentLine.length();
-				break;
-			}
-			LineStartOffset += CurrentLine.length();
-		}
-		if (u_feof(File)) {
-			CleanupStreams();
-		}
-	}
-	return found;
+            // ATTN: docs lie,... giving it a -1 for arg 2 does not work
+            UChar* buf = CurrentLine.getBuffer(2048);
+            u_fgets(buf, 2047, File);
+            CurrentLine.releaseBuffer(-1);
+            found = Finder.FindNext(CurrentLine, 0) && Finder.GetLastMatch(LineOffset, MatchLength);
+            if (found) {
+                FileOffset = LineStartOffset + LineOffset;
+                LineStartOffset += CurrentLine.length();
+                break;
+            }
+            LineStartOffset += CurrentLine.length();
+        }
+        if (u_feof(File)) {
+            CleanupStreams();
+        }
+    }
+    return found;
 }
 
 int t4p::FindInFilesClass::GetCurrentLineNumber() const {
-	return LineNumber;
+    return LineNumber;
 }
 
 int t4p::FindInFilesClass::GetLineOffset() const {
-	return LineOffset;
+    return LineOffset;
 }
 
 int t4p::FindInFilesClass::GetFileOffset() const {
-	return FileOffset;
+    return FileOffset;
 }
 
 int t4p::FindInFilesClass::GetMatchLength() const {
-	return MatchLength;
+    return MatchLength;
 }
 
 UnicodeString t4p::FindInFilesClass::GetCurrentLine() const {
-	return CurrentLine;
+    return CurrentLine;
 }
 
 bool t4p::FindInFilesClass::GetLastReplacementText(const UnicodeString& text, UnicodeString& replacementText) const {
-	return Finder.GetLastReplacementText(text, replacementText);
+    return Finder.GetLastReplacementText(text, replacementText);
 }
 
 int t4p::FindInFilesClass::ReplaceAllMatches(UnicodeString& text) const {
-	return Finder.ReplaceAllMatches(text);
+    return Finder.ReplaceAllMatches(text);
 }
 
 int t4p::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileName) const {
-	int matches = 0;
-	if (!fileName.empty() && wxFileName::IsFileReadable(fileName)) {
-		// ATTN: problems here: this code will load entire file into memory not too efficient
-		// but the regular expression classes do not work with strings
-		UnicodeString fileContents;
-		bool hasSignature = false;
-		wxString charset;
-		t4p::FindInFilesClass::OpenErrors error = FileContents(fileName, fileContents, charset, hasSignature);
-			if (NONE == error) {
-			matches += ReplaceAllMatches(fileContents);
-			UFILE* file = u_fopen(fileName.ToAscii(), "wb", NULL, NULL);
-			if (NULL != file) {
-				if (hasSignature) {
-					UChar sig = 0xFEFF;
-					u_file_write(&sig, 1, file);
-				}
-				u_file_write(fileContents.getBuffer(), fileContents.length(), file);
-				u_fclose(file);
-			}
-		} else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
-			t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, fileName);
-		}
-	}
-	return matches;
+    int matches = 0;
+    if (!fileName.empty() && wxFileName::IsFileReadable(fileName)) {
+        // ATTN: problems here: this code will load entire file into memory not too efficient
+        // but the regular expression classes do not work with strings
+        UnicodeString fileContents;
+        bool hasSignature = false;
+        wxString charset;
+        t4p::FindInFilesClass::OpenErrors error = FileContents(fileName, fileContents, charset, hasSignature);
+        if (NONE == error) {
+            matches += ReplaceAllMatches(fileContents);
+            UFILE* file = u_fopen(fileName.ToAscii(), "wb", NULL, NULL);
+            if (NULL != file) {
+                if (hasSignature) {
+                    UChar sig = 0xFEFF;
+                    u_file_write(&sig, 1, file);
+                }
+                u_file_write(fileContents.getBuffer(), fileContents.length(), file);
+                u_fclose(file);
+            }
+        } else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
+            t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, fileName);
+        }
+    }
+    return matches;
 }
 
 void t4p::FindInFilesClass::CopyFinder(FinderClass& dest) {
-	dest.Expression = Finder.Expression;
-	dest.ReplaceExpression = Finder.ReplaceExpression;
-	dest.Mode = Finder.Mode;
-	dest.Wrap = Finder.Wrap;
+    dest.Expression = Finder.Expression;
+    dest.ReplaceExpression = Finder.ReplaceExpression;
+    dest.Mode = Finder.Mode;
+    dest.Wrap = Finder.Wrap;
 }
 
 t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxString& fileName,
-		UnicodeString& fileContents, wxString& charset, bool& hasSignature) {
-	OpenErrors error = NONE;
-	charset = wxT("");
-	wxFileName wxf(fileName);
-	if (wxf.GetSize() > 10000000) {  // file > 10 MB
-		return FILE_TOO_LARGE;
-	}
-	wxFFile fFile(fileName, wxT("rb"));
-	if (fFile.IsOpened()) {
-		// need to detect the character set so we can decode it correctly
-		// at this point I could only find the character set detection code that works for
-		// byte arrays; not sure one exists to detect charset from files
+        UnicodeString& fileContents, wxString& charset, bool& hasSignature) {
+    OpenErrors error = NONE;
+    charset = wxT("");
+    wxFileName wxf(fileName);
+    if (wxf.GetSize() > 10000000) {  // file > 10 MB
+        return FILE_TOO_LARGE;
+    }
+    wxFFile fFile(fileName, wxT("rb"));
+    if (fFile.IsOpened()) {
+        // need to detect the character set so we can decode it correctly
+        // at this point I could only find the character set detection code that works for
+        // byte arrays; not sure one exists to detect charset from files
 
-		// obtain file size and read the raw data
-		// got this code by looking at the code of wxFFile::ReadAll
-		wxFileOffset offset = fFile.Length();
-		size_t bufferSize = wx_truncate_cast(size_t, fFile.Length());
-		if ((wxFileOffset)bufferSize == offset) {
-			char* buffer = new char[bufferSize];
-			fFile.Read(buffer, bufferSize);
-			fFile.Close();
+        // obtain file size and read the raw data
+        // got this code by looking at the code of wxFFile::ReadAll
+        wxFileOffset offset = fFile.Length();
+        size_t bufferSize = wx_truncate_cast(size_t, fFile.Length());
+        if ((wxFileOffset)bufferSize == offset) {
+            char* buffer = new char[bufferSize];
+            fFile.Read(buffer, bufferSize);
+            fFile.Close();
 
-			// what encoding is it??
-			// we first look for a BOM marker, and if the file does
-			// not have one then attempt to detect the encoding
-			error = CHARSET_DETECTION;
-			const char* name = CharsetFromSignature(buffer, bufferSize);
-			if (NULL != name) {
-				hasSignature = true;
-			} else {
-				hasSignature = false;
-				name = CharsetDetection(buffer, bufferSize);
-			}
-			if (NULL != name) {
-				// encode to Unicode from the detected charset. file already opened, just translate the
-				// buffer from memory
-				UErrorCode status = U_ZERO_ERROR;
-				UConverter* converter = ucnv_open(name, &status);
-				if (U_SUCCESS(status)) {
-					UChar* dest = fileContents.getBuffer(bufferSize + 1);
-					int32_t read = ucnv_toUChars(converter, dest, bufferSize + 1, buffer, bufferSize, &status);
-					fileContents.releaseBuffer(read);
-					if (U_SUCCESS(status)) {
-						error = NONE;
-					}
-					ucnv_close(converter);
-					if (hasSignature) {
-						// remove the BOM marker
-						fileContents.remove(0, 1);
-					}
-					charset = t4p::CharToWx(name);
-				}
-			}
-			delete[] buffer;
-		} else {
-			error = FILE_NOT_FOUND;
-		}
-	} else {
-		error = FILE_NOT_FOUND;
-	}
-	return error;
+            // what encoding is it??
+            // we first look for a BOM marker, and if the file does
+            // not have one then attempt to detect the encoding
+            error = CHARSET_DETECTION;
+            const char* name = CharsetFromSignature(buffer, bufferSize);
+            if (NULL != name) {
+                hasSignature = true;
+            } else {
+                hasSignature = false;
+                name = CharsetDetection(buffer, bufferSize);
+            }
+            if (NULL != name) {
+                // encode to Unicode from the detected charset. file already opened, just translate the
+                // buffer from memory
+                UErrorCode status = U_ZERO_ERROR;
+                UConverter* converter = ucnv_open(name, &status);
+                if (U_SUCCESS(status)) {
+                    UChar* dest = fileContents.getBuffer(bufferSize + 1);
+                    int32_t read = ucnv_toUChars(converter, dest, bufferSize + 1, buffer, bufferSize, &status);
+                    fileContents.releaseBuffer(read);
+                    if (U_SUCCESS(status)) {
+                        error = NONE;
+                    }
+                    ucnv_close(converter);
+                    if (hasSignature) {
+                        // remove the BOM marker
+                        fileContents.remove(0, 1);
+                    }
+                    charset = t4p::CharToWx(name);
+                }
+            }
+            delete[] buffer;
+        } else {
+            error = FILE_NOT_FOUND;
+        }
+    } else {
+        error = FILE_NOT_FOUND;
+    }
+    return error;
 }
 
 t4p::FindInFilesClass& t4p::FindInFilesClass::operator=(const FindInFilesClass& src) {
-	Copy(src);
-	return *this;
+    Copy(src);
+    return *this;
 }
 
 void t4p::FindInFilesClass::Copy(const FindInFilesClass& src) {
-	CleanupStreams();
+    CleanupStreams();
 
-	Expression = src.Expression;
-	ReplaceExpression = src.ReplaceExpression;
-	Source = src.Source;
-	Mode = src.Mode;
-	Finder.Expression = src.Finder.Expression;
-	Finder.Mode = src.Finder.Mode;
+    Expression = src.Expression;
+    ReplaceExpression = src.ReplaceExpression;
+    Source = src.Source;
+    Mode = src.Mode;
+    Finder.Expression = src.Finder.Expression;
+    Finder.Mode = src.Finder.Mode;
 
-	LineNumber = 0;
-	LineOffset = 0;
-	FileOffset = 0;
-	LineStartOffset = 0;
-	MatchLength = 0;
+    LineNumber = 0;
+    LineOffset = 0;
+    FileOffset = 0;
+    LineStartOffset = 0;
+    MatchLength = 0;
 }
 
 void t4p::FindInFilesClass::CleanupStreams() {
-	if (NULL != File) {
-		u_fclose(File);
-		File = NULL;
-	}
-	FFile.Close();
+    if (NULL != File) {
+        u_fclose(File);
+        File = NULL;
+    }
+    FFile.Close();
 }

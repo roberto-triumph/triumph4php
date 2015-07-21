@@ -104,237 +104,237 @@ namespace t4p {
  * @see FinderClass.h
  */
 class FindInFilesClass : public DirectoryWalkerClass {
-	public:
-	/**
-	 * Reasons why a file could not be opened.
-	 */
-	enum OpenErrors {
-		NONE,
-		FILE_NOT_FOUND,
-		CHARSET_DETECTION,
-		FILE_TOO_LARGE
-	};
+ public:
+    /**
+     * Reasons why a file could not be opened.
+     */
+    enum OpenErrors {
+        NONE,
+        FILE_NOT_FOUND,
+        CHARSET_DETECTION,
+        FILE_TOO_LARGE
+    };
 
-	FindInFilesClass(const UnicodeString& expression = UNICODE_STRING_SIMPLE(""), FinderClass::Modes mode = FinderClass::EXACT);
+    FindInFilesClass(const UnicodeString& expression = UNICODE_STRING_SIMPLE(""), FinderClass::Modes mode = FinderClass::EXACT);
 
-	/**
-	 * Will copy source into this new instance. However, this variable is not prepared, and
-	 * the caller MUST call Prepare on this new  variable.
-	 */
-	FindInFilesClass(const FindInFilesClass& source);
+    /**
+     * Will copy source into this new instance. However, this variable is not prepared, and
+     * the caller MUST call Prepare on this new  variable.
+     */
+    FindInFilesClass(const FindInFilesClass& source);
 
-	~FindInFilesClass();
+    ~FindInFilesClass();
 
-	/**
-	 * The string to look for. If Expression is modified, Prepare() method MUST be called in order to
-	 * set the internal state machine.
-	 * @var wxString
-	 */
-	UnicodeString Expression;
+    /**
+     * The string to look for. If Expression is modified, Prepare() method MUST be called in order to
+     * set the internal state machine.
+     * @var wxString
+     */
+    UnicodeString Expression;
 
-	/**
-	 * The string to replace
-	 * @var wxString
-	 */
-	UnicodeString ReplaceExpression;
+    /**
+     * The string to replace
+     * @var wxString
+     */
+    UnicodeString ReplaceExpression;
 
-	/**
-	 * The folder and wildcards to search.
-	 */
-	SourceClass Source;
+    /**
+     * The folder and wildcards to search.
+     */
+    SourceClass Source;
 
-	/**
-	 * The find mode. If Mode is modified, Prepare() method MUST be called in order to
-	 * set the internal state machine.
-	 * @var one of FinderClass::MODES
-	 */
-	int Mode;
+    /**
+     * The find mode. If Mode is modified, Prepare() method MUST be called in order to
+     * set the internal state machine.
+     * @var one of FinderClass::MODES
+     */
+    int Mode;
 
-	/**
-	 * Prepare  Expression, ReplaceExpression.
-	 * @return bool if Expression, ReplaceExpression are valid
-	 */
-	bool Prepare();
+    /**
+     * Prepare  Expression, ReplaceExpression.
+     * @return bool if Expression, ReplaceExpression are valid
+     */
+    bool Prepare();
 
-	/**
-	 * Searches the given file for matches of this expression. If the given file has at least one match, then
-	 * true is returned.  Otherwise false is returned.  You MUST call Prepare() method you call this method,,
-	 * if Prepare method has not been called this method will return false.
-	 *
-	 * @return bool true if the given file has at least one match of this expression. If a match is found, then
-	 * 	      GetCurrentLine() will contain the line number of the hit.  Then FindNext() can be used to
-	 * 		 iterate through the rest of the hits of the file.
-	 */
-	virtual bool Walk(const wxString& fileName);
+    /**
+     * Searches the given file for matches of this expression. If the given file has at least one match, then
+     * true is returned.  Otherwise false is returned.  You MUST call Prepare() method you call this method,,
+     * if Prepare method has not been called this method will return false.
+     *
+     * @return bool true if the given file has at least one match of this expression. If a match is found, then
+     * 	      GetCurrentLine() will contain the line number of the hit.  Then FindNext() can be used to
+     * 		 iterate through the rest of the hits of the file.
+     */
+    virtual bool Walk(const wxString& fileName);
 
-	/**
-	 * Finds the next match in the given text. The matched line number is then made available with the GetCurrentLineNumber() method.
-	 *
-	 * @return bool true if match was found.
-	 */
-	bool FindNext();
+    /**
+     * Finds the next match in the given text. The matched line number is then made available with the GetCurrentLineNumber() method.
+     *
+     * @return bool true if match was found.
+     */
+    bool FindNext();
 
-	/**
-	 * Returns the replacement string, with any back references already replaced with
-	 * the correct text.
-	 *
-	 * @param const UnicodeString& text the original text
-	 * @param UnicodeString& replacementText text that matched this expression
-	 * @return bool true if this expression was found in the last call to FindPrevious()
-	 * or FindNext() methods
-	 */
-	bool GetLastReplacementText(const UnicodeString& text, UnicodeString& replacementText) const;
+    /**
+     * Returns the replacement string, with any back references already replaced with
+     * the correct text.
+     *
+     * @param const UnicodeString& text the original text
+     * @param UnicodeString& replacementText text that matched this expression
+     * @return bool true if this expression was found in the last call to FindPrevious()
+     * or FindNext() methods
+     */
+    bool GetLastReplacementText(const UnicodeString& text, UnicodeString& replacementText) const;
 
-	/**
-	 * Replace all occurrences of this Expression in text with ReplaceExpression.
-	 *
-	 * @var UnicodeString& text the text to modify
-	 * @return int the number of replacements made, 0 if ReplaceExpression is
-	 * an empty string
-	 */
-	int ReplaceAllMatches(UnicodeString& text) const;
+    /**
+     * Replace all occurrences of this Expression in text with ReplaceExpression.
+     *
+     * @var UnicodeString& text the text to modify
+     * @return int the number of replacements made, 0 if ReplaceExpression is
+     * an empty string
+     */
+    int ReplaceAllMatches(UnicodeString& text) const;
 
-	/**
-	 * Replaces this Expression with this ReplaceExpression in the current matched file.
-	 *
-	 * @param const wxString& fileName the full path of the file to find & replace
-	 * @return int the number of replacement made.
-	 */
-	int ReplaceAllMatchesInFile(const wxString& fileName) const;
+    /**
+     * Replaces this Expression with this ReplaceExpression in the current matched file.
+     *
+     * @param const wxString& fileName the full path of the file to find & replace
+     * @return int the number of replacement made.
+     */
+    int ReplaceAllMatchesInFile(const wxString& fileName) const;
 
-	/**
-	 * Assignment operator will copy an instance to the new variable. However, the assigned variable is not prepared, and
-	 * the called MUST call Prepare on the assigned variable.
-	 */
-	FindInFilesClass& operator=(const FindInFilesClass& source);
+    /**
+     * Assignment operator will copy an instance to the new variable. However, the assigned variable is not prepared, and
+     * the called MUST call Prepare on the assigned variable.
+     */
+    FindInFilesClass& operator=(const FindInFilesClass& source);
 
-	/**
-	 * Will copy source into this instance. However, this variable is not prepared, and
-	 * the caller MUST call Prepare on this new variable.
-	 */
-	void Copy(const FindInFilesClass& source);
+    /**
+     * Will copy source into this instance. However, this variable is not prepared, and
+     * the caller MUST call Prepare on this new variable.
+     */
+    void Copy(const FindInFilesClass& source);
 
-	/**
-	 * Copy this expression into the given finder.
-	 *
-	 * @var FinderClass finder. After a call to this method, dest.Expression will be equivalent to this expression.
-	 */
-	void CopyFinder(FinderClass& dest);
+    /**
+     * Copy this expression into the given finder.
+     *
+     * @var FinderClass finder. After a call to this method, dest.Expression will be equivalent to this expression.
+     */
+    void CopyFinder(FinderClass& dest);
 
-	/**
-	 * Returns the current line. If FindNext() returned true, then this line is the line that the match
-	 * was found in.
-	 *
-	 * @return UnicodeString
-	 */
-	UnicodeString GetCurrentLine() const;
+    /**
+     * Returns the current line. If FindNext() returned true, then this line is the line that the match
+     * was found in.
+     *
+     * @return UnicodeString
+     */
+    UnicodeString GetCurrentLine() const;
 
-	/**
-	 * Returns the current line number. If FindNext() returned true, then this line number is the line number that the match
-	 * was found in. Liner number starts at 1.
-	 *
-	 * @return int
-	 */
-	int GetCurrentLineNumber() const;
+    /**
+     * Returns the current line number. If FindNext() returned true, then this line number is the line number that the match
+     * was found in. Liner number starts at 1.
+     *
+     * @return int
+     */
+    int GetCurrentLineNumber() const;
 
-	/**
-	 * Returns the start of the current hit. If FindNext() returned true, then this is the position
-	 * where the match was found in. Position number starts at 0
-	 * and it's relative to the start of the file.
-	 * @return int
-	 */
-	int GetFileOffset() const;
+    /**
+     * Returns the start of the current hit. If FindNext() returned true, then this is the position
+     * where the match was found in. Position number starts at 0
+     * and it's relative to the start of the file.
+     * @return int
+     */
+    int GetFileOffset() const;
 
-	/**
-	 * Returns the offset where the hit is found in the matching line. 0-based
-	 * and it's relative to the beginning of the line
-	 * @return int 0 <= GetLineOffset() <= GetCurrentLine.length()
-	 */
-	int GetLineOffset() const;
+    /**
+     * Returns the offset where the hit is found in the matching line. 0-based
+     * and it's relative to the beginning of the line
+     * @return int 0 <= GetLineOffset() <= GetCurrentLine.length()
+     */
+    int GetLineOffset() const;
 
-	/**
-	 * @return the character length of matched text
-	 */
-	int GetMatchLength() const;
+    /**
+     * @return the character length of matched text
+     */
+    int GetMatchLength() const;
 
-	/**
-	 * Get the file contents from the file and write them to the string
-	 * @param fileName full path of the file to open
-	 * @param content [out] the file contents will be written to this variable
-	 * @param charset [out] the character set of the file will be written to this variable
-	 * @param hasSignature [out] will be set to true if the content had a unicode
-	 *        BOM (file signature). Note that the returned content will already
-	 *        have the BOM removed from it
-	 * @return OpenErrors reason for content not being set
-	 */
-	static OpenErrors FileContents(const wxString& fileName, UnicodeString& content,
-		wxString& charset, bool& hasSignature);
+    /**
+     * Get the file contents from the file and write them to the string
+     * @param fileName full path of the file to open
+     * @param content [out] the file contents will be written to this variable
+     * @param charset [out] the character set of the file will be written to this variable
+     * @param hasSignature [out] will be set to true if the content had a unicode
+     *        BOM (file signature). Note that the returned content will already
+     *        have the BOM removed from it
+     * @return OpenErrors reason for content not being set
+     */
+    static OpenErrors FileContents(const wxString& fileName, UnicodeString& content,
+                                   wxString& charset, bool& hasSignature);
 
-	private:
-	/**
-	 * To find text
-	 * @var FinderClass
-	 */
-	FinderClass Finder;
+ private:
+    /**
+     * To find text
+     * @var FinderClass
+     */
+    FinderClass Finder;
 
-	/**
-	 * use wxWidgets file class as it allows us to properly open
-	 * unicode filenames
-	 */
-	wxFFile FFile;
+    /**
+     * use wxWidgets file class as it allows us to properly open
+     * unicode filenames
+     */
+    wxFFile FFile;
 
-	/**
-	 * The input stream; used to open the file
-	 *
-	 * @var UFILE*
-	 */
-	 UFILE* File;
+    /**
+     * The input stream; used to open the file
+     *
+     * @var UFILE*
+     */
+    UFILE* File;
 
-	/**
-	 * The current line
-	 *
-	 * @var UnicodeString
-	 */
-	UnicodeString CurrentLine;
+    /**
+     * The current line
+     *
+     * @var UnicodeString
+     */
+    UnicodeString CurrentLine;
 
-	/**
-	 * The current line number
-	 *
-	 * @var int
-	 */
-	int LineNumber;
+    /**
+     * The current line number
+     *
+     * @var int
+     */
+    int LineNumber;
 
-	/**
-	 * The offset where the hit is found in the matching line.. 0-based
-	 *
-	 * @var int
-	 */
-	int LineOffset;
+    /**
+     * The offset where the hit is found in the matching line.. 0-based
+     *
+     * @var int
+     */
+    int LineOffset;
 
-	/**
-	 * The start of the hit (relative to the start of the file) found by FindNext
-	 *
-	 * @var int
-	 */
-	int FileOffset;
+    /**
+     * The start of the hit (relative to the start of the file) found by FindNext
+     *
+     * @var int
+     */
+    int FileOffset;
 
-	/**
-	 * The current position of the start of the current line
-	 *
-	 * @var int
-	 */
-	int LineStartOffset;
+    /**
+     * The current position of the start of the current line
+     *
+     * @var int
+     */
+    int LineStartOffset;
 
-	/**
-	 * The length of the currently matched hit
-	 * @var int
-	 */
-	int MatchLength;
+    /**
+     * The length of the currently matched hit
+     * @var int
+     */
+    int MatchLength;
 
-	/**
-	 * Close the associated input streams.
-	 */
-	void CleanupStreams();
+    /**
+     * Close the associated input streams.
+     */
+    void CleanupStreams();
 };
 }  // namespace t4p
 

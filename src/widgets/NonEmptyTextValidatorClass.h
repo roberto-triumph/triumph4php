@@ -35,39 +35,39 @@
  * Currently this only works on TextCtrl.
  */
 class NonEmptyTextValidatorClass : public wxValidator {
-	public:
-	/**
-	 * Constructor takes in a static text so that the error message will sound proper.
-	 *
-	 * @var wxString* data the string variable to be populated.
-	 * @var wxStaticText* the text box label (can be NULL)
-	 */
-	NonEmptyTextValidatorClass(wxString* data, wxStaticText* label);
+ public:
+    /**
+     * Constructor takes in a static text so that the error message will sound proper.
+     *
+     * @var wxString* data the string variable to be populated.
+     * @var wxStaticText* the text box label (can be NULL)
+     */
+    NonEmptyTextValidatorClass(wxString* data, wxStaticText* label);
 
-	virtual bool TransferToWindow();
+    virtual bool TransferToWindow();
 
-	virtual bool TransferFromWindow();
+    virtual bool TransferFromWindow();
 
-	virtual bool Validate(wxWindow* parent);
+    virtual bool Validate(wxWindow* parent);
 
-	virtual wxObject* Clone() const;
+    virtual wxObject* Clone() const;
 
-	private:
-	NonEmptyTextValidatorClass();
+ private:
+    NonEmptyTextValidatorClass();
 
-	/**
-	 * The data
-	 * @var wxString*
-	 */
-	wxString* Data;
+    /**
+     * The data
+     * @var wxString*
+     */
+    wxString* Data;
 
-	/**
-	 * The text box label. Used to build the error message that is displayed to the user when the user
-	 * does not enter a value. This can be NULL.
-	 *
-	 * @var wxStaticText*
-	 */
-	wxStaticText* Label;
+    /**
+     * The text box label. Used to build the error message that is displayed to the user when the user
+     * does not enter a value. This can be NULL.
+     *
+     * @var wxStaticText*
+     */
+    wxStaticText* Label;
 };
 
 #endif  // SRC_WIDGETS_NONEMPTYTEXTVALIDATORCLASS_H_

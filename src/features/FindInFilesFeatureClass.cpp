@@ -34,163 +34,163 @@
 #include "Triumph.h"
 
 t4p::FindInFilesHitClass::FindInFilesHitClass()
-	: wxObject()
-	, FileName()
-	, Preview()
-	, LineNumber()
-	, LineOffset(0)
-	, FileOffset(0)
-	, MatchLength(0) {
+    : wxObject()
+    , FileName()
+    , Preview()
+    , LineNumber()
+    , LineOffset(0)
+    , FileOffset(0)
+    , MatchLength(0) {
 }
 
 t4p::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview,
-	int lineNumber, int lineOffset, int fileOffset, int matchLength)
-	: wxObject()
-	// use c_str() to deep copy
-	, FileName(fileName.c_str())
-	, Preview(preview.c_str())
-	, LineNumber(lineNumber)
-	, LineOffset(lineOffset)
-	, FileOffset(fileOffset)
-	, MatchLength(matchLength) {
+        int lineNumber, int lineOffset, int fileOffset, int matchLength)
+    : wxObject()
+      // use c_str() to deep copy
+    , FileName(fileName.c_str())
+    , Preview(preview.c_str())
+    , LineNumber(lineNumber)
+    , LineOffset(lineOffset)
+    , FileOffset(fileOffset)
+    , MatchLength(matchLength) {
 }
 
 t4p::FindInFilesHitClass::FindInFilesHitClass(const t4p::FindInFilesHitClass& hit)
-	: wxObject()
-	, FileName()
-	, Preview()
-	, LineNumber(1)
-	, LineOffset(0)
-	, FileOffset(0)
-	, MatchLength(0) {
-	Copy(hit);
+    : wxObject()
+    , FileName()
+    , Preview()
+    , LineNumber(1)
+    , LineOffset(0)
+    , FileOffset(0)
+    , MatchLength(0) {
+    Copy(hit);
 }
 
 t4p::FindInFilesHitClass& t4p::FindInFilesHitClass::operator=(const t4p::FindInFilesHitClass& hit) {
-	Copy(hit);
-	return *this;
+    Copy(hit);
+    return *this;
 }
 
 bool t4p::FindInFilesHitClass::operator==(const t4p::FindInFilesHitClass& hit) {
-	return FileName == hit.FileName
-		&& LineNumber == hit.LineNumber
-		&& LineOffset == hit.LineOffset
-		&& FileOffset == hit.FileOffset;
+    return FileName == hit.FileName
+           && LineNumber == hit.LineNumber
+           && LineOffset == hit.LineOffset
+           && FileOffset == hit.FileOffset;
 }
 
 void t4p::FindInFilesHitClass::Copy(const t4p::FindInFilesHitClass& hit) {
-	FileName = hit.FileName.c_str();
-	Preview = hit.Preview.c_str();
-	LineNumber = hit.LineNumber;
-	LineOffset = hit.LineOffset;
-	FileOffset = hit.FileOffset;
-	MatchLength = hit.MatchLength;
+    FileName = hit.FileName.c_str();
+    Preview = hit.Preview.c_str();
+    LineNumber = hit.LineNumber;
+    LineOffset = hit.LineOffset;
+    FileOffset = hit.FileOffset;
+    MatchLength = hit.MatchLength;
 }
 
 IMPLEMENT_DYNAMIC_CLASS(t4p::FindInFilesHitClass, wxObject)
 namespace t4p {
-	IMPLEMENT_VARIANT_OBJECT(FindInFilesHitClass)
+IMPLEMENT_VARIANT_OBJECT(FindInFilesHitClass)
 }
 
 
 t4p::FindInFilesHitEventClass::FindInFilesHitEventClass(int eventId, const std::vector<t4p::FindInFilesHitClass> &hits)
-	: wxEvent(eventId, t4p::EVENT_FIND_IN_FILES_FILE_HIT)
-	, Hits(hits) {
+    : wxEvent(eventId, t4p::EVENT_FIND_IN_FILES_FILE_HIT)
+    , Hits(hits) {
 }
 
 wxEvent* t4p::FindInFilesHitEventClass::Clone() const {
-	wxEvent* newEvt = new t4p::FindInFilesHitEventClass(GetId(), Hits);
-	return newEvt;
+    wxEvent* newEvt = new t4p::FindInFilesHitEventClass(GetId(), Hits);
+    return newEvt;
 }
 
 std::vector<t4p::FindInFilesHitClass> t4p::FindInFilesHitEventClass::GetHits() const {
-	return Hits;
+    return Hits;
 }
 
 t4p::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: BackgroundFileReaderClass(runningThreads, eventId)
-	, FindInFiles()
-	, SkipFiles() {
+    : BackgroundFileReaderClass(runningThreads, eventId)
+    , FindInFiles()
+    , SkipFiles() {
 }
 
 bool t4p::FindInFilesBackgroundReaderClass::InitForFind(t4p::FindInFilesClass findInFiles,
-															  bool doHiddenFiles,
-															  std::vector<wxString> skipFiles) {
-	// find in files needs to be a copy; just to be sure
-	// its thread safe
-	FindInFiles = findInFiles;
-	SkipFiles = skipFiles;
+        bool doHiddenFiles,
+        std::vector<wxString> skipFiles) {
+    // find in files needs to be a copy; just to be sure
+    // its thread safe
+    FindInFiles = findInFiles;
+    SkipFiles = skipFiles;
 
-	std::vector<t4p::SourceClass> sources;
-	sources.push_back(FindInFiles.Source);
-	return Init(sources, t4p::DirectorySearchClass::RECURSIVE, doHiddenFiles) && FindInFiles.Prepare();
+    std::vector<t4p::SourceClass> sources;
+    sources.push_back(FindInFiles.Source);
+    return Init(sources, t4p::DirectorySearchClass::RECURSIVE, doHiddenFiles) && FindInFiles.Prepare();
 }
 
 bool t4p::FindInFilesBackgroundReaderClass::InitForReplace(t4p::FindInFilesClass findInFiles,
-																 const std::vector<wxString>& replaceFiles,
-																 std::vector<wxString> skipFiles) {
-	FindInFiles = findInFiles;
-	SkipFiles = skipFiles;
-	return FindInFiles.Prepare() && InitMatched(replaceFiles);
+        const std::vector<wxString>& replaceFiles,
+        std::vector<wxString> skipFiles) {
+    FindInFiles = findInFiles;
+    SkipFiles = skipFiles;
+    return FindInFiles.Prepare() && InitMatched(replaceFiles);
 }
 
 bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchClass& search) {
-	bool found = false;
-	found = search.Walk(FindInFiles);
-	if (found) {
-		wxString fileName = search.GetMatchedFiles().back();
+    bool found = false;
+    found = search.Walk(FindInFiles);
+    if (found) {
+        wxString fileName = search.GetMatchedFiles().back();
 
-		// if this match is for one of the skip files then we want to ignore it
-		// DirectorySearch doesn't have a GetCurrentFile() so the one way to know the
-		// file that was searched is to do the search
-		std::vector<wxString>::iterator it = find(SkipFiles.begin(), SkipFiles.end(), fileName);
-		std::vector<t4p::FindInFilesHitClass> hits;
-		if (it == SkipFiles.end()) {
-			bool destroy = IsCancelled();
-			do {
-				if (destroy) {
-					break;
-				}
-				t4p::FindInFilesHitClass hit(fileName,
-					t4p::IcuToWx(FindInFiles.GetCurrentLine()),
-					FindInFiles.GetCurrentLineNumber(),
-					FindInFiles.GetLineOffset(),
-					FindInFiles.GetFileOffset(),
-					FindInFiles.GetMatchLength());
-				hits.push_back(hit);
-			}
-			while (!destroy && FindInFiles.FindNext());  // NOLINT(whitespace/empty_loop_body)
-			if (!destroy && !hits.empty()) {
-				// PostEvent will change the ID of the event to the correct
-				// one
-				t4p::FindInFilesHitEventClass hitEvent(wxID_ANY, hits);
-				PostEvent(hitEvent);
-			}
-		}
-	}
-	return found;
+        // if this match is for one of the skip files then we want to ignore it
+        // DirectorySearch doesn't have a GetCurrentFile() so the one way to know the
+        // file that was searched is to do the search
+        std::vector<wxString>::iterator it = find(SkipFiles.begin(), SkipFiles.end(), fileName);
+        std::vector<t4p::FindInFilesHitClass> hits;
+        if (it == SkipFiles.end()) {
+            bool destroy = IsCancelled();
+            do {
+                if (destroy) {
+                    break;
+                }
+                t4p::FindInFilesHitClass hit(fileName,
+                                             t4p::IcuToWx(FindInFiles.GetCurrentLine()),
+                                             FindInFiles.GetCurrentLineNumber(),
+                                             FindInFiles.GetLineOffset(),
+                                             FindInFiles.GetFileOffset(),
+                                             FindInFiles.GetMatchLength());
+                hits.push_back(hit);
+            }
+            while (!destroy && FindInFiles.FindNext());  // NOLINT(whitespace/empty_loop_body)
+            if (!destroy && !hits.empty()) {
+                // PostEvent will change the ID of the event to the correct
+                // one
+                t4p::FindInFilesHitEventClass hitEvent(wxID_ANY, hits);
+                PostEvent(hitEvent);
+            }
+        }
+    }
+    return found;
 }
 
 bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileMatch(const wxString& file) {
-	wxString fileToReplace = file;
-	int matches = 0;
+    wxString fileToReplace = file;
+    int matches = 0;
 
-	// don't do replace for open files
-	std::vector<wxString>::iterator it = find(SkipFiles.begin(), SkipFiles.end(), fileToReplace);
-	if (it == SkipFiles.end()) {
-		matches += FindInFiles.ReplaceAllMatchesInFile(fileToReplace);
-	}
-	return matches > 0;
+    // don't do replace for open files
+    std::vector<wxString>::iterator it = find(SkipFiles.begin(), SkipFiles.end(), fileToReplace);
+    if (it == SkipFiles.end()) {
+        matches += FindInFiles.ReplaceAllMatchesInFile(fileToReplace);
+    }
+    return matches > 0;
 }
 
 wxString t4p::FindInFilesBackgroundReaderClass::GetLabel() const {
-	return wxT("Find In Files");
+    return wxT("Find In Files");
 }
 
 t4p::FindInFilesFeatureClass::FindInFilesFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app)
-	, PreviousFindInFiles()
-	, DoHiddenFiles(false) {
+    : FeatureClass(app)
+    , PreviousFindInFiles()
+    , DoHiddenFiles(false) {
 }
 
 const wxEventType t4p::EVENT_FIND_IN_FILES_FILE_HIT = wxNewEventType();

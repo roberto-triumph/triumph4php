@@ -40,12 +40,12 @@ namespace t4p {
  * shallow copies)
  */
 class GlobalActionClass : public t4p::ActionClass {
-	public:
-	GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	virtual bool Init(t4p::GlobalsClass& globals) = 0;
+    virtual bool Init(t4p::GlobalsClass& globals) = 0;
 
-	virtual bool DoAsync();
+    virtual bool DoAsync();
 };
 
 /**
@@ -54,16 +54,16 @@ class GlobalActionClass : public t4p::ActionClass {
  * manner.
  */
 class InitializerGlobalActionClass : public t4p::GlobalActionClass {
-	public:
-	InitializerGlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    InitializerGlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	bool Init(t4p::GlobalsClass& globals);
+    bool Init(t4p::GlobalsClass& globals);
 
-	virtual void Work(t4p::GlobalsClass& globals) = 0;
+    virtual void Work(t4p::GlobalsClass& globals) = 0;
 
-	void BackgroundWork();
+    void BackgroundWork();
 
-	bool DoAsync();
+    bool DoAsync();
 };
 }  // namespace t4p
 

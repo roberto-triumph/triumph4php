@@ -53,23 +53,23 @@ namespace t4p {
  * event handler system
  */
 class MacCommonMenuBarClass {
-	public:
-	enum {
-		ID_COMMON_MENU_NEW = wxID_HIGHEST + 1,
-		ID_COMMON_MENU_OPEN
-	};
+ public:
+    enum {
+        ID_COMMON_MENU_NEW = wxID_HIGHEST + 1,
+        ID_COMMON_MENU_OPEN
+    };
 
-	MacCommonMenuBarClass(wxApp& app);
+    MacCommonMenuBarClass(wxApp& app);
 
-	private:
-	wxApp& App;
+ private:
+    wxApp& App;
 
-	/**
-	 * menubar that is shown when the main frame is not around.
-	 */
-	std::auto_ptr<wxMenuBar> CommonMenuBar;
+    /**
+     * menubar that is shown when the main frame is not around.
+     */
+    std::auto_ptr<wxMenuBar> CommonMenuBar;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

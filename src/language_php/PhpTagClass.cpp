@@ -25,191 +25,190 @@
 #include "language_php/PhpTagClass.h"
 
 t4p::PhpTagClass::PhpTagClass()
-	: Identifier()
-	, ClassName()
-	, NamespaceName()
-	, Signature()
-	, ReturnType()
-	, Comment()
-	, Id(0)
-	, FileIsNew(false)
-	, Type(CLASS)
-	, IsProtected(false)
-	, IsPrivate(false)
-	, IsStatic(false)
-	, IsDynamic(false)
-	, IsNative(false)
-	, HasVariableArgs(false)
-	, Key()
-	, FullPath()
-	, FileTagId(-1)
-	, SourceId(-1) {
+    : Identifier()
+    , ClassName()
+    , NamespaceName()
+    , Signature()
+    , ReturnType()
+    , Comment()
+    , Id(0)
+    , FileIsNew(false)
+    , Type(CLASS)
+    , IsProtected(false)
+    , IsPrivate(false)
+    , IsStatic(false)
+    , IsDynamic(false)
+    , IsNative(false)
+    , HasVariableArgs(false)
+    , Key()
+    , FullPath()
+    , FileTagId(-1)
+    , SourceId(-1) {
 }
 
 t4p::PhpTagClass::PhpTagClass(const t4p::PhpTagClass& src)
-	: Identifier()
-	, ClassName()
-	, NamespaceName()
-	, Signature()
-	, ReturnType()
-	, Comment()
-	, Id(0)
-	, FileIsNew(false)
-	, Type(CLASS)
-	, IsProtected(false)
-	, IsPrivate(false)
-	, IsStatic(false)
-	, IsDynamic(false)
-	, IsNative(false)
-	, HasVariableArgs(false)
-	, Key()
-	, FullPath()
-	, FileTagId(-1)
-	, SourceId(-1) {
-	Copy(src);
+    : Identifier()
+    , ClassName()
+    , NamespaceName()
+    , Signature()
+    , ReturnType()
+    , Comment()
+    , Id(0)
+    , FileIsNew(false)
+    , Type(CLASS)
+    , IsProtected(false)
+    , IsPrivate(false)
+    , IsStatic(false)
+    , IsDynamic(false)
+    , IsNative(false)
+    , HasVariableArgs(false)
+    , Key()
+    , FullPath()
+    , FileTagId(-1)
+    , SourceId(-1) {
+    Copy(src);
 }
 
 void t4p::PhpTagClass::operator=(const t4p::PhpTagClass& src) {
-	Copy(src);
+    Copy(src);
 }
 
 void t4p::PhpTagClass::Copy(const t4p::PhpTagClass& src) {
-	Identifier = src.Identifier;
-	ClassName = src.ClassName;
-	NamespaceName = src.NamespaceName;
-	Signature = src.Signature;
-	ReturnType = src.ReturnType;
-	Comment = src.Comment;
-	Type = src.Type;
+    Identifier = src.Identifier;
+    ClassName = src.ClassName;
+    NamespaceName = src.NamespaceName;
+    Signature = src.Signature;
+    ReturnType = src.ReturnType;
+    Comment = src.Comment;
+    Type = src.Type;
 
-	// deep copy the wxString, as this object may be passed between threads
-	FullPath = src.FullPath.c_str();
-	Key = src.Key;
-	Id = src.Id;
-	FileTagId = src.FileTagId;
-	SourceId = src.SourceId;
-	IsProtected = src.IsProtected;
-	IsPrivate = src.IsPrivate;
-	IsStatic = src.IsStatic;
-	IsDynamic = src.IsDynamic;
-	IsNative = src.IsNative;
-	HasVariableArgs = src.HasVariableArgs;
-	FileIsNew = src.FileIsNew;
+    // deep copy the wxString, as this object may be passed between threads
+    FullPath = src.FullPath.c_str();
+    Key = src.Key;
+    Id = src.Id;
+    FileTagId = src.FileTagId;
+    SourceId = src.SourceId;
+    IsProtected = src.IsProtected;
+    IsPrivate = src.IsPrivate;
+    IsStatic = src.IsStatic;
+    IsDynamic = src.IsDynamic;
+    IsNative = src.IsNative;
+    HasVariableArgs = src.HasVariableArgs;
+    FileIsNew = src.FileIsNew;
 }
 
 bool t4p::PhpTagClass::operator<(const t4p::PhpTagClass& a) const {
-	return Key.caseCompare(a.Key, 0) < 0;
+    return Key.caseCompare(a.Key, 0) < 0;
 }
 
 bool t4p::PhpTagClass::operator==(const t4p::PhpTagClass& a) const {
-	return Identifier == a.Identifier && ClassName == a.ClassName && NamespaceName == a.NamespaceName;
+    return Identifier == a.Identifier && ClassName == a.ClassName && NamespaceName == a.NamespaceName;
 }
 
 bool t4p::PhpTagClass::IsKeyEqualTo(const UnicodeString& key) const {
-	return Key.caseCompare(key, 0) == 0;
+    return Key.caseCompare(key, 0) == 0;
 }
 
 void t4p::PhpTagClass::Clear() {
-	Identifier.remove();
-	ClassName.remove();
-	NamespaceName.remove();
-	Signature.remove();
-	ReturnType.remove();
-	Comment.remove();
-	Id = 0;
-	Type = CLASS;
-	FileTagId = -1;
-	SourceId = -1;
-	FullPath = wxT("");
-	Key.remove();
-	IsProtected = false;
-	IsPrivate = false;
-	IsStatic = false;
-	IsDynamic = false;
-	IsNative = false;
-	HasVariableArgs = false;
-	FileIsNew = false;
+    Identifier.remove();
+    ClassName.remove();
+    NamespaceName.remove();
+    Signature.remove();
+    ReturnType.remove();
+    Comment.remove();
+    Id = 0;
+    Type = CLASS;
+    FileTagId = -1;
+    SourceId = -1;
+    FullPath = wxT("");
+    Key.remove();
+    IsProtected = false;
+    IsPrivate = false;
+    IsStatic = false;
+    IsDynamic = false;
+    IsNative = false;
+    HasVariableArgs = false;
+    FileIsNew = false;
 }
 
 t4p::PhpTagClass t4p::PhpTagClass::MakeNamespace(const UnicodeString& namespaceName) {
-	t4p::PhpTagClass namespaceItem;
-	namespaceItem.Type = t4p::PhpTagClass::NAMESPACE;
-	namespaceItem.NamespaceName = namespaceName;
-	namespaceItem.Identifier = namespaceName;
-	namespaceItem.Key = namespaceName;
-	return namespaceItem;
+    t4p::PhpTagClass namespaceItem;
+    namespaceItem.Type = t4p::PhpTagClass::NAMESPACE;
+    namespaceItem.NamespaceName = namespaceName;
+    namespaceItem.Identifier = namespaceName;
+    namespaceItem.Key = namespaceName;
+    return namespaceItem;
 }
 
 wxFileName t4p::PhpTagClass::FileName() const {
-	wxFileName fileName(FullPath);
-	return fileName;
+    wxFileName fileName(FullPath);
+    return fileName;
 }
 
 wxString  t4p::PhpTagClass::GetFullPath() const {
-	return FullPath;
+    return FullPath;
 }
 
 void t4p::PhpTagClass::SetFullPath(const wxString& fullPath) {
-	FullPath = fullPath;
+    FullPath = fullPath;
 }
 
 bool t4p::PhpTagClass::HasParameters() const {
-	// watch out for default argument of "array()"
-	// look for the function name followed by parentheses
-	return Signature.indexOf(Identifier + UNICODE_STRING_SIMPLE("()")) < 0;
+    // watch out for default argument of "array()"
+    // look for the function name followed by parentheses
+    return Signature.indexOf(Identifier + UNICODE_STRING_SIMPLE("()")) < 0;
 }
 
 UnicodeString t4p::PhpTagClass::FullyQualifiedClassName() const {
-	UnicodeString qualifiedName = NamespaceName;
-	if (!qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
-		qualifiedName.append(UNICODE_STRING_SIMPLE("\\"));
-	}
-	qualifiedName.append(ClassName);
-	return qualifiedName;
+    UnicodeString qualifiedName = NamespaceName;
+    if (!qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
+        qualifiedName.append(UNICODE_STRING_SIMPLE("\\"));
+    }
+    qualifiedName.append(ClassName);
+    return qualifiedName;
 }
 
 t4p::TraitTagClass::TraitTagClass()
-	: TraitClassName()
-	, Aliased()
-	, InsteadOfs()
-	, FileTagId(0) {
+    : TraitClassName()
+    , Aliased()
+    , InsteadOfs()
+    , FileTagId(0) {
 }
 
 t4p::FileTagClass::FileTagClass()
-	: FullPath()
-	, DateTime()
-	, FileId(0)
-	, SourceId(0)
-	, IsParsed(false)
-	, IsNew(true) {
+    : FullPath()
+    , DateTime()
+    , FileId(0)
+    , SourceId(0)
+    , IsParsed(false)
+    , IsNew(true) {
 }
 
 bool t4p::FileTagClass::NeedsToBeParsed(const wxDateTime& fileLastModifiedDateTime) const {
-	if (IsNew || !IsParsed) {
-		return true;
-	}
+    if (IsNew || !IsParsed) {
+        return true;
+    }
 
-	// precision that is stored in SQLite is up to the second;
-	// lets truncate the given date to the nearest second before comparing
-	wxDateTime truncated;
-	truncated.Set(
-		fileLastModifiedDateTime.GetDay(), fileLastModifiedDateTime.GetMonth(), fileLastModifiedDateTime.GetYear(),
-		fileLastModifiedDateTime.GetHour(), fileLastModifiedDateTime.GetMinute(), fileLastModifiedDateTime.GetSecond(), 0
-	);
-	bool modified = truncated.IsLaterThan(DateTime);
-	return modified;
+    // precision that is stored in SQLite is up to the second;
+    // lets truncate the given date to the nearest second before comparing
+    wxDateTime truncated;
+    truncated.Set(
+        fileLastModifiedDateTime.GetDay(), fileLastModifiedDateTime.GetMonth(), fileLastModifiedDateTime.GetYear(),
+        fileLastModifiedDateTime.GetHour(), fileLastModifiedDateTime.GetMinute(), fileLastModifiedDateTime.GetSecond(), 0);
+    bool modified = truncated.IsLaterThan(DateTime);
+    return modified;
 }
 
 void t4p::FileTagClass::MakeNew(const wxFileName& fileName, wxDateTime modTime, bool isParsed) {
-	wxASSERT_MSG(modTime.IsValid(), _("file modification time is not valid"));
-	FullPath = fileName.GetFullPath();
-	DateTime = modTime;
-	FileId = 0;
-	IsParsed = isParsed;
-	IsNew = false;
+    wxASSERT_MSG(modTime.IsValid(), _("file modification time is not valid"));
+    FullPath = fileName.GetFullPath();
+    DateTime = modTime;
+    FileId = 0;
+    IsParsed = isParsed;
+    IsNew = false;
 }
 
 wxString t4p::FileTagClass::Name() const {
-	wxFileName fileName(FullPath);
-	return fileName.GetFullName();
+    wxFileName fileName(FullPath);
+    return fileName.GetFullName();
 }

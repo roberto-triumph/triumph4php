@@ -37,23 +37,23 @@ namespace t4p {
  * located in the lower status bar might not be enough feedback for the user.
  */
 class GaugeDialogClass : public GaugeDialogGeneratedClass {
-	public:
-	GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label);
+ public:
+    GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label);
 
-	/**
-	 * initialize this dialog's gauge (in pulse mode)
-	 */
-	void Start();
+    /**
+     * initialize this dialog's gauge (in pulse mode)
+     */
+    void Start();
 
-	protected:
-	void OnHideButton(wxCommandEvent& event);
+ protected:
+    void OnHideButton(wxCommandEvent& event);
 
-	void OnTimer(wxTimerEvent& event);
+    void OnTimer(wxTimerEvent& event);
 
-	private:
-	wxTimer Timer;
+ private:
+    wxTimer Timer;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

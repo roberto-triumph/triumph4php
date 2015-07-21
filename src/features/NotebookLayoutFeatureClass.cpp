@@ -25,5 +25,5 @@
 #include "features/NotebookLayoutFeatureClass.h"
 
 t4p::NotebookLayoutFeatureClass::NotebookLayoutFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+    : FeatureClass(app) {
 }

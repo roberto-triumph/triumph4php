@@ -38,87 +38,87 @@ namespace t4p {
 class GlobalsClass;
 
 class KeyboardShortcutsPanelClass : public wxKeyConfigPanel {
-	public:
-	KeyboardShortcutsPanelClass(wxWindow* parent, int id, wxPoint position = wxDefaultPosition,
-		wxSize size = wxDefaultSize, long style = 0);
+ public:
+    KeyboardShortcutsPanelClass(wxWindow* parent, int id, wxPoint position = wxDefaultPosition,
+                                wxSize size = wxDefaultSize, long style = 0);
 
-	void AddDynamicCmds(const std::vector<t4p::DynamicCmdClass>& cmds);
+    void AddDynamicCmds(const std::vector<t4p::DynamicCmdClass>& cmds);
 };
 
 /** Implementing PreferencesDialogGeneratedClass */
 class PreferencesDialogClass : public wxPropertySheetDialog {
-	public:
-	/**
-	 * @param parent the parent window
-	 * @param globals the GlobalsClass, to check to see if the user modified any globals settings
-	 * @param preferences the Preferences object to edit
-	 * @param settingsDir wxFileName the location where settings are stored
-	 * @param changedSettingsDir bool [out] if TRUE the user changed the location of the settings directory
-	 *        the caller should save the settings to the new directory
-	 * @param needsRetags bool [out] if TRUE the active projects should be retagged because
-	 *        a settings that affects PHP parsing was changed
-	 */
-	PreferencesDialogClass(wxWindow* parent,
-		t4p::GlobalsClass& globals,
-		t4p::PreferencesClass& preferences,
-		wxFileName& settingsDir, bool& changedSettingsDir, bool& needsRetag);
+ public:
+    /**
+     * @param parent the parent window
+     * @param globals the GlobalsClass, to check to see if the user modified any globals settings
+     * @param preferences the Preferences object to edit
+     * @param settingsDir wxFileName the location where settings are stored
+     * @param changedSettingsDir bool [out] if TRUE the user changed the location of the settings directory
+     *        the caller should save the settings to the new directory
+     * @param needsRetags bool [out] if TRUE the active projects should be retagged because
+     *        a settings that affects PHP parsing was changed
+     */
+    PreferencesDialogClass(wxWindow* parent,
+                           t4p::GlobalsClass& globals,
+                           t4p::PreferencesClass& preferences,
+                           wxFileName& settingsDir, bool& changedSettingsDir, bool& needsRetag);
 
-	/**
-	 * Call this after all property sheets have been added but before they are shown. This method
-	 * will transfer all variables to the windows.
-	 */
-	void Prepare();
+    /**
+     * Call this after all property sheets have been added but before they are shown. This method
+     * will transfer all variables to the windows.
+     */
+    void Prepare();
 
-	/**
-	 * Saves the user's changes.
-	 */
-	void OnOkButton(wxCommandEvent& event);
+    /**
+     * Saves the user's changes.
+     */
+    void OnOkButton(wxCommandEvent& event);
 
-	private:
-	/**
-	 * The dialog to let the user create shortcut keys
-	 *
-	 * @var KeyboardShortcutsPanelClass
-	 */
-	KeyboardShortcutsPanelClass* KeyboardShortcutsPanel;
+ private:
+    /**
+     * The dialog to let the user create shortcut keys
+     *
+     * @var KeyboardShortcutsPanelClass
+     */
+    KeyboardShortcutsPanelClass* KeyboardShortcutsPanel;
 
-	/**
-	 * The preferences object to show & manipulate
-	 *
-	 * @var PreferencesClass
-	 */
-	PreferencesClass& Preferences;
+    /**
+     * The preferences object to show & manipulate
+     *
+     * @var PreferencesClass
+     */
+    PreferencesClass& Preferences;
 
-	/**
-	 * The Globals object to check for modifications
-	 *
-	 * @var GlobalsClass
-	 */
-	GlobalsClass& Globals;
+    /**
+     * The Globals object to check for modifications
+     *
+     * @var GlobalsClass
+     */
+    GlobalsClass& Globals;
 
-	/**
-	 * The initial value of SettingsDir
-	 */
-	wxFileName OldSettingsDir;
+    /**
+     * The initial value of SettingsDir
+     */
+    wxFileName OldSettingsDir;
 
-	/**
-	 * The [possibly[ updated value of SettingsDir
-	 */
-	wxFileName& SettingsDir;
+    /**
+     * The [possibly[ updated value of SettingsDir
+     */
+    wxFileName& SettingsDir;
 
-	/**
-	 * if TRUE the user changed the location of the settings directory
-	 * the caller should save the settings to the new directory
-	 */
-	bool& ChangedSettingsDir;
+    /**
+     * if TRUE the user changed the location of the settings directory
+     * the caller should save the settings to the new directory
+     */
+    bool& ChangedSettingsDir;
 
-	/**
-	 * if TRUE the active projects should be retagged because
-	 * a settings that affects PHP parsing was changed
-	 */
-	bool& NeedsRetag;
+    /**
+     * if TRUE the active projects should be retagged because
+     * a settings that affects PHP parsing was changed
+     */
+    bool& NeedsRetag;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 }  // namespace t4p
 

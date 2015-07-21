@@ -25,7 +25,7 @@
 #include "features/FeatureClass.h"
 
 t4p::FeatureClass::FeatureClass(t4p::AppClass& app)
-	: App(app) {
+    : App(app) {
 }
 
 t4p::FeatureClass::~FeatureClass() {

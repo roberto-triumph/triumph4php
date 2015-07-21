@@ -42,7 +42,7 @@ namespace t4p {
  */
 extern const wxEventType EVENT_DEBUGGER_LOG;
 #define EVT_DEBUGGER_LOG(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DEBUGGER_LOG, id, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DEBUGGER_LOG, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(wxThreadEventFunction, & fn), (wxObject *) NULL),
 
@@ -54,7 +54,7 @@ extern const wxEventType EVENT_DEBUGGER_LOG;
  */
 extern const wxEventType EVENT_DEBUGGER_SOCKET_ERROR;
 #define EVT_DEBUGGER_SOCKET_ERROR(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DEBUGGER_SOCKET_ERROR, id, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DEBUGGER_SOCKET_ERROR, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(wxThreadEventFunction, & fn), (wxObject *) NULL),
 
@@ -66,7 +66,7 @@ extern const wxEventType EVENT_DEBUGGER_SOCKET_ERROR;
  */
 extern const wxEventType EVENT_DEBUGGER_LISTEN_ERROR;
 #define EVT_DEBUGGER_LISTEN_ERROR(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DEBUGGER_LISTEN_ERROR, id, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DEBUGGER_LISTEN_ERROR, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(wxThreadEventFunction, & fn), (wxObject *) NULL),
 
@@ -78,7 +78,7 @@ extern const wxEventType EVENT_DEBUGGER_LISTEN_ERROR;
  */
 extern const wxEventType EVENT_DEBUGGER_LISTEN;
 #define EVT_DEBUGGER_LISTEN(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DEBUGGER_LISTEN, id, -1, \
+    DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DEBUGGER_LISTEN, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(wxThreadEventFunction, & fn), (wxObject *) NULL),
 
@@ -130,109 +130,109 @@ extern const wxEventType EVENT_DEBUGGER_CMD;
  * need to connect to the port and send a payload of "close"
  */
 class DebuggerServerActionClass : public wxEvtHandler, public t4p::ActionClass {
-	public:
-	DebuggerServerActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker);
+ public:
+    DebuggerServerActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker);
 
-	~DebuggerServerActionClass();
+    ~DebuggerServerActionClass();
 
-	/**
-	 * set the port that will be listened on.  this should be the same as the "xdebug.remote_port"
-	 * setting in the user's php.ini.
-	 */
-	void Init(int port);
+    /**
+     * set the port that will be listened on.  this should be the same as the "xdebug.remote_port"
+     * setting in the user's php.ini.
+     */
+    void Init(int port);
 
-	protected:
-	/**
-	 * this method contains the "main loop" of the socket service. we will
-	 * continously listen for new responses and send new commands.
-	 * we will also listen for a triumph-only special "close" message to
-	 * be able to close the socket properly.
-	 */
-	void BackgroundWork();
+ protected:
+    /**
+     * this method contains the "main loop" of the socket service. we will
+     * continously listen for new responses and send new commands.
+     * we will also listen for a triumph-only special "close" message to
+     * be able to close the socket properly.
+     */
+    void BackgroundWork();
 
-	/**
-	 * parses the xdebug xml response into the approprivate DbgpEvent class
-	 * and posts the event.
-	 *
-	 * @param xml the xml response from xdebug
-	 * @param cmd the command that we sent to xdebug
-	 * @param [out] isDebuggerStopped will be set to TRUE when the debugger responds
-	 *        that the script has finished running (ie. "step over" the last line of the script)
-	 */
-	void ParseAndPost(const wxString& xml, const std::string& cmd, bool& isDebuggerStopped);
+    /**
+     * parses the xdebug xml response into the approprivate DbgpEvent class
+     * and posts the event.
+     *
+     * @param xml the xml response from xdebug
+     * @param cmd the command that we sent to xdebug
+     * @param [out] isDebuggerStopped will be set to TRUE when the debugger responds
+     *        that the script has finished running (ie. "step over" the last line of the script)
+     */
+    void ParseAndPost(const wxString& xml, const std::string& cmd, bool& isDebuggerStopped);
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 
-	/**
-	 * the loop for each debugger seesion (script)
-	 */
-	void SessionWork(boost::asio::ip::tcp::socket& socket);
+    /**
+     * the loop for each debugger seesion (script)
+     */
+    void SessionWork(boost::asio::ip::tcp::socket& socket);
 
-	/**
-	 * adds a command to be sent over to the debug engine. adding is
-	 * done safely by using the mutex.
-	 */
-	void AddCommand(std::string cmd);
+    /**
+     * adds a command to be sent over to the debug engine. adding is
+     * done safely by using the mutex.
+     */
+    void AddCommand(std::string cmd);
 
-	/**
-	 * @return the next command to send, empty string if there are no more commands
-	 *         to send. the command is removed from the queue.
-	 *         this method safely removes from the queue by using the mutex.
-	 */
-	std::string NextCommand();
+    /**
+     * @return the next command to send, empty string if there are no more commands
+     *         to send. the command is removed from the queue.
+     *         this method safely removes from the queue by using the mutex.
+     */
+    std::string NextCommand();
 
-	/**
-	 * send a log event; this is usually the command we send to xdebug or
-	 * the response we get back
-	 */
-	void Log(const wxString& title, const wxString& msg);
+    /**
+     * send a log event; this is usually the command we send to xdebug or
+     * the response we get back
+     */
+    void Log(const wxString& title, const wxString& msg);
 
-	/**
-	 * handler of the EVENT_DEBUGGER_CMD event. adds the command
-	 * to be sent over to the debug engine after all previously queues
-	 * commands have been sent.
-	 */
-	void OnCmd(wxThreadEvent& event);
+    /**
+     * handler of the EVENT_DEBUGGER_CMD event. adds the command
+     * to be sent over to the debug engine after all previously queues
+     * commands have been sent.
+     */
+    void OnCmd(wxThreadEvent& event);
 
-	/**
-	 * commands to be sent by triumph to the debugger engine. These strings
-	 * are built with DbgpCommandClass. Examples of commands: set a
-	 * breakpoint, get a variable value, get the runtime stack
-	 */
-	std::queue<std::string> Commands;
+    /**
+     * commands to be sent by triumph to the debugger engine. These strings
+     * are built with DbgpCommandClass. Examples of commands: set a
+     * breakpoint, get a variable value, get the runtime stack
+     */
+    std::queue<std::string> Commands;
 
-	/**
-	 * prevent simulatenous access to commands list
-	 */
-	wxMutex CommandMutex;
+    /**
+     * prevent simulatenous access to commands list
+     */
+    wxMutex CommandMutex;
 
-	/**
-	 * the io service listens on the socket for
-	 * information from the debugger engine
-	 */
-	boost::asio::io_service IoService;
+    /**
+     * the io service listens on the socket for
+     * information from the debugger engine
+     */
+    boost::asio::io_service IoService;
 
-	/**
-	 * we use the event sink to get commands from the foreground thread.
-	 * for example, the user clicks the "step out" command the
-	 * foreground thread will post a command to this event sink.
-	 * the server action will listen for the commands an send them to
-	 * the debug engine.
-	 */
-	t4p::EventSinkLockerClass& EventSinkLocker;
+    /**
+     * we use the event sink to get commands from the foreground thread.
+     * for example, the user clicks the "step out" command the
+     * foreground thread will post a command to this event sink.
+     * the server action will listen for the commands an send them to
+     * the debug engine.
+     */
+    t4p::EventSinkLockerClass& EventSinkLocker;
 
-	/**
-	 * used to build the xdebug commands. using a class-wide instance
-	 * because xdebug commands require a unique "transactionId"
-	 */
-	t4p::DbgpCommandClass Cmd;
+    /**
+     * used to build the xdebug commands. using a class-wide instance
+     * because xdebug commands require a unique "transactionId"
+     */
+    t4p::DbgpCommandClass Cmd;
 
-	/**
-	 * the port number to listen on.  This is the same port
-	 * that the user will set on their php.ini file for
-	 * "xdebug.remote_port"
-	 */
-	int Port;
+    /**
+     * the port number to listen on.  This is the same port
+     * that the user will set on their php.ini file for
+     * "xdebug.remote_port"
+     */
+    int Port;
 };
 }  // namespace t4p
 

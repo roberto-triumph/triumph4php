@@ -46,79 +46,79 @@ namespace t4p {
  * for the URL that the user has selected.
  */
 class TemplateFilesViewClass : public t4p::FeatureViewClass {
-	public:
-	TemplateFilesViewClass(t4p::TemplateFilesFeatureClass& feature);
+ public:
+    TemplateFilesViewClass(t4p::TemplateFilesFeatureClass& feature);
 
-	void SetCurrentUrl(t4p::UrlTagClass url);
+    void SetCurrentUrl(t4p::UrlTagClass url);
 
-	void AddViewMenuItems(wxMenu* viewMenu);
+    void AddViewMenuItems(wxMenu* viewMenu);
 
 
-	/**
-	 * @return wxString the currently opened file. Note that this may not be
-	 *         a valid file (new, untitled files).
-	 */
-	wxString CurrentFile();
+    /**
+     * @return wxString the currently opened file. Note that this may not be
+     *         a valid file (new, untitled files).
+     */
+    wxString CurrentFile();
 
-	/**
-	 * Opens the given file. file must be a full path.
-	 */
-	void OpenFile(wxString file);
+    /**
+     * Opens the given file. file must be a full path.
+     */
+    void OpenFile(wxString file);
 
-	private:
-	/**
-	 * show (or create) the view files window and start the calculations if needed
-	 */
-	void OnTemplateFilesMenu(wxCommandEvent& event);
+ private:
+    /**
+     * show (or create) the view files window and start the calculations if needed
+     */
+    void OnTemplateFilesMenu(wxCommandEvent& event);
 
-	/**
-	 * when the template file detection process completes update the variable tree
-	 */
-	void OnTemplateDetectionComplete(t4p::ActionEventClass& event);
+    /**
+     * when the template file detection process completes update the variable tree
+     */
+    void OnTemplateDetectionComplete(t4p::ActionEventClass& event);
 
-	void ShowPanel();
+    void ShowPanel();
 
-	t4p::TemplateFilesFeatureClass& Feature;
+    t4p::TemplateFilesFeatureClass& Feature;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
-	public:
-	TemplateFilesFeatureClass& Feature;
+ public:
+    TemplateFilesFeatureClass& Feature;
 
-	TemplateFilesViewClass& View;
+    TemplateFilesViewClass& View;
 
-	TemplateFilesPanelClass(wxWindow* parent, int id,
-		TemplateFilesFeatureClass& feature,
-		TemplateFilesViewClass& view);
+    TemplateFilesPanelClass(wxWindow* parent, int id,
+                            TemplateFilesFeatureClass& feature,
+                            TemplateFilesViewClass& view);
 
-	void UpdateResults();
+    void UpdateResults();
 
-	void ClearResults();
+    void ClearResults();
 
-	void UpdateControllers();
+    void UpdateControllers();
 
-	protected:
-	void OnHelpButton(wxCommandEvent& event);
+ protected:
+    void OnHelpButton(wxCommandEvent& event);
 
-	void OnCurrentButton(wxCommandEvent& event);
+    void OnCurrentButton(wxCommandEvent& event);
 
-	void OnControllerChoice(wxCommandEvent& event);
+    void OnControllerChoice(wxCommandEvent& event);
 
-	void OnActionChoice(wxCommandEvent& event);
+    void OnActionChoice(wxCommandEvent& event);
 
-	void OnTreeItemActivated(wxTreeEvent& event);
+    void OnTreeItemActivated(wxTreeEvent& event);
 
-	private:
-	enum {
-		IMAGE_TEMPLATE_FOLDER = 0,
-		IMAGE_TEMPLATE_FOLDER_OPEN,
-		IMAGE_TEMPLATE_FILE,
-		IMAGE_TEMPLATE_VARIABLE
-	};
+ private:
+    enum {
+        IMAGE_TEMPLATE_FOLDER = 0,
+        IMAGE_TEMPLATE_FOLDER_OPEN,
+        IMAGE_TEMPLATE_FILE,
+        IMAGE_TEMPLATE_VARIABLE
+    };
 
-	wxImageList ImageList;
+    wxImageList ImageList;
 };
 }  // namespace t4p
 

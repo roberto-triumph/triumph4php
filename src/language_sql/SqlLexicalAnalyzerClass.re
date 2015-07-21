@@ -1,4 +1,7 @@
 /*
+ * @copyright  2009-2011 Roberto Perpuly
+ * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
+ *
  * The MIT License
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,9 +21,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
- * @copyright  2009-2011 Roberto Perpuly
- * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/SqlLexicalAnalyzerClass.h>
 
@@ -31,51 +31,51 @@
 #define SQL_LEXICAL_ANALYZER_SET_CONDITION(c) CurrentCondition = c
 
 t4p::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass()
-	: Buffer()
-	, QueryStartLineNumber(0)
-	, CurrentCondition(SQL_ANY) {
+    : Buffer()
+    , QueryStartLineNumber(0)
+    , CurrentCondition(SQL_ANY) {
 
 }
 
 void t4p::SqlLexicalAnalyzerClass::Close() {
-	Buffer.Close();
+    Buffer.Close();
 }
 
 bool t4p::SqlLexicalAnalyzerClass::OpenString(const UnicodeString& queries) {
-	QueryStartLineNumber = 1;
-	return Buffer.OpenString(queries);
+    QueryStartLineNumber = 1;
+    return Buffer.OpenString(queries);
 }
 
 bool t4p::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
-	Buffer.MarkTokenStart();
-	query.remove();
-	QueryStartLineNumber = Buffer.GetLineNumber();
-	NextToken();
-	bool contents = false;
-	const UChar *start = Buffer.TokenStart;
-	const UChar *end =  Buffer.Current;
-	if ((end - start) > 0 && Buffer.Current <= Buffer.Limit) {
+    Buffer.MarkTokenStart();
+    query.remove();
+    QueryStartLineNumber = Buffer.GetLineNumber();
+    NextToken();
+    bool contents = false;
+    const UChar *start = Buffer.TokenStart;
+    const UChar *end =  Buffer.Current;
+    if ((end - start) > 0 && Buffer.Current <= Buffer.Limit) {
 
-		// if passed by the EOF need to step back otherwise we insert
-		// a null character
-		if (Buffer.Current >= Buffer.Limit) {
-			end--;
-		}
-		query.append(Buffer.TokenStart, end - start);
-		query.trim();
-		contents = !query.isEmpty();
-	}
-	return contents;
+        // if passed by the EOF need to step back otherwise we insert
+        // a null character
+        if (Buffer.Current >= Buffer.Limit) {
+            end--;
+        }
+        query.append(Buffer.TokenStart, end - start);
+        query.trim();
+        contents = !query.isEmpty();
+    }
+    return contents;
 }
 
 int t4p::SqlLexicalAnalyzerClass::GetLineNumber() const {
-	return QueryStartLineNumber;
+    return QueryStartLineNumber;
 }
 
 int t4p::SqlLexicalAnalyzerClass::NextToken() {
-	if (Buffer.HasReachedEnd()) {
-		return t4p::SqlLexicalAnalyzerClass::SQL_EOF;
-	}
+    if (Buffer.HasReachedEnd()) {
+        return t4p::SqlLexicalAnalyzerClass::SQL_EOF;
+    }
 
 sql_lexical_analyzer_next:
 

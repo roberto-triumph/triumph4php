@@ -32,28 +32,28 @@
 
 namespace t4p {
 class FileWatcherViewClass : public t4p::FeatureViewClass {
-	public:
-	FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature);
+ public:
+    FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature);
 
-	void AddPreferenceWindow(wxBookCtrlBase* parent);
+    void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-	private:
-	t4p::FileWatcherFeatureClass& Feature;
+ private:
+    t4p::FileWatcherFeatureClass& Feature;
 
-	// to track opened files, since the watcher needs to
-	// see which files are currently opened
-	void OnFileClosed(t4p::CodeControlEventClass& event);
-	void OnFileOpened(t4p::CodeControlEventClass& event);
+    // to track opened files, since the watcher needs to
+    // see which files are currently opened
+    void OnFileClosed(t4p::CodeControlEventClass& event);
+    void OnFileOpened(t4p::CodeControlEventClass& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGeneratedClass {
-	public:
-	FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature);
+ public:
+    FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature);
 
-	private:
-	t4p::FileWatcherFeatureClass& Feature;
+ private:
+    t4p::FileWatcherFeatureClass& Feature;
 };
 }  // namespace t4p
 

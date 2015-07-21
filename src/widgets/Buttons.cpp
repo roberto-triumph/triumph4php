@@ -27,16 +27,15 @@
 #include <wx/platinfo.h>
 
 void t4p::HelpButtonIcon(wxBitmapButton* button) {
-	wxPlatformInfo info;
-	if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
-		// the mac toolkit will put icons on the help
-		// buttons (when the button's ID is wxID_HELP)
-		button->SetMinSize(wxSize(32, 32));
-		return;
-	}
+    wxPlatformInfo info;
+    if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
+        // the mac toolkit will put icons on the help
+        // buttons (when the button's ID is wxID_HELP)
+        button->SetMinSize(wxSize(32, 32));
+        return;
+    }
 
-	// on GTK, windows, add the image
-	button->SetBitmapLabel(
-		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
-	);
+    // on GTK, windows, add the image
+    button->SetBitmapLabel(
+        wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16)));
 }

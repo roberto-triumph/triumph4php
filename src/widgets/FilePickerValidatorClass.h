@@ -34,25 +34,25 @@ namespace t4p {
  * can handle either wxFilePickerCtrl only.
  */
 class FilePickerValidatorClass : public wxValidator {
-	public:
-	/**
-	 * @param The string to validate / transfer. This class will not own this pointer.
-	 */
-	FilePickerValidatorClass(wxFileName* data);
+ public:
+    /**
+     * @param The string to validate / transfer. This class will not own this pointer.
+     */
+    FilePickerValidatorClass(wxFileName* data);
 
-	virtual bool TransferToWindow();
+    virtual bool TransferToWindow();
 
-	virtual bool TransferFromWindow();
+    virtual bool TransferFromWindow();
 
-	virtual bool Validate(wxWindow* parent);
+    virtual bool Validate(wxWindow* parent);
 
-	virtual wxObject* Clone() const;
+    virtual wxObject* Clone() const;
 
-	private:
-	/**
-	 * The object to validate. This class will not own this pointer.
-	 */
-	wxFileName* Data;
+ private:
+    /**
+     * The object to validate. This class will not own this pointer.
+     */
+    wxFileName* Data;
 };
 }  // namespace t4p
 

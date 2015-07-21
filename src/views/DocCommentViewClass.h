@@ -35,43 +35,43 @@ class DocCommentFeatureClass;
 class CodeControlClass;
 
 class DocCommentViewClass : public t4p::FeatureViewClass {
-	public:
-	DocCommentViewClass(t4p::DocCommentFeatureClass& feature);
+ public:
+    DocCommentViewClass(t4p::DocCommentFeatureClass& feature);
 
-	void AddEditMenuItems(wxMenu* editMenu);
+    void AddEditMenuItems(wxMenu* editMenu);
 
-	private:
-	void OnShowDocComment(wxCommandEvent& event);
+ private:
+    void OnShowDocComment(wxCommandEvent& event);
 
-	void OnMotionAlt(wxCommandEvent& event);
+    void OnMotionAlt(wxCommandEvent& event);
 
-	void ShowDocComment(t4p::CodeControlClass* ctrl, int pos);
+    void ShowDocComment(t4p::CodeControlClass* ctrl, int pos);
 
-	void OnPhpSiteLinkClick(wxHyperlinkEvent& event);
+    void OnPhpSiteLinkClick(wxHyperlinkEvent& event);
 
-	t4p::DocCommentFeatureClass& Feature;
+    t4p::DocCommentFeatureClass& Feature;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /**
  * the panel that shows a PHP doc comment.
  */
 class DocCommentPanelClass : public DocCommentPanelGeneratedClass {
-	public:
-	DocCommentPanelClass(wxWindow* parent, t4p::DocCommentViewClass& featureView);
+ public:
+    DocCommentPanelClass(wxWindow* parent, t4p::DocCommentViewClass& featureView);
 
-	void SetText(const wxString& text);
+    void SetText(const wxString& text);
 
-	void EnablePhpSiteLink(const wxString& functionName);
+    void EnablePhpSiteLink(const wxString& functionName);
 
-	protected:
-	void OnClose(wxHyperlinkEvent& event);
-	void OnKeyDown(wxKeyEvent& event);
-	void OnPhpSiteDocs(wxHyperlinkEvent& event);
-	void DoDestroy();
+ protected:
+    void OnClose(wxHyperlinkEvent& event);
+    void OnKeyDown(wxKeyEvent& event);
+    void OnPhpSiteDocs(wxHyperlinkEvent& event);
+    void DoDestroy();
 
-	t4p::DocCommentViewClass& FeatureView;
+    t4p::DocCommentViewClass& FeatureView;
 };
 
 }  // namespace t4p

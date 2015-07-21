@@ -37,12 +37,12 @@ namespace t4p {
  * stale.
  */
 class DetectorDbInitActionClass : public t4p::InitializerGlobalActionClass {
-	public:
-	DetectorDbInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+ public:
+    DetectorDbInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	void Work(t4p::GlobalsClass& globals);
+    void Work(t4p::GlobalsClass& globals);
 
-	wxString GetLabel() const;
+    wxString GetLabel() const;
 };
 }  // namespace t4p
 

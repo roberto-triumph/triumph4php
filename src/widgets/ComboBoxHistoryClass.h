@@ -37,57 +37,57 @@ namespace t4p {
  * of th
  */
 class ComboBoxHistoryClass : public wxEvtHandler {
-	public:
-	/**
-	 * Construct a new history
-	 * @param The combo box we are to add history to.  We will not own this pointer; calling code needs to delete it.
-	 * Can be NULL.  IF NULL, nothing happens.
-	 */
-	ComboBoxHistoryClass(wxComboBox* combo = NULL);
+ public:
+    /**
+     * Construct a new history
+     * @param The combo box we are to add history to.  We will not own this pointer; calling code needs to delete it.
+     * Can be NULL.  IF NULL, nothing happens.
+     */
+    ComboBoxHistoryClass(wxComboBox* combo = NULL);
 
-	/**
-	 * Cleanup.
-	 */
-	~ComboBoxHistoryClass();
+    /**
+     * Cleanup.
+     */
+    ~ComboBoxHistoryClass();
 
-	/**
-	 * This method is appropriate for combo boxes withing modal dialogs. Will prepopulate items from the
-	 * previous runs.  Note that you must call detach so that events are properly disconnected.
-	 * Also note that this object can only Attach to one combobox at a time.
-	 */
-	void Attach(wxComboBox* combo);
+    /**
+     * This method is appropriate for combo boxes withing modal dialogs. Will prepopulate items from the
+     * previous runs.  Note that you must call detach so that events are properly disconnected.
+     * Also note that this object can only Attach to one combobox at a time.
+     */
+    void Attach(wxComboBox* combo);
 
-	/**
-	 * This method can be called to save the current combo's value to the history.  While this object
-	 * is attached to the EVT_TEXT_ENTER event. there may be other cases when the history needs to be saved
-	 * (for example if the dialog has an OK button).
-	 * Precondition: combobox MUST have been given in the constructor or via the Attach() method.
-	 */
-	void Save();
+    /**
+     * This method can be called to save the current combo's value to the history.  While this object
+     * is attached to the EVT_TEXT_ENTER event. there may be other cases when the history needs to be saved
+     * (for example if the dialog has an OK button).
+     * Precondition: combobox MUST have been given in the constructor or via the Attach() method.
+     */
+    void Save();
 
-	/**
-	 * Cleanup for comboxes inside modal dialogs.
-	 */
-	void Detach();
+    /**
+     * Cleanup for comboxes inside modal dialogs.
+     */
+    void Detach();
 
-	private:
-	/**
-	 * We will use this only for modal dialogs; in order to persist items accross many instances of the same dialog.
-	 * @param wxArrayString
-	 */
-	wxArrayString Items;
+ private:
+    /**
+     * We will use this only for modal dialogs; in order to persist items accross many instances of the same dialog.
+     * @param wxArrayString
+     */
+    wxArrayString Items;
 
-	/**
-	 * The combo box we are managing.  We will not own this pointer; calling code needs to delete it
-	 */
-	wxComboBox* Combo;
+    /**
+     * The combo box we are managing.  We will not own this pointer; calling code needs to delete it
+     */
+    wxComboBox* Combo;
 
-	/**
-	 * When an item is chosen, add it to the combo box list.
-	 *
-	 * @param wxCommandEvent* event
-	 */
-	void OnComboSelected(wxCommandEvent& event);
+    /**
+     * When an item is chosen, add it to the combo box list.
+     *
+     * @param wxCommandEvent* event
+     */
+    void OnComboSelected(wxCommandEvent& event);
 };
 }  // namespace t4p
 

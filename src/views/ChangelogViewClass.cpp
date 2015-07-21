@@ -26,19 +26,19 @@
 #include "features/ChangelogFeatureClass.h"
 
 t4p::ChangelogViewClass::ChangelogViewClass(t4p::ChangelogFeatureClass& feature)
-: FeatureViewClass()
-, Feature(feature) {
+    : FeatureViewClass()
+    , Feature(feature) {
 }
 
 void t4p::ChangelogViewClass::AddHelpMenuItems(wxMenu* helpMenu) {
-	helpMenu->Append(t4p::MENU_CHANGELOG + 0, _("See ChangeLog"),
-		_("Open the triumph4php ChangeLog file"), wxITEM_NORMAL);
+    helpMenu->Append(t4p::MENU_CHANGELOG + 0, _("See ChangeLog"),
+                     _("Open the triumph4php ChangeLog file"), wxITEM_NORMAL);
 }
 
 void t4p::ChangelogViewClass::OnHelpChangelog(wxCommandEvent& event) {
-	Feature.ShowChangeLog();
+    Feature.ShowChangeLog();
 }
 
 BEGIN_EVENT_TABLE(t4p::ChangelogViewClass, t4p::FeatureViewClass)
-	EVT_MENU(t4p::MENU_CHANGELOG + 0, t4p::ChangelogViewClass::OnHelpChangelog)
+    EVT_MENU(t4p::MENU_CHANGELOG + 0, t4p::ChangelogViewClass::OnHelpChangelog)
 END_EVENT_TABLE()

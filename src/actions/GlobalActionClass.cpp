@@ -25,28 +25,28 @@
 #include "actions/GlobalActionClass.h"
 
 t4p::GlobalActionClass::GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId) {
+    : ActionClass(runningThreads, eventId) {
 }
 
 bool t4p::GlobalActionClass::DoAsync() {
-	return true;
+    return true;
 }
 
 t4p::InitializerGlobalActionClass::InitializerGlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId) {
+    : GlobalActionClass(runningThreads, eventId) {
 }
 
 bool t4p::InitializerGlobalActionClass::Init(t4p::GlobalsClass& globals) {
-	Work(globals);
+    Work(globals);
 
-	t4p::ActionEventClass evt(GetEventId(), t4p::EVENT_ACTION_COMPLETE, wxT(""));
-	PostEvent(evt);
-	return true;
+    t4p::ActionEventClass evt(GetEventId(), t4p::EVENT_ACTION_COMPLETE, wxT(""));
+    PostEvent(evt);
+    return true;
 }
 
 
 bool t4p::InitializerGlobalActionClass::DoAsync() {
-	return false;
+    return false;
 }
 
 void t4p::InitializerGlobalActionClass::BackgroundWork() {

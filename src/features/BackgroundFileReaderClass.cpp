@@ -26,79 +26,79 @@
 #include <vector>
 
 t4p::BackgroundFileReaderClass::BackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: ActionClass(runningThreads, eventId)
-	, DirectorySearch()
-	, Mode(WALK) {
+    : ActionClass(runningThreads, eventId)
+    , DirectorySearch()
+    , Mode(WALK) {
 }
 
 bool t4p::BackgroundFileReaderClass::Init(const wxString& path, t4p::DirectorySearchClass::Modes mode,
-												bool doHiddenFiles) {
-	Mode = WALK;
-	return DirectorySearch.Init(path, mode, doHiddenFiles);
+        bool doHiddenFiles) {
+    Mode = WALK;
+    return DirectorySearch.Init(path, mode, doHiddenFiles);
 }
 
 bool t4p::BackgroundFileReaderClass::Init(std::vector<t4p::SourceClass> sources, t4p::DirectorySearchClass::Modes mode,
-												bool doHiddenFiles) {
-	Mode = WALK;
-	return DirectorySearch.Init(sources, mode, doHiddenFiles);
+        bool doHiddenFiles) {
+    Mode = WALK;
+    return DirectorySearch.Init(sources, mode, doHiddenFiles);
 }
 
 
 bool t4p::BackgroundFileReaderClass::InitMatched(const std::vector<wxString>& matchedFiles) {
-	Mode = MATCHED;
-	MatchedFiles = matchedFiles;
-	return !matchedFiles.empty();
+    Mode = MATCHED;
+    MatchedFiles = matchedFiles;
+    return !matchedFiles.empty();
 }
 
 void t4p::BackgroundFileReaderClass::BackgroundWork() {
-	bool isDestroy = IsCancelled();
-	int counter = 0;
-	if (Mode == WALK) {
-		// careful to test for destroy first
-		while (!isDestroy && DirectorySearch.More()) {
-			bool res = BackgroundFileRead(DirectorySearch);
+    bool isDestroy = IsCancelled();
+    int counter = 0;
+    if (Mode == WALK) {
+        // careful to test for destroy first
+        while (!isDestroy && DirectorySearch.More()) {
+            bool res = BackgroundFileRead(DirectorySearch);
 
-			// signal that the background thread has finished one file
-			counter++;
-			wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
+            // signal that the background thread has finished one file
+            counter++;
+            wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
 
-			// when isDestroy returns TRUE, must exit as soon as possible
-			// for example, when app exists the ThreadWithHeartbeat class kills the
-			// thread, many things are no longer valid
-			// this IF block prevents crashes on app exit
-			isDestroy = IsCancelled();
-			if (!isDestroy) {
-				singleEvent.SetInt(counter);
-				singleEvent.SetClientData(reinterpret_cast<void*>(res));
-				PostEvent(singleEvent);
-			}
-		}
-	} else if (Mode == MATCHED) {
-		int count = MatchedFiles.size();
-		for (int i = 0; i < count && !isDestroy; i++) {
-			BackgroundFileMatch(MatchedFiles[i]);
+            // when isDestroy returns TRUE, must exit as soon as possible
+            // for example, when app exists the ThreadWithHeartbeat class kills the
+            // thread, many things are no longer valid
+            // this IF block prevents crashes on app exit
+            isDestroy = IsCancelled();
+            if (!isDestroy) {
+                singleEvent.SetInt(counter);
+                singleEvent.SetClientData(reinterpret_cast<void*>(res));
+                PostEvent(singleEvent);
+            }
+        }
+    } else if (Mode == MATCHED) {
+        int count = MatchedFiles.size();
+        for (int i = 0; i < count && !isDestroy; i++) {
+            BackgroundFileMatch(MatchedFiles[i]);
 
-			// signal that the background thread has finished one file
-			counter++;
-			isDestroy = IsCancelled();
-			if (!isDestroy) {
-				wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
-				singleEvent.SetInt(counter);
-				PostEvent(singleEvent);
-			}
-		}
-	}
+            // signal that the background thread has finished one file
+            counter++;
+            isDestroy = IsCancelled();
+            if (!isDestroy) {
+                wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
+                singleEvent.SetInt(counter);
+                PostEvent(singleEvent);
+            }
+        }
+    }
 
-	// signal that the background thread has finished
-	// when isDestroy returns TRUE, must exit as soon as possible
-	// for example, when app exists the ThreadWithHeartbeat class kills the
-	// thread, many things are no longer valid
-	// this IF block prevents crashes on app exit
-	if (!isDestroy) {
-		wxCommandEvent endEvent(EVENT_FILE_READ_COMPLETE, wxNewId());
-		endEvent.SetInt(Mode);
-		PostEvent(endEvent);
-	}
+    // signal that the background thread has finished
+    // when isDestroy returns TRUE, must exit as soon as possible
+    // for example, when app exists the ThreadWithHeartbeat class kills the
+    // thread, many things are no longer valid
+    // this IF block prevents crashes on app exit
+    if (!isDestroy) {
+        wxCommandEvent endEvent(EVENT_FILE_READ_COMPLETE, wxNewId());
+        endEvent.SetInt(Mode);
+        PostEvent(endEvent);
+    }
 }
 
 const wxEventType t4p::EVENT_FILE_READ_COMPLETE = wxNewEventType();

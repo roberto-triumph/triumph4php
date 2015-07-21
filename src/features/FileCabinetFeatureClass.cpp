@@ -27,24 +27,24 @@
 #include "Triumph.h"
 
 t4p::FileCabinetFeatureClass::FileCabinetFeatureClass(t4p::AppClass& app)
-: FeatureClass(app)
-, Store() {
+    : FeatureClass(app)
+    , Store() {
 }
 
 t4p::FileCabinetItemClass t4p::FileCabinetFeatureClass::AddDirectoryToCabinet(const wxString& dir) {
-	t4p::FileCabinetItemClass fileCabinetItem;
-	fileCabinetItem.FileName.AssignDir(dir);
-	Store.Store(App.Globals.ResourceCacheSession, fileCabinetItem);
-	return fileCabinetItem;
+    t4p::FileCabinetItemClass fileCabinetItem;
+    fileCabinetItem.FileName.AssignDir(dir);
+    Store.Store(App.Globals.ResourceCacheSession, fileCabinetItem);
+    return fileCabinetItem;
 }
 
 t4p::FileCabinetItemClass t4p::FileCabinetFeatureClass::AddFileToCabinet(const wxString& file) {
-	t4p::FileCabinetItemClass fileCabinetItem;
-	fileCabinetItem.FileName.Assign(file);
-	Store.Store(App.Globals.ResourceCacheSession, fileCabinetItem);
-	return fileCabinetItem;
+    t4p::FileCabinetItemClass fileCabinetItem;
+    fileCabinetItem.FileName.Assign(file);
+    Store.Store(App.Globals.ResourceCacheSession, fileCabinetItem);
+    return fileCabinetItem;
 }
 
 void t4p::FileCabinetFeatureClass::DeleteCabinetItem(int id) {
-	Store.Delete(App.Globals.ResourceCacheSession, id);
+    Store.Delete(App.Globals.ResourceCacheSession, id);
 }

@@ -42,99 +42,99 @@ static const int SCHEMA_VERSION_TAGS = 10;
 static const int SCHEMA_VERSION_DETECTOR = 9;
 
 t4p::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId)
-	, TagDbs()
-	, Session() {
+    : GlobalActionClass(runningThreads, eventId)
+    , TagDbs()
+    , Session() {
 }
 
 bool t4p::TagCacheDbVersionActionClass::Init(t4p::GlobalsClass& globals) {
-	SetStatus(_("Tag Cache Check"));
+    SetStatus(_("Tag Cache Check"));
 
-	// don't think wxFileName copy constructor is a deep clone
-	// we need a deep clone since we access this in the background thread
-	wxFileName file(globals.TagCacheDbFileName.GetFullPath());
-	TagDbs.push_back(file);
-	return true;
+    // don't think wxFileName copy constructor is a deep clone
+    // we need a deep clone since we access this in the background thread
+    wxFileName file(globals.TagCacheDbFileName.GetFullPath());
+    TagDbs.push_back(file);
+    return true;
 }
 
 void t4p::TagCacheDbVersionActionClass::BackgroundWork() {
-	std::vector<wxFileName>::iterator filename;
-	for (filename = TagDbs.begin(); filename != TagDbs.end() && !IsCancelled(); ++filename) {
-		try {
-			// if file does not exist create it
-			// if the directory that the sqlite file should be in does not exist
-			// then dont create the dirs.
-			if (wxFileName::DirExists(filename->GetPath())) {
-				std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
-				Session.open(*soci::factory_sqlite3(), stdFilename);
-				int versionNumber = t4p::SqliteSchemaVersion(Session);
-				if (versionNumber != SCHEMA_VERSION_TAGS) {
-					wxString error;
-					bool good = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), Session, error);
-					if (!good) {
-						t4p::EditorLogError(t4p::ERR_TAG_READ, error);
-					}
-				}
-				Session.close();
-			}
-		} catch (std::exception& e) {
-			wxString msg = wxString::FromAscii(e.what());
-			wxUnusedVar(msg);
-			wxASSERT_MSG(false, msg);
-		}
-	}
+    std::vector<wxFileName>::iterator filename;
+    for (filename = TagDbs.begin(); filename != TagDbs.end() && !IsCancelled(); ++filename) {
+        try {
+            // if file does not exist create it
+            // if the directory that the sqlite file should be in does not exist
+            // then dont create the dirs.
+            if (wxFileName::DirExists(filename->GetPath())) {
+                std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
+                Session.open(*soci::factory_sqlite3(), stdFilename);
+                int versionNumber = t4p::SqliteSchemaVersion(Session);
+                if (versionNumber != SCHEMA_VERSION_TAGS) {
+                    wxString error;
+                    bool good = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), Session, error);
+                    if (!good) {
+                        t4p::EditorLogError(t4p::ERR_TAG_READ, error);
+                    }
+                }
+                Session.close();
+            }
+        } catch (std::exception& e) {
+            wxString msg = wxString::FromAscii(e.what());
+            wxUnusedVar(msg);
+            wxASSERT_MSG(false, msg);
+        }
+    }
 }
 
 wxString t4p::TagCacheDbVersionActionClass::GetLabel() const {
-	return _("Tag Cache Version Check");
+    return _("Tag Cache Version Check");
 }
 
 t4p::DetectorCacheDbVersionActionClass::DetectorCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId)
-	, DetectorDbs()
-	, Session() {
+    : GlobalActionClass(runningThreads, eventId)
+    , DetectorDbs()
+    , Session() {
 }
 
 bool t4p::DetectorCacheDbVersionActionClass::Init(t4p::GlobalsClass& globals) {
-	SetStatus(_("Detector Cache Check"));
+    SetStatus(_("Detector Cache Check"));
 
-	// don't think wxFileName copy constructor is a deep clone
-	// we need a deep clone since we access this in the background thread
-	wxFileName file(globals.DetectorCacheDbFileName.GetFullPath());
-	DetectorDbs.push_back(file);
-	return true;
+    // don't think wxFileName copy constructor is a deep clone
+    // we need a deep clone since we access this in the background thread
+    wxFileName file(globals.DetectorCacheDbFileName.GetFullPath());
+    DetectorDbs.push_back(file);
+    return true;
 }
 
 void t4p::DetectorCacheDbVersionActionClass::BackgroundWork() {
-	std::vector<wxFileName>::iterator filename;
-	for (filename = DetectorDbs.begin(); filename != DetectorDbs.end() && !IsCancelled(); ++filename) {
-		try {
-			// if file does not exist create it
-			// if the directory that the sqlite file should be in does not exist
-			// then dont create the dirs.
-			if (wxFileName::DirExists(filename->GetPath())) {
-				std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
-				Session.open(*soci::factory_sqlite3(), stdFilename);
-				int versionNumber = t4p::SqliteSchemaVersion(Session);
-				if (versionNumber != SCHEMA_VERSION_DETECTOR) {
-					wxString error;
-					bool good = t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), Session, error);
-					if (!good) {
-						t4p::EditorLogError(t4p::ERR_TAG_READ, error);
-					}
-				}
-				Session.close();
-			}
-		} catch (std::exception& e) {
-			wxString msg = wxString::FromAscii(e.what());
-			wxUnusedVar(msg);
-			wxASSERT_MSG(false, msg);
-		}
-	}
+    std::vector<wxFileName>::iterator filename;
+    for (filename = DetectorDbs.begin(); filename != DetectorDbs.end() && !IsCancelled(); ++filename) {
+        try {
+            // if file does not exist create it
+            // if the directory that the sqlite file should be in does not exist
+            // then dont create the dirs.
+            if (wxFileName::DirExists(filename->GetPath())) {
+                std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
+                Session.open(*soci::factory_sqlite3(), stdFilename);
+                int versionNumber = t4p::SqliteSchemaVersion(Session);
+                if (versionNumber != SCHEMA_VERSION_DETECTOR) {
+                    wxString error;
+                    bool good = t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), Session, error);
+                    if (!good) {
+                        t4p::EditorLogError(t4p::ERR_TAG_READ, error);
+                    }
+                }
+                Session.close();
+            }
+        } catch (std::exception& e) {
+            wxString msg = wxString::FromAscii(e.what());
+            wxUnusedVar(msg);
+            wxASSERT_MSG(false, msg);
+        }
+    }
 }
 
 wxString t4p::DetectorCacheDbVersionActionClass::GetLabel() const {
-	return _("Detector Cache Version Check");
+    return _("Detector Cache Version Check");
 }
 
 

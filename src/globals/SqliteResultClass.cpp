@@ -27,104 +27,104 @@
 #include "globals/String.h"
 
 t4p::SqliteResultClass::SqliteResultClass()
-: IsEmpty(true)
-, IsFetched(false) {
-	Stmt = NULL;
+    : IsEmpty(true)
+    , IsFetched(false) {
+    Stmt = NULL;
 }
 
 t4p::SqliteResultClass::~SqliteResultClass() {
-	if (Stmt) {
-		delete Stmt;
-	}
+    if (Stmt) {
+        delete Stmt;
+    }
 }
 
 bool t4p::SqliteResultClass::Init(soci::session& session, bool doLimit) {
-	bool good = false;
-	wxASSERT_MSG(NULL == Stmt, "result can only be initialized once");
-	try {
-		soci::statement* stmt = new soci::statement(session);
-		Stmt = stmt;
-		DoPrepare(*stmt, doLimit);
-		DoBind(*stmt);
-		Stmt->define_and_bind();
-		good = true;
-	} catch (std::exception& exception) {
-		wxASSERT_MSG(false, exception.what());
-	}
-	return good;
+    bool good = false;
+    wxASSERT_MSG(NULL == Stmt, "result can only be initialized once");
+    try {
+        soci::statement* stmt = new soci::statement(session);
+        Stmt = stmt;
+        DoPrepare(*stmt, doLimit);
+        DoBind(*stmt);
+        Stmt->define_and_bind();
+        good = true;
+    } catch (std::exception& exception) {
+        wxASSERT_MSG(false, exception.what());
+    }
+    return good;
 }
 
 bool t4p::SqliteResultClass::IsOk() const {
-	return Stmt != NULL;
+    return Stmt != NULL;
 }
 
 bool t4p::SqliteResultClass::Exec(soci::session& session, bool doLimit) {
-	bool prepped = Stmt != NULL;
-	if (!Stmt) {
-		prepped = Init(session, doLimit);
-	}
-	if (!prepped) {
-		return false;
-	}
+    bool prepped = Stmt != NULL;
+    if (!Stmt) {
+        prepped = Init(session, doLimit);
+    }
+    if (!prepped) {
+        return false;
+    }
 
-	IsEmpty = true;
-	IsFetched = false;
-	wxString error;
-	try {
-		bool hasData = Stmt->execute(true);
-		if (hasData) {
-			IsEmpty = false;
-		} else {
-			IsEmpty = true;
-			IsFetched = true;
-		}
-	} catch (std::exception& e) {
-		error = t4p::CharToWx(e.what());
-		wxASSERT_MSG(false, error);
-		delete Stmt;
-		Stmt = NULL;
-	}
-	return !IsEmpty;
+    IsEmpty = true;
+    IsFetched = false;
+    wxString error;
+    try {
+        bool hasData = Stmt->execute(true);
+        if (hasData) {
+            IsEmpty = false;
+        } else {
+            IsEmpty = true;
+            IsFetched = true;
+        }
+    } catch (std::exception& e) {
+        error = t4p::CharToWx(e.what());
+        wxASSERT_MSG(false, error);
+        delete Stmt;
+        Stmt = NULL;
+    }
+    return !IsEmpty;
 }
 
 bool t4p::SqliteResultClass::Empty() const {
-	return IsEmpty;
+    return IsEmpty;
 }
 
 bool t4p::SqliteResultClass::More() const {
-	return !IsEmpty && !IsFetched;
+    return !IsEmpty && !IsFetched;
 }
 
 bool t4p::SqliteResultClass::Fetch() {
-	if (!Stmt || IsFetched) {
-		return false;
-	}
-	bool more = Stmt->fetch();
-	if (!more) {
-		IsFetched = true;
-	}
-	return more;
+    if (!Stmt || IsFetched) {
+        return false;
+    }
+    bool more = Stmt->fetch();
+    if (!more) {
+        IsFetched = true;
+    }
+    return more;
 }
 
 bool t4p::SqliteResultClass::ReExec(wxString& error)  {
-	IsEmpty = true;
-	IsFetched = false;
-	if (!Stmt) {
-		error = wxT("Result has not been prepared");
-		return false;
-	}
-	try {
-		bool hasData = Stmt->execute(true);
-		if (hasData) {
-			IsEmpty = false;
-		} else {
-			IsEmpty = true;
-		}
-	} catch (std::exception& e) {
-		error = t4p::CharToWx(e.what());
-		wxASSERT_MSG(false, error);
-		delete Stmt;
-		Stmt = NULL;
-	}
-	return !IsEmpty;
+    IsEmpty = true;
+    IsFetched = false;
+    if (!Stmt) {
+        error = wxT("Result has not been prepared");
+        return false;
+    }
+    try {
+        bool hasData = Stmt->execute(true);
+        if (hasData) {
+            IsEmpty = false;
+        } else {
+            IsEmpty = true;
+        }
+    } catch (std::exception& e) {
+        error = t4p::CharToWx(e.what());
+        wxASSERT_MSG(false, error);
+        delete Stmt;
+        Stmt = NULL;
+    }
+    return !IsEmpty;
 }

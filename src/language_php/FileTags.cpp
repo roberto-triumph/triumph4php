@@ -30,74 +30,77 @@
 #include "globals/String.h"
 
 std::vector<int> t4p::FileTagIdsForDirs(soci::session& session, const std::vector<wxFileName>& dirs, bool& error, wxString& errorMsg) {
-	std::vector<int> fileTagIds;
-	if (dirs.empty()) {
-		return fileTagIds;
-	}
-	std::string sql = "";
-	for (size_t i = 0; i < dirs.size(); i++) {
-		sql += "SELECT file_item_id FROM file_items WHERE full_path LIKE '" +
-			t4p::WxToChar(dirs[i].GetPathWithSep()) + "%' ESCAPE '^'";
-		if (i < (dirs.size() - 1)) {
-			sql += " UNION ";
-		}
-	}
-	int fileItemId = 0;
-	try {
-		soci::statement stmt = (session.prepare << sql,
-			soci::into(fileItemId));
-		bool foundFile = stmt.execute(true);
-		if (foundFile) {
-			fileTagIds.push_back(fileItemId);
-			while (stmt.fetch()) {
-				fileTagIds.push_back(fileItemId);
-			}
-		}
-	} catch (std::exception& e) {
-		error = true;
-		errorMsg = t4p::CharToWx(e.what());
-		wxASSERT_MSG(false, errorMsg);
-	}
-	std::sort(fileTagIds.begin(), fileTagIds.end());
-	std::vector<int>::iterator it = std::unique(fileTagIds.begin(), fileTagIds.end());
-	fileTagIds.erase(it, fileTagIds.end());
-	return fileTagIds;
+    std::vector<int> fileTagIds;
+    if (dirs.empty()) {
+        return fileTagIds;
+    }
+    std::string sql = "";
+    for (size_t i = 0; i < dirs.size(); i++) {
+        sql += "SELECT file_item_id FROM file_items WHERE full_path LIKE '" +
+               t4p::WxToChar(dirs[i].GetPathWithSep()) + "%' ESCAPE '^'";
+        if (i < (dirs.size() - 1)) {
+            sql += " UNION ";
+        }
+    }
+    int fileItemId = 0;
+    try {
+        soci::statement stmt = (session.prepare << sql,
+                                soci::into(fileItemId));
+        bool foundFile = stmt.execute(true);
+        if (foundFile) {
+            fileTagIds.push_back(fileItemId);
+            while (stmt.fetch()) {
+                fileTagIds.push_back(fileItemId);
+            }
+        }
+    } catch (std::exception& e) {
+        error = true;
+        errorMsg = t4p::CharToWx(e.what());
+        wxASSERT_MSG(false, errorMsg);
+    }
+    std::sort(fileTagIds.begin(), fileTagIds.end());
+    std::vector<int>::iterator it = std::unique(fileTagIds.begin(), fileTagIds.end());
+    fileTagIds.erase(it, fileTagIds.end());
+    return fileTagIds;
 }
 
 bool t4p::FileTagPersist(soci::session& session, t4p::FileTagClass& fileTag) {
-	std::string fullPath = t4p::WxToChar(fileTag.FullPath);
-	std::string name = t4p::WxToChar(fileTag.Name());
-	std::tm tm;
-	int isParsed = fileTag.IsParsed ? 1 : 0;
-	int isNew = fileTag.IsNew ? 1 : 0;
-	int sourceId = fileTag.SourceId;
-	if (fileTag.DateTime.IsValid()) {
-		wxDateTime::Tm wxTm = fileTag.DateTime.GetTm();
-		tm.tm_hour = wxTm.hour;
-		tm.tm_isdst = fileTag.DateTime.IsDST();
-		tm.tm_mday = wxTm.mday;
-		tm.tm_min = wxTm.min;
-		tm.tm_mon = wxTm.mon;
-		tm.tm_sec = wxTm.sec;
-		tm.tm_wday = fileTag.DateTime.GetWeekDay();
-		tm.tm_yday = fileTag.DateTime.GetDayOfYear();
+    std::string fullPath = t4p::WxToChar(fileTag.FullPath);
+    std::string name = t4p::WxToChar(fileTag.Name());
+    std::tm tm;
+    int isParsed = fileTag.IsParsed ? 1 : 0;
+    int isNew = fileTag.IsNew ? 1 : 0;
+    int sourceId = fileTag.SourceId;
+    if (fileTag.DateTime.IsValid()) {
+        wxDateTime::Tm wxTm = fileTag.DateTime.GetTm();
+        tm.tm_hour = wxTm.hour;
+        tm.tm_isdst = fileTag.DateTime.IsDST();
+        tm.tm_mday = wxTm.mday;
+        tm.tm_min = wxTm.min;
+        tm.tm_mon = wxTm.mon;
+        tm.tm_sec = wxTm.sec;
+        tm.tm_wday = fileTag.DateTime.GetWeekDay();
+        tm.tm_yday = fileTag.DateTime.GetDayOfYear();
 
-		// tm holds number of years since 1900 (2012 = 112)
-		tm.tm_year = wxTm.year - 1900;
-	}
-	bool success = false;
-	try {
-		soci::statement stmt = (session.prepare <<
-			"INSERT INTO file_items (file_item_id, source_id, full_path, name, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?, ?, ?)",
-			soci::use(sourceId), soci::use(fullPath), soci::use(name), soci::use(tm), soci::use(isParsed), soci::use(isNew));
-		stmt.execute(true);
-		fileTag.FileId = t4p::SqliteInsertId(stmt);
-		success = true;
-	} catch (std::exception& e) {
-		// ATTN: at some point bubble these exceptions up?
-		// to avoid unreferenced local variable warnings in MSVC
-		wxString msg = wxString::FromAscii(e.what());
-		wxASSERT_MSG(false, msg);
-	}
-	return success;
+        // tm holds number of years since 1900 (2012 = 112)
+        tm.tm_year = wxTm.year - 1900;
+    }
+    bool success = false;
+    try {
+        soci::statement stmt = (session.prepare <<
+                                "INSERT INTO file_items " <<
+                                "(file_item_id, source_id, full_path, name, last_modified, is_parsed, is_new)" <<
+                                "VALUES(NULL, ?, ?, ?, ?, ?, ?)",
+                                soci::use(sourceId), soci::use(fullPath), soci::use(name),
+                                soci::use(tm), soci::use(isParsed), soci::use(isNew));
+        stmt.execute(true);
+        fileTag.FileId = t4p::SqliteInsertId(stmt);
+        success = true;
+    } catch (std::exception& e) {
+        // ATTN: at some point bubble these exceptions up?
+        // to avoid unreferenced local variable warnings in MSVC
+        wxString msg = wxString::FromAscii(e.what());
+        wxASSERT_MSG(false, msg);
+    }
+    return success;
 }

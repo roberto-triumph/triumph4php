@@ -37,109 +37,109 @@ namespace t4p {
  * This project can hold files from multiple, separate directories.
  */
 class ProjectClass {
-	public:
-	/**
-	 * A friendly label for this project. This is usually set by a user.
-	 */
-	wxString Label;
+ public:
+    /**
+     * A friendly label for this project. This is usually set by a user.
+     */
+    wxString Label;
 
-	/**
-	 * The directories where source files are located in.
-	 */
-	std::vector<t4p::SourceClass> Sources;
+    /**
+     * The directories where source files are located in.
+     */
+    std::vector<t4p::SourceClass> Sources;
 
-	/**
-	 * If TRUE, this project is enabled and is used by Triumph.
-	 */
-	bool IsEnabled;
+    /**
+     * If TRUE, this project is enabled and is used by Triumph.
+     */
+    bool IsEnabled;
 
-	/**
-	 * Construct a ProjectClass object from the given options
-	 *
-	 * @param ProjectOptionsClass options the new project's options
-	 */
-	ProjectClass();
+    /**
+     * Construct a ProjectClass object from the given options
+     *
+     * @param ProjectOptionsClass options the new project's options
+     */
+    ProjectClass();
 
-	ProjectClass(const t4p::ProjectClass& src);
+    ProjectClass(const t4p::ProjectClass& src);
 
-	void operator=(const t4p::ProjectClass& src);
+    void operator=(const t4p::ProjectClass& src);
 
-	/**
-	 * Add a source directory to this project.
-	 */
-	void AddSource(const t4p::SourceClass& src);
+    /**
+     * Add a source directory to this project.
+     */
+    void AddSource(const t4p::SourceClass& src);
 
-	/**
-	 * Removes all of the sources from this project.
-	 */
-	void ClearSources();
+    /**
+     * Removes all of the sources from this project.
+     */
+    void ClearSources();
 
-	/**
-	 * This method will return a list of sources suitable
-	 * for recursing into this project to find all of the PHP Source
-	 * code files in this project.
-	 *
-	 * @param fileTypes the configured file type extensions
-	 * @return all of this project's source directories
-	 * but with the PHP extensions added to each source.
-	 */
-	std::vector<t4p::SourceClass> AllPhpSources(const t4p::FileTypeClass& fileType) const;
+    /**
+     * This method will return a list of sources suitable
+     * for recursing into this project to find all of the PHP Source
+     * code files in this project.
+     *
+     * @param fileTypes the configured file type extensions
+     * @return all of this project's source directories
+     * but with the PHP extensions added to each source.
+     */
+    std::vector<t4p::SourceClass> AllPhpSources(const t4p::FileTypeClass& fileType) const;
 
-	/**
-	 * This method will return a list of sources suitable for recursing into
-	 * this project to find all relevant files; ie PHP, CSS, SQL,
-	 * and all misc file extensions.
-	 *
-	 * @param fileTypes the configured file type extensions
-	 * @return all of this project's sources with all of the wildcards (PHP, CSS, SQL, JS,
-	 * and misc file extensions) added to each sources.
-	 */
-	std::vector<t4p::SourceClass> AllSources(const t4p::FileTypeClass& fileType) const;
+    /**
+     * This method will return a list of sources suitable for recursing into
+     * this project to find all relevant files; ie PHP, CSS, SQL,
+     * and all misc file extensions.
+     *
+     * @param fileTypes the configured file type extensions
+     * @return all of this project's sources with all of the wildcards (PHP, CSS, SQL, JS,
+     * and misc file extensions) added to each sources.
+     */
+    std::vector<t4p::SourceClass> AllSources(const t4p::FileTypeClass& fileType) const;
 
-	/**
-	 *
-	 * @params fullPath the full path to check
-	 * @param fileTypes the configured file type extensions
-	 * @return TRUE if given full path is a PHP file, as determined by
-	 * the sources directories and the file type php extensions.
-	 */
-	bool IsAPhpSourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const;
+    /**
+     *
+     * @params fullPath the full path to check
+     * @param fileTypes the configured file type extensions
+     * @return TRUE if given full path is a PHP file, as determined by
+     * the sources directories and the file type php extensions.
+     */
+    bool IsAPhpSourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const;
 
 
-	/**
-	 * @return TRUE if given full path is a "source" file; TRUE if
-	 *         the given file's extension is any of the fileType's
-	 *         extensions
-	 */
-	bool IsASourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const;
+    /**
+     * @return TRUE if given full path is a "source" file; TRUE if
+     *         the given file's extension is any of the fileType's
+     *         extensions
+     */
+    bool IsASourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const;
 
-	/**
-	 * @return bool TRUE if this project has AT LEAST 1 source
-	 */
-	bool HasSources() const;
+    /**
+     * @return bool TRUE if this project has AT LEAST 1 source
+     */
+    bool HasSources() const;
 
-	/**
-	 * removes the source directory from the given full path.
-	 * Examples
-	 * source directory = /home/roberto/
-	 * fullPath = /home/roberto/workspace/now.php
-	 * Then this method returns "workspace/now.php"
-	 *
-	 * @param full path to a file
-	 * @return the part of the file without the source prefix
-	 * In the case that fullPath is not contained in any of this
-	 * project's sources, then this method returns nothing.
-	 */
-	wxString RelativeFileName(const wxString& fullPath) const;
+    /**
+     * removes the source directory from the given full path.
+     * Examples
+     * source directory = /home/roberto/
+     * fullPath = /home/roberto/workspace/now.php
+     * Then this method returns "workspace/now.php"
+     *
+     * @param full path to a file
+     * @return the part of the file without the source prefix
+     * In the case that fullPath is not contained in any of this
+     * project's sources, then this method returns nothing.
+     */
+    wxString RelativeFileName(const wxString& fullPath) const;
 
-	/**
-	 *
-	 * return the CssFileExtensions + SqlFileExtensions + MiscFileExtensions for this project.
-	 * @return all extension wilcards except for PHP wildcards
-	 */
-	std::vector<wxString> GetNonPhpExtensions(const t4p::FileTypeClass& fileType) const;
+    /**
+     *
+     * return the CssFileExtensions + SqlFileExtensions + MiscFileExtensions for this project.
+     * @return all extension wilcards except for PHP wildcards
+     */
+    std::vector<wxString> GetNonPhpExtensions(const t4p::FileTypeClass& fileType) const;
 
-	private:
+ private:
 };
 }  // namespace t4p
 

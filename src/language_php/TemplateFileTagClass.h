@@ -37,52 +37,52 @@ namespace t4p {
  * as the names of the variables that the controller assigned to this template file.
  */
 class TemplateFileTagClass {
-	public:
-	/**
-	 * the full path of the template file
-	 */
-	wxString FullPath;
+ public:
+    /**
+     * the full path of the template file
+     */
+    wxString FullPath;
 
-	/**
-	 * the names of the variables that the controller assigned to this template file.
-	 */
-	std::vector<wxString> Variables;
+    /**
+     * the names of the variables that the controller assigned to this template file.
+     */
+    std::vector<wxString> Variables;
 
-	TemplateFileTagClass();
+    TemplateFileTagClass();
 
-	TemplateFileTagClass(const t4p::TemplateFileTagClass& src);
+    TemplateFileTagClass(const t4p::TemplateFileTagClass& src);
 
-	void Copy(const t4p::TemplateFileTagClass& src);
+    void Copy(const t4p::TemplateFileTagClass& src);
 
-	t4p::TemplateFileTagClass& operator=(const t4p::TemplateFileTagClass& src);
+    t4p::TemplateFileTagClass& operator=(const t4p::TemplateFileTagClass& src);
 
-	void Init(const wxString& fullPath, const std::vector<wxString>& variables);
+    void Init(const wxString& fullPath, const std::vector<wxString>& variables);
 };
 
 /**
  * This class will load template file rows from the detector DB into memeory
  */
 class TemplateFileTagFinderClass {
-	public:
-	TemplateFileTagFinderClass();
+ public:
+    TemplateFileTagFinderClass();
 
-	/**
-	 * Connect to the given db; will disconnect from the previous db
-	 *
-	 * @param detectorDbFileName full path to the detector sqlite db
-	 */
-	void Init(const wxFileName& detectorDbFileName);
+    /**
+     * Connect to the given db; will disconnect from the previous db
+     *
+     * @param detectorDbFileName full path to the detector sqlite db
+     */
+    void Init(const wxFileName& detectorDbFileName);
 
-	/**
-	 * @return all of the templates that are in the detectors db file that was last
-	 *  initialized.
-	 */
-	std::vector<t4p::TemplateFileTagClass> All();
+    /**
+     * @return all of the templates that are in the detectors db file that was last
+     *  initialized.
+     */
+    std::vector<t4p::TemplateFileTagClass> All();
 
-	private:
-	soci::session Session;
+ private:
+    soci::session Session;
 
-	bool IsInitialized;
+    bool IsInitialized;
 };
 }  // namespace t4p
 

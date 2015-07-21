@@ -38,42 +38,42 @@ class ApacheFileReadCompleteEventClass;
 class EnvironmentFeatureClass;
 
 class EnvironmentViewClass : public t4p::FeatureViewClass {
-	public:
-	EnvironmentViewClass(t4p::EnvironmentFeatureClass& feature);
+ public:
+    EnvironmentViewClass(t4p::EnvironmentFeatureClass& feature);
 
-	/**
-	 * Add the environment dialogs to the preferences notebook
-	 */
-	void AddPreferenceWindow(wxBookCtrlBase* parent);
+    /**
+     * Add the environment dialogs to the preferences notebook
+     */
+    void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-	private:
-	t4p::EnvironmentFeatureClass& Feature;
+ private:
+    t4p::EnvironmentFeatureClass& Feature;
 };
 
 /**
  * A dialog that edits a virtual host mapping.
  */
 class VirtualHostCreateDialogClass : public VirtualHostCreateDialogGeneratedClass {
-	public:
-	VirtualHostCreateDialogClass(wxWindow* parent, std::map<wxString, wxString> existingVirtualHosts,
-			wxString& hostname, wxFileName& rootDirectory);
+ public:
+    VirtualHostCreateDialogClass(wxWindow* parent, std::map<wxString, wxString> existingVirtualHosts,
+                                 wxString& hostname, wxFileName& rootDirectory);
 
-	protected:
-	/**
-	 * here we will do duplicate checks; the same directory may not be entered twice
-	 */
-	void OnOkButton(wxCommandEvent& event);
+ protected:
+    /**
+     * here we will do duplicate checks; the same directory may not be entered twice
+     */
+    void OnOkButton(wxCommandEvent& event);
 
-	private:
-	/**
-	 * This is used to check that the same directory is not entered twice
-	 */
-	std::map<wxString, wxString> ExistingVirtualHosts;
+ private:
+    /**
+     * This is used to check that the same directory is not entered twice
+     */
+    std::map<wxString, wxString> ExistingVirtualHosts;
 
-	/**
-	 * Used because there is to validator for wxDirPickerCtrl
-	 */
-	wxFileName& RootDirectoryFileName;
+    /**
+     * Used because there is to validator for wxDirPickerCtrl
+     */
+    wxFileName& RootDirectoryFileName;
 };
 
 /**
@@ -81,162 +81,162 @@ class VirtualHostCreateDialogClass : public VirtualHostCreateDialogGeneratedClas
  * have functionality to scan a directory for apache config files
  */
 class ApacheEnvironmentPanelClass : public ApacheEnvironmentPanelGeneratedClass {
-	protected:
-	void OnScanButton(wxCommandEvent& event);
-	void OnAddButton(wxCommandEvent& event);
-	void OnEditButton(wxCommandEvent& event);
-	void OnRemoveButton(wxCommandEvent& event);
+ protected:
+    void OnScanButton(wxCommandEvent& event);
+    void OnAddButton(wxCommandEvent& event);
+    void OnEditButton(wxCommandEvent& event);
+    void OnRemoveButton(wxCommandEvent& event);
 
-	public:
-	/** Constructor */
-	ApacheEnvironmentPanelClass(wxWindow* parent, t4p::RunningThreadsClass& runningThreads, EnvironmentClass& environment);
+ public:
+    /** Constructor */
+    ApacheEnvironmentPanelClass(wxWindow* parent, t4p::RunningThreadsClass& runningThreads, EnvironmentClass& environment);
 
-	~ApacheEnvironmentPanelClass();
+    ~ApacheEnvironmentPanelClass();
 
-	/**
-	 * transfers the settings from the window to the Environment data structure
-	 */
-	bool TransferDataFromWindow();
+    /**
+     * transfers the settings from the window to the Environment data structure
+     */
+    bool TransferDataFromWindow();
 
-	private:
-	/**
-	 * The configuration class
-	 *
-	 * @var EnvironmentClass
-	 */
-	EnvironmentClass& Environment;
+ private:
+    /**
+     * The configuration class
+     *
+     * @var EnvironmentClass
+     */
+    EnvironmentClass& Environment;
 
-	/**
-	 * keeps track of background threads
-	 */
-	t4p::RunningThreadsClass& RunningThreads;
+    /**
+     * keeps track of background threads
+     */
+    t4p::RunningThreadsClass& RunningThreads;
 
-	/**
-	 * A copy of the current virtual hosts; this is the data structure that the
-	 * user modifies (while the dialog is opened)
-	 */
-	ApacheClass EditedApache;
+    /**
+     * A copy of the current virtual hosts; this is the data structure that the
+     * user modifies (while the dialog is opened)
+     */
+    ApacheClass EditedApache;
 
-	/**
-	 * the action identifier, used to stop any running actions
-	 */
-	int RunningActionId;
+    /**
+     * the action identifier, used to stop any running actions
+     */
+    int RunningActionId;
 
-	/**
-	 * populate the dialog according to the ApacheClass settings
-	 */
-	void OnApacheFileReadComplete(t4p::ApacheFileReadCompleteEventClass& event);
+    /**
+     * populate the dialog according to the ApacheClass settings
+     */
+    void OnApacheFileReadComplete(t4p::ApacheFileReadCompleteEventClass& event);
 
-	/**
-	 * When this panel is resized automatically re-adjust the wrapping the label
-	 */
-	void OnResize(wxSizeEvent& event);
+    /**
+     * When this panel is resized automatically re-adjust the wrapping the label
+     */
+    void OnResize(wxSizeEvent& event);
 
-	/**
-	 * tick the gauge here
-	 */
-	void OnActionProgress(t4p::ActionProgressEventClass& event);
+    /**
+     * tick the gauge here
+     */
+    void OnActionProgress(t4p::ActionProgressEventClass& event);
 
-	/**
-	 * stop the gauge here
-	 */
-	void OnActionComplete(t4p::ActionEventClass& event);
+    /**
+     * stop the gauge here
+     */
+    void OnActionComplete(t4p::ActionEventClass& event);
 
-	/**
-	 * Fills in the dialogs based on the Apache environment
-	 */
-	void Populate();
+    /**
+     * Fills in the dialogs based on the Apache environment
+     */
+    void Populate();
 
-	/**
-	 * disable the CRUD buttons according to the Manual flag
-	 */
-	void OnUpdateUi(wxUpdateUIEvent& event);
+    /**
+     * disable the CRUD buttons according to the Manual flag
+     */
+    void OnUpdateUi(wxUpdateUIEvent& event);
 
-	/**
-	 * when the user picks a directory start the scan
-	 */
-	void OnDirChanged(wxFileDirPickerEvent& event);
+    /**
+     * when the user picks a directory start the scan
+     */
+    void OnDirChanged(wxFileDirPickerEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /**
  * Panel that displays the configured web browser executable paths
  */
 class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
-	public:
-	WebBrowserEditPanelClass(wxWindow* parent, EnvironmentClass& environment);
+ public:
+    WebBrowserEditPanelClass(wxWindow* parent, EnvironmentClass& environment);
 
-	/**
-	 * applies the settings that were changed to the Environment reference [given
-	 * in the constructor].
-	 */
-	bool TransferDataFromWindow();
+    /**
+     * applies the settings that were changed to the Environment reference [given
+     * in the constructor].
+     */
+    bool TransferDataFromWindow();
 
-	protected:
-	/**
-	 * When this panel is resized automatically re-adjust the wrapping the label
-	 */
-	void OnResize(wxSizeEvent& event);
+ protected:
+    /**
+     * When this panel is resized automatically re-adjust the wrapping the label
+     */
+    void OnResize(wxSizeEvent& event);
 
-	void OnRemoveSelectedWebBrowser(wxCommandEvent& event);
+    void OnRemoveSelectedWebBrowser(wxCommandEvent& event);
 
-	void OnAddWebBrowser(wxCommandEvent& event);
+    void OnAddWebBrowser(wxCommandEvent& event);
 
-	void OnEditSelectedWebBrowser(wxCommandEvent& event);
+    void OnEditSelectedWebBrowser(wxCommandEvent& event);
 
-	void OnMoveUp(wxCommandEvent& event);
+    void OnMoveUp(wxCommandEvent& event);
 
-	void OnMoveDown(wxCommandEvent& event);
+    void OnMoveDown(wxCommandEvent& event);
 
-	private:
-	/**
-	 * The configuration class
-	 *
-	 * @var EnvironmentClass
-	 */
-	EnvironmentClass& Environment;
+ private:
+    /**
+     * The configuration class
+     *
+     * @var EnvironmentClass
+     */
+    EnvironmentClass& Environment;
 
-	/**
-	 * The web browsers being modified. this is the vector that is the recipient
-	 * of all of the user's operations; it will be copied only when the
-	 * user clicks OK.
-	 */
-	std::vector<WebBrowserClass> EditedWebBrowsers;
+    /**
+     * The web browsers being modified. this is the vector that is the recipient
+     * of all of the user's operations; it will be copied only when the
+     * user clicks OK.
+     */
+    std::vector<WebBrowserClass> EditedWebBrowsers;
 };
 
 /**
  * Panel that shows the PHP binary path locations
  */
 class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
-	public:
-	PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
+ public:
+    PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
 
-	bool TransferDataFromWindow();
+    bool TransferDataFromWindow();
 
-	protected:
-	/**
-	 * Handle the file picker changed event.
-	 */
-	void OnPhpFileChanged(wxFileDirPickerEvent& event);
+ protected:
+    /**
+     * Handle the file picker changed event.
+     */
+    void OnPhpFileChanged(wxFileDirPickerEvent& event);
 
-	/*
-	 * disable the file picker when the checkbox is checked
-	 */
-	void OnInstalledCheck(wxCommandEvent& event);
+    /*
+     * disable the file picker when the checkbox is checked
+     */
+    void OnInstalledCheck(wxCommandEvent& event);
 
-	/**
-	 * When this panel is resized automatically re-adjust the wrapping the label
-	 */
-	void OnResize(wxSizeEvent& event);
+    /**
+     * When this panel is resized automatically re-adjust the wrapping the label
+     */
+    void OnResize(wxSizeEvent& event);
 
-	private:
-	/**
-	 * The configuration class
-	 *
-	 * @var EnvironmentClass
-	 */
-	EnvironmentClass& Environment;
+ private:
+    /**
+     * The configuration class
+     *
+     * @var EnvironmentClass
+     */
+    EnvironmentClass& Environment;
 };
 
 /**
@@ -244,29 +244,29 @@ class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
  * location
  */
 class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass {
-	public:
-	WebBrowserCreateDialogClass(wxWindow* parent, std::vector<WebBrowserClass> existingBrowsers,
-		WebBrowserClass& newBrowser);
+ public:
+    WebBrowserCreateDialogClass(wxWindow* parent, std::vector<WebBrowserClass> existingBrowsers,
+                                WebBrowserClass& newBrowser);
 
-	protected:
-	void OnOkButton(wxCommandEvent& event);
+ protected:
+    void OnOkButton(wxCommandEvent& event);
 
-	/**
-	 * to prevent multiple browsers with the same name
-	 */
-	std::vector<WebBrowserClass> ExistingBrowsers;
+    /**
+     * to prevent multiple browsers with the same name
+     */
+    std::vector<WebBrowserClass> ExistingBrowsers;
 
-	/**
-	 * to transfer the chosen file path
-	 */
-	WebBrowserClass& NewBrowser;
+    /**
+     * to transfer the chosen file path
+     */
+    WebBrowserClass& NewBrowser;
 
-	/**
-	 * Safe the original name so that when editing we can tell that the name is not changing
-	 * and the "duplicate" name check won't be run (allow the user to edit a browser
-	 * path only).
-	 */
-	wxString OriginalName;
+    /**
+     * Safe the original name so that when editing we can tell that the name is not changing
+     * and the "duplicate" name check won't be run (allow the user to edit a browser
+     * path only).
+     */
+    wxString OriginalName;
 };
 }  // namespace t4p
 
