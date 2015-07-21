@@ -15,4 +15,4 @@
 	ignore = dirty
 [submodule "lib/googleStyleGuide"]
 	path = lib/googleStyleGuide
-	url = git@github.com:google/styleguide.git
+	url = https://github.com/google/styleguide.git
