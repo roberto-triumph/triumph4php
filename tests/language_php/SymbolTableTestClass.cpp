@@ -22,8 +22,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <UnitTest++.h>
 #include <string>
 #include <vector>
@@ -36,6 +34,8 @@
 #include "language_php/TagParserClass.h"
 #include "SqliteTestFixtureClass.h"
 #include "TriumphChecks.h"
+#include <soci/soci.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 UnicodeString CURSOR = UNICODE_STRING_SIMPLE("{CURSOR}");
 

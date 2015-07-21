@@ -23,12 +23,12 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/filefn.h>
 #include <wx/stdpaths.h>
 #include <wx/timer.h>
 #include <wx/tokenzr.h>
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <algorithm>
 #include <vector>
 #include "FileTestFixtureClass.h"

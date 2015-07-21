@@ -22,8 +22,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/app.h>
 #include <wx/stdpaths.h>
 #include <wx/string.h>
@@ -35,6 +33,7 @@
 #include "language_php/CallStackClass.h"
 #include "language_php/TagCacheClass.h"
 #include "language_php/TagFinderList.h"
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 /**
  * Caches the given directory, putting all resources in the resource cache.

@@ -22,8 +22,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <soci/mysql/soci-mysql.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/uclean.h>
 #include <wx/wx.h>
 #include <vector>
@@ -31,6 +29,9 @@
 #include "actions/ProjectTagActionClass.h"
 #include "actions/SequenceClass.h"
 #include "actions/UrlTagDetectorActionClass.h"
+#include <soci/soci.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/mysql/soci-mysql.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 /**
  * This is a program that tests a single sequence or action in isolation.  This was

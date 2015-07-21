@@ -23,8 +23,6 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/event.h>
 #include "actions/ProjectTagActionClass.h"
 #include "ActionTestFixtureClass.h"
@@ -32,6 +30,8 @@
 #include "globals/Assets.h"
 #include "language_php/TagCacheClass.h"
 #include "TriumphChecks.h"
+#include <soci/soci.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 static int ID_EVENT = wxNewId();
 

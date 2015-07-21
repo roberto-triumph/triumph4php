@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#include <cstdarg>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/uclean.h>
 #include <UnitTest++.h>
-#include <cstdarg>
 #include <iostream>
 
 int main(int argc, char** argv) {

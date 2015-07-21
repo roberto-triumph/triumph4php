@@ -29,8 +29,8 @@
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <UnitTest++.h>
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
+#include <soci/soci.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 class CacheDbVersionActionFixtureClass : public ActionTestFixtureClass, public FileTestFixtureClass {
  public:

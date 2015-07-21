@@ -23,8 +23,6 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/stdpaths.h>
 #include <string>
 #include "globals/Assets.h"
@@ -32,6 +30,8 @@
 #include "globals/String.h"
 #include "language_php/DetectorDbClass.h"
 #include "SqliteTestFixtureClass.h"
+#include <soci/soci.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 class DetectorDbTestFixtureClass : public SqliteTestFixtureClass {
  public:

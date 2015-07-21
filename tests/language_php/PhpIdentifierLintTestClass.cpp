@@ -23,8 +23,6 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <vector>
 #include "FileTestFixtureClass.h"
 #include "globals/Assets.h"
@@ -36,6 +34,8 @@
 #include "language_php/TagFinderList.h"
 #include "SqliteTestFixtureClass.h"
 #include "TriumphChecks.h"
+#include <soci/soci.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 /**
  * fixture for the PHP identifier lint tests. Will create a
