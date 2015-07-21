@@ -23,8 +23,6 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 #include <vector>
 #include "FileTestFixtureClass.h"
@@ -33,6 +31,8 @@
 #include "language_php/TagCacheClass.h"
 #include "language_php/TagFinderList.h"
 #include "SqliteTestFixtureClass.h"
+#include <soci/soci.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 class PhpFunctionCallLintTestFixtureClass :
     public FileTestFixtureClass, public SqliteTestFixtureClass {

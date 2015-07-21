@@ -30,8 +30,8 @@
 #include <TestReporterStdout.h>
 #include <TestRunner.h>
 #include <unicode/uclean.h>
-#include <algorithm>
 #include <cstdarg>
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>

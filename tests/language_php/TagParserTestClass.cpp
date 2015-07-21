@@ -23,14 +23,14 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 #include <vector>
 #include "globals/Assets.h"
 #include "globals/Sqlite.h"
 #include "language_php/TagParserClass.h"
 #include "SqliteTestFixtureClass.h"
+#include <soci/soci.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
+#include <soci/sqlite3/soci-sqlite3.h>  // NOLINT(build/include_order) prevent 'va_list' has not been declared
 
 class TagParserTestFixtureClass : public SqliteTestFixtureClass {
  public:
