@@ -1,16 +1,16 @@
 -------------------------------------------------------------------
 -- This software is released under the terms of the MIT License
--- 
+--
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
 -- in the Software without restriction, including without limitation the rights
 -- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 -- copies of the Software, and to permit persons to whom the Software is
 -- furnished to do so, subject to the following conditions:
--- 
+--
 -- The above copyright notice and this permission notice shall be included in
 -- all copies or substantial portions of the Software.
--- 
+--
 -- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 -- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 -- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,22 +26,22 @@
 --
 -- This action perfoms linting of Triumph's source code by using
 -- google's C++ source code style linter.  This action should
--- be run before every push to the central repo. 
+-- be run before every push to the central repo.
 --
 function lint()
 	if os.is "windows" then
 		print "lint only works on linux or Mac OS X systems.\n";
 		os.exit(1);
-	elseif os.is "linux" or os.is "macosx" then  
+	elseif os.is "linux" or os.is "macosx" then
 		failMsg = "The lint action requires that python be installed."
 		programexistence("python", "--version", failMsg);
 
-		cmd = 'find -f profilers src tests tutorials view_tests -name "*.cpp" -or -name "*.h" | xargs python lib/googleStyleGuide/cpplint/cpplint.py';
+		cmd = 'find profilers src tests tutorials view_tests -name "*.cpp" -or -name "*.h" | xargs python lib/googleStyleGuide/cpplint/cpplint.py';
 		ret = os.execute(cmd);
 		if ret > 0 then
 			os.exit(1)
 		end
-	else 
+	else
 		print "Triumph does not support linting on this operating system.\n"
 	end
 end
