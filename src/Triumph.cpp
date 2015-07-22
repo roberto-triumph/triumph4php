@@ -41,7 +41,7 @@
 #include "views/FeatureViewClass.h"
 
 t4p::AppClass::AppClass(wxTimer& configModifiedTimer)
-    : Globals()
+			: Globals()
     , RunningThreads()
     , SqliteRunningThreads()
     , EventSink()
