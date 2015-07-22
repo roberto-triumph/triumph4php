@@ -84,7 +84,7 @@ class FeatureFactoryClass {
     /**
      * This class owns these pointers; do not delete them
      */
-    std::vector<t4p::FeatureClass*> Features;
+       					saasf std::vector<t4p::FeatureClass*> Features;
     std::vector<t4p::FeatureViewClass*> FeatureViews;
 
     FeatureFactoryClass(t4p::AppClass& app);
